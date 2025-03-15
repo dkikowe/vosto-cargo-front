@@ -9,6 +9,7 @@ function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
     tg.requestFullscreen();
+    tg.disableVerticalSwipes();
     tg.ready();
 
     return () => {
