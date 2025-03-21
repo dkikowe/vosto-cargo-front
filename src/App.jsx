@@ -1,9 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { useEffect } from "react";
 import "./App.css";
 import Header from "./components/Header/Header";
 import Nav from "./components/NavMenu/Nav";
 import Cabinet from "./Pages/Cabinet/Cabinet";
+import Start from "./Pages/Start/Start";
+import Create from "./Pages/Create/Create";
+import Company from "./Pages/Company/Company";
 
 function App() {
   useEffect(() => {
@@ -21,7 +29,11 @@ function App() {
       <Header />
       <Nav />
       <Routes>
-        <Route path="/" element={<Cabinet />} />
+        <Route path="/" element={<Navigate to="/start" replace />} />
+        <Route path="/start" element={<Start />} />
+        <Route path="/menu" element={<Cabinet />} />
+        <Route path="/create" element={<Create />} />
+        <Route path="/company" element={<Company />} />
       </Routes>
     </Router>
   );

@@ -1,30 +1,40 @@
+import { NavLink } from "react-router-dom";
 import s from "./Nav.module.sass";
 import { Menu, PackagePlus, Search, Bell, House } from "lucide-react";
 
 export default function Nav() {
+  // Массив навигационных элементов с путями, иконками и названиями
+  const navItems = [
+    { path: "/home", icon: <House className={s.icon} />, label: "Главная" },
+    { path: "/search", icon: <Search className={s.icon} />, label: "Поиск" },
+    {
+      path: "/create",
+      icon: <PackagePlus className={s.icon} />,
+      label: "Создать",
+    },
+    {
+      path: "/notifications",
+      icon: <Bell className={s.icon} />,
+      label: "Уведомления",
+    },
+    { path: "/menu", icon: <Menu className={s.icon} />, label: "Меню" },
+  ];
+
   return (
     <div className={s.container}>
       <div className={s.icons}>
-        <div className={s.iconDiv}>
-          <House сlassName={s.icon} />
-          <p className={s.navText}>Главная</p>
-        </div>
-        <div className={s.iconDiv}>
-          <Search сlassName={s.icon} />
-          <p className={s.navText}>Поиск</p>
-        </div>
-        <div className={s.iconDiv}>
-          <PackagePlus сlassName={s.icon} />
-          <p className={s.navText}>Создать </p>
-        </div>
-        <div className={s.iconDiv}>
-          <Bell сlassName={s.icon} />
-          <p className={s.navText}>Уведомления</p>
-        </div>
-        <div className={s.iconDivActive}>
-          <Menu сlassName={s.icon} />
-          <p className={s.navText}>Меню</p>
-        </div>
+        {navItems.map((item, index) => (
+          <NavLink
+            key={index}
+            to={item.path}
+            className={({ isActive }) =>
+              isActive ? s.iconDivActive : s.iconDiv
+            }
+          >
+            {item.icon}
+            <p className={s.navText}>{item.label}</p>
+          </NavLink>
+        ))}
       </div>
     </div>
   );
