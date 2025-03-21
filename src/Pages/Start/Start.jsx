@@ -13,6 +13,9 @@ export default function Start() {
     { name: "Диспетчер", emoji: "📞" },
   ];
 
+  const validRoles = roles.map((role) => role.name);
+  // ["Грузодатель", "Грузоперевозчик", "Диспетчер"]
+
   const navigate = useNavigate();
   const userId = localStorage.getItem("id");
 
@@ -22,11 +25,11 @@ export default function Start() {
       axios
         .get(`/getUserById/${userId}`)
         .then((res) => {
-          if (res.data && res.data.role) {
-            // Если роль уже установлена, сразу переходим в меню
+          if (res.data && validRoles.includes(res.data.role)) {
+            // Если роль уже одна из допустимых, сразу переходим в меню
             navigate("/menu");
           } else {
-            // Если роль не установлена, разрешаем отобразить выбор
+            // Если роль отсутствует, пустая или неверная — разрешаем выбрать
             setIsLoading(false);
           }
         })
@@ -39,7 +42,7 @@ export default function Start() {
       // Если userId нет, тоже показываем выбор роли
       setIsLoading(false);
     }
-  }, [userId, navigate]);
+  }, [userId, navigate, validRoles]);
 
   const handleNext = async () => {
     try {
@@ -56,7 +59,7 @@ export default function Start() {
     return <div className={s.loading}>Загрузка...</div>;
   }
 
-  // Если проверка закончилась и роли нет, показываем выбор
+  // Если проверка закончилась и роль не валидная, показываем выбор
   return (
     <div className={s.container}>
       <p className={s.who}>Кто вы?</p>
