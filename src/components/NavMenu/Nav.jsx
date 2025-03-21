@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import s from "./Nav.module.sass";
+import { NavLink } from "react-router-dom";
 import { Menu, PackagePlus, Search, Bell, House } from "lucide-react";
 
 export default function Nav() {
