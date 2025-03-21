@@ -1,9 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import s from "./Nav.module.sass";
 import { Menu, PackagePlus, Search, Bell, House } from "lucide-react";
 
 export default function Nav() {
-  // Массив навигационных элементов с путями, иконками и названиями
+  const location = useLocation();
+  const isStartPage = location.pathname === "/start";
+
   const navItems = [
     { path: "/home", icon: <House className={s.icon} />, label: "Главная" },
     { path: "/search", icon: <Search className={s.icon} />, label: "Поиск" },
@@ -21,7 +23,7 @@ export default function Nav() {
   ];
 
   return (
-    <div className={s.container}>
+    <div className={isStartPage ? s.containerDisabled : s.container}>
       <div className={s.icons}>
         {navItems.map((item, index) => (
           <NavLink
