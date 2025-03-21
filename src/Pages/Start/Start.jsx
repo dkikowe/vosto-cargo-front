@@ -46,6 +46,9 @@ export default function Start() {
 
   const handleNext = async () => {
     try {
+      console.log("userId:", userId);
+      console.log("role:", selected);
+
       await axios.post("/setRole", { userId, role: selected });
       navigate("/menu");
     } catch (error) {
