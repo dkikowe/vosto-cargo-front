@@ -18,6 +18,44 @@ export default function Start() {
 
   const navigate = useNavigate();
   const userId = localStorage.getItem("id");
+  const initData = window.Telegram.WebApp.initData;
+
+  useEffect(() => {
+    try {
+      if (initData) {
+        const params = new URLSearchParams(initData);
+        const userData = params.get("user");
+
+        if (userData) {
+          const userObj = JSON.parse(decodeURIComponent(userData));
+          console.log(userObj);
+
+          if (!userObj.id) {
+            alert("Не удалось получить Telegram ID");
+            return;
+          }
+
+          axios
+            .post("/getTelegramId", {
+              initData: userObj.id,
+              img: userObj.photo_url,
+              name: userObj.username,
+            })
+            .then((response) => {
+              if (response.data?.user?._id) {
+                localStorage.setItem("id", response.data.user._id);
+              }
+            })
+            .catch((error) => {
+              console.error("Ошибка при отправке данных:", error);
+              alert("Произошла ошибка");
+            });
+        }
+      }
+    } catch (error) {
+      console.error("Ошибка при разборе initData:", error);
+    }
+  }, [initData]);
 
   // Проверяем наличие роли у пользователя при загрузке компонента
   useEffect(() => {
