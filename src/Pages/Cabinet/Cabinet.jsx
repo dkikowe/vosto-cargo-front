@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import AvatarEditor from "react-avatar-editor";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "../../axios";
-import { Star, Headset, ChevronRight, Building2 } from "lucide-react";
+import { User, Star, Headset, ChevronRight, Building2 } from "lucide-react";
 import s from "./Cabinet.module.sass";
 
 export default function Cabinet() {
+  //   const initData =
+  // "user=%7B%22id%22%3A5056024242%2C%22first_name%22%3A%22%3C%5C%2Fabeke%3E%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22abylaikak%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FAj3hfrbNq8PfLLKvsSp3-WizcXTc3HO8Vynsw3R1a1A5spK3fDmZERABNoOGLEQN.svg%22%7D&chat_instance=-4908992446394523843&chat_type=private&auth_date=1735556539&signature=pgNJfzcxYGAcJCJ_jnsYEsmiTJJxOP2tNKb941-fT7QcsUQ2chSkFcItG8KvjR_r3nH0vem4bxtlltuyX-IwBQ&hash=c0b510163f5b1dea53172644df35e63458216a9d5d9a10413af4f5b0204bb493";
+  const initData = window.Telegram.WebApp.initData;
   const navigate = useNavigate();
-  const location = useLocation();
   const id = localStorage.getItem("id");
-
-  // Если роль передана из Start, получаем её из location.state
-  const passedRole = location.state?.role || "";
-
   const [user, setUser] = useState(null);
   const [company, setCompany] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,44 +20,92 @@ export default function Cabinet() {
   const [scale, setScale] = useState(1.2);
 
   const [name, setName] = useState("");
-  const [role, setRole] = useState(""); // локальное поле роли
+  const [role, setRole] = useState("");
 
-  // При монтировании получаем данные пользователя
   useEffect(() => {
-    if (!id) {
-      navigate("/start");
-      return;
-    }
-    axios.get(`/getUserById/${id}`).then((res) => {
-      if (res.data) {
-        setUser(res.data);
-        setName(res.data.name || "Ваше имя");
-        setRole(res.data.role || ""); // если роль уже установлена на сервере, используем её
-        setCompany(res.data.company);
-        setIsLoading(false);
+    try {
+      if (initData) {
+        const params = new URLSearchParams(initData);
+        const userData = params.get("user");
+
+        if (userData) {
+          const userObj = JSON.parse(decodeURIComponent(userData));
+          console.log(userObj);
+
+          if (!userObj.id) {
+            alert("Не удалось получить Telegram ID");
+            return;
+          }
+
+          axios
+            .post("/getTelegramId", {
+              initData: userObj.id,
+              img: userObj.photo_url,
+              name: userObj.username ? userObj.username : userObj.first_name,
+            })
+            .then((response) => {
+              if (response.data?.user?._id) {
+                localStorage.setItem("id", response.data.user._id);
+              }
+            })
+            .catch((error) => {
+              console.error("Ошибка при отправке данных:", error);
+              alert("Произошла ошибка");
+            });
+        }
       }
-    });
-  }, [id, navigate]);
+    } catch (error) {
+      console.error("Ошибка при разборе initData:", error);
+    }
+  }, [initData]);
 
-  // Если роль передана из Start и отличается от полученной, устанавливаем её
   useEffect(() => {
-    if (passedRole && passedRole !== role && id) {
+    if (id) {
+      axios.get(`/getUserById/${id}`).then((res) => {
+        if (res.data) {
+          console.log(res.data);
+          setUser(res.data);
+          setName(res.data.name || "Ваше имя");
+          setRole(res.data.role);
+          setCompany(res.data.company);
+          setIsLoading(false);
+        }
+      });
+    }
+  }, [id]);
+
+  // Новый useEffect для получения информации о компании
+  useEffect(() => {
+    if (id) {
       axios
-        .post("/setRole", { userId: id, role: passedRole })
-        .then(() => {
-          setRole(passedRole);
+        .get(`/getCompany/${id}`)
+        .then((res) => {
+          console.log(res);
+          if (res.data && res.data.company) {
+            сonsole.log(res.data.company);
+          }
         })
         .catch((error) => {
-          console.error("Ошибка при установке роли:", error);
+          console.error("Ошибка при получении данных компании:", error);
         });
     }
-  }, [passedRole, role, id]);
+  }, [id]);
+
+  function handleNavigate(path) {
+    navigate(`/${path}`);
+  }
 
   const saveName = () => {
     axios
-      .post("/saveName", { userId: id, name })
-      .then((res) => {
-        alert("Успешно изменено имя");
+      .post("/saveName", {
+        userId: id,
+        name,
+      })
+      .then((res) => res.data)
+      .then((data) => {
+        if (data) {
+          alert("Успешно изменено имя");
+        }
       })
       .catch((err) => {
         console.log(err.message);
@@ -75,14 +121,19 @@ export default function Cabinet() {
 
   const handleSaveAvatar = async () => {
     if (!editor) return;
+
     setIsLoading(true);
+
     const canvas = editor.getImageScaledToCanvas();
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
       formData.append("photo", blob, "avatar.png");
+
       try {
         const response = await axios.post(`/uploadPhoto/${id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         });
         console.log("Upload successful:", response.data);
         setUser((prev) => ({ ...prev, avatar: URL.createObjectURL(blob) }));
@@ -94,18 +145,6 @@ export default function Cabinet() {
       }
     });
   };
-
-  function handleNavigate(path) {
-    navigate(`/${path}`);
-  }
-
-  if (isLoading) {
-    return (
-      <div className={s.container}>
-        <p>Загрузка...</p>
-      </div>
-    );
-  }
 
   return (
     <div className={s.container}>
@@ -142,7 +181,9 @@ export default function Cabinet() {
               <>
                 <img
                   src={user?.avatar || "/images/nav-icons/user.svg"}
-                  className={s.profileIcon}
+                  className={`${s.profileIcon} ${
+                    avatarLoaded ? "opacity-100" : "opacity-0"
+                  }`}
                   alt=""
                   onLoad={() => setAvatarLoaded(true)}
                 />
@@ -168,7 +209,7 @@ export default function Cabinet() {
               className={s.name}
               onBlur={saveName}
             />
-            <p className={s.role}>{role || "Роль не установлена"}</p>
+            <p className={s.role}>{role}</p>
           </div>
         </div>
         <hr />
