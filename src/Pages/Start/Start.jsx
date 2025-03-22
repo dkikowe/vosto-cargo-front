@@ -81,7 +81,7 @@ export default function Start() {
       // Если userId нет, тоже показываем выбор роли
       setIsLoading(false);
     }
-  }, [userId, navigate, validRoles]);
+  }, [id, navigate, validRoles]);
 
   const handleNext = async () => {
     try {
