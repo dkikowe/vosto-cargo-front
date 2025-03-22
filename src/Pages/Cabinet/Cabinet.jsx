@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useNavigate } from "react-router-dom";
 import axios from "../../axios";
@@ -21,6 +21,8 @@ export default function Cabinet() {
 
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
+  // Состояние для темы: "light" или "dark"
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
     try {
@@ -68,6 +70,10 @@ export default function Cabinet() {
           setName(res.data.name || "Ваше имя");
           setRole(res.data.role);
           setCompany(res.data.company);
+          // Устанавливаем тему из полученных данных, если она есть
+          if (res.data.theme) {
+            setTheme(res.data.theme);
+          }
           setIsLoading(false);
         }
       });
@@ -146,8 +152,29 @@ export default function Cabinet() {
     });
   };
 
+  // Обработчик переключения темы
+  const handleThemeToggle = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+
+    // Вызываем API для сохранения новой темы пользователя
+    axios
+      .post("/saveTheme", { userId: id, theme: newTheme })
+      .then((res) => {
+        console.log("Theme saved:", res.data);
+      })
+      .catch((err) => {
+        console.error("Ошибка при сохранении темы:", err);
+      });
+  };
+
+  if (isLoading) {
+    return <div>Загрузка...</div>;
+  }
+
   return (
-    <div className={s.container}>
+    // Применяем классы в зависимости от выбранной темы: light или dark
+    <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
       <div className={s.profileContainer}>
         <div className={s.profile}>
           <label htmlFor="image" className="w-[97px] relative">
@@ -210,6 +237,18 @@ export default function Cabinet() {
               onBlur={saveName}
             />
             <p className={s.role}>{role}</p>
+          </div>
+          {/* Переключатель темы */}
+          <div className={s.themeToggle}>
+            <label className={s.switch}>
+              <input
+                type="checkbox"
+                checked={theme === "dark"}
+                onChange={handleThemeToggle}
+              />
+              <span className={s.slider}></span>
+            </label>
+            <span>{theme === "dark" ? "Тёмная тема" : "Светлая тема"}</span>
           </div>
         </div>
         <hr />
