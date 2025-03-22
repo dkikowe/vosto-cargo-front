@@ -79,6 +79,7 @@ export default function Cabinet() {
       axios
         .get(`/getCompany/${id}`)
         .then((res) => {
+          console.log(res);
           if (res.data && res.data.company) {
             setCompany(res.data.company);
           }
