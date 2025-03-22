@@ -82,7 +82,7 @@ export default function Cabinet() {
         .then((res) => {
           console.log(res);
           if (res.data && res.data.company) {
-            setCompany(res.data.company);
+            сonsole.log(res.data.company);
           }
         })
         .catch((error) => {
