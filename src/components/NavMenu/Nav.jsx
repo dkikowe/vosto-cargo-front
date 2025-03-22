@@ -11,6 +11,7 @@ export default function Nav() {
   useEffect(() => {
     // Загружаем тему из localStorage или по умолчанию белая
     const storedTheme = localStorage.getItem("theme") || "light";
+    console.log(storedTheme);
     setTheme(storedTheme);
   }, []);
 
