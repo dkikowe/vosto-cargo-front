@@ -36,7 +36,7 @@ export default function Start() {
             .post("/getTelegramId", {
               initData: userObj.id,
               img: userObj.photo_url,
-              name: userObj.username || userObj.first_name,
+              name: userObj.username ? userObj.username : userObj.first_name,
             })
             .then((response) => {
               if (response.data?.user?._id) {
