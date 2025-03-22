@@ -1,11 +1,18 @@
-import { useLocation } from "react-router-dom";
-import s from "./Nav.module.sass";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, NavLink } from "react-router-dom";
 import { Menu, PackagePlus, Search, Bell, House } from "lucide-react";
+import s from "./Nav.module.sass";
 
 export default function Nav() {
   const location = useLocation();
   const isStartPage = location.pathname === "/start";
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    // Загружаем тему из localStorage или по умолчанию белая
+    const storedTheme = localStorage.getItem("theme") || "light";
+    setTheme(storedTheme);
+  }, []);
 
   const navItems = [
     { path: "/home", icon: <House className={s.icon} />, label: "Главная" },
@@ -24,7 +31,13 @@ export default function Nav() {
   ];
 
   return (
-    <div className={isStartPage ? s.containerDisabled : s.container}>
+    <div
+      className={
+        isStartPage
+          ? s.containerDisabled
+          : `${s.container} ${theme === "dark" ? s.dark : s.light}`
+      }
+    >
       <div className={s.icons}>
         {navItems.map((item, index) => (
           <NavLink

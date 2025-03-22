@@ -24,6 +24,12 @@ export default function Cabinet() {
   // Состояние для темы: "light" или "dark"
   const [theme, setTheme] = useState("light");
 
+  // Загружаем тему из localStorage при монтировании
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme") || "light";
+    setTheme(storedTheme);
+  }, []);
+
   useEffect(() => {
     try {
       if (initData) {
@@ -73,6 +79,7 @@ export default function Cabinet() {
           // Устанавливаем тему из полученных данных, если она есть
           if (res.data.theme) {
             setTheme(res.data.theme);
+            localStorage.setItem("theme", res.data.theme);
           }
           setIsLoading(false);
         }
@@ -88,7 +95,7 @@ export default function Cabinet() {
         .then((res) => {
           console.log(res);
           if (res.data && res.data.company) {
-            сonsole.log(res.data.company);
+            console.log(res.data.company);
           }
         })
         .catch((error) => {
@@ -152,12 +159,12 @@ export default function Cabinet() {
     });
   };
 
-  // Обработчик переключения темы
+  // Обработчик переключения темы: сохраняем новую тему в localStorage и на сервере
   const handleThemeToggle = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
 
-    // Вызываем API для сохранения новой темы пользователя
     axios
       .post("/saveTheme", { userId: id, theme: newTheme })
       .then((res) => {
