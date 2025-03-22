@@ -11,6 +11,29 @@
         background: #121212 // темный фон
         color: #ffffff // светлый текст
 
+    .profileContainer
+        width: 90%
+        height: 25%
+        border-radius: 15px
+        background: #ffffff
+        display: flex
+        flex-direction: column
+        justify-content: flex-start
+        align-items: center
+        gap: 10px
+        padding: 20px
+
+    &.dark
+        background: #1e1e1e
+        color: #ffffff
+
+    hr
+        width: 100%
+        color: #e3e3e3
+        align-items: flex-end
+        margin-left: auto
+        display: block
+
 .paymentContainer
     width: 90%
     border-radius: 15px
@@ -63,29 +86,6 @@
     font-weight: 500
     margin-left: 30px
     font-size: 24px
-
-.profileContainer
-    width: 90%
-    height: 25%
-    border-radius: 15px
-    background: #ffffff
-    display: flex
-    flex-direction: column
-    justify-content: flex-start
-    align-items: center
-    gap: 10px
-    padding: 20px
-
-    &.dark
-        background: #1e1e1e
-        color: #ffffff
-
-    hr
-        width: 100%
-        color: #e3e3e3
-        align-items: flex-end
-        margin-left: auto
-        display: block
 
 .overlay
     position: fixed
