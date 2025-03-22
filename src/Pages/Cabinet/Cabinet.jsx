@@ -65,7 +65,7 @@ export default function Cabinet() {
         if (res.data) {
           console.log(res.data);
           setUser(res.data);
-          setName(res.data.name || res.data.first_name || "Ваше имя");
+          setName(res.data.name || "Ваше имя");
           setRole(res.data.role);
           setCompany(res.data.company);
           setIsLoading(false);

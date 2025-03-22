@@ -28,7 +28,7 @@ export default function Start() {
 
         if (userData) {
           const userObj = JSON.parse(decodeURIComponent(userData));
-          console.log(userObj);
+          console.log("userobj:", userObj);
 
           if (!userObj.id) {
             alert("Не удалось получить Telegram ID");
