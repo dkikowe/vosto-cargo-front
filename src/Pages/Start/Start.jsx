@@ -17,7 +17,7 @@ export default function Start() {
   // ["Грузодатель", "Грузоперевозчик", "Диспетчер"]
 
   const navigate = useNavigate();
-  const id = localStorage.getItem("id");
+  const userId = localStorage.getItem("id");
   const initData = window.Telegram.WebApp.initData;
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function Start() {
 
         if (userData) {
           const userObj = JSON.parse(decodeURIComponent(userData));
-          console.log("userobj:", userObj);
+          console.log(userObj);
 
           if (!userObj.id) {
             alert("Не удалось получить Telegram ID");
@@ -60,9 +60,9 @@ export default function Start() {
 
   // Проверяем наличие роли у пользователя при загрузке компонента
   useEffect(() => {
-    if (id) {
+    if (userId) {
       axios
-        .get(`/getUserById/${id}`)
+        .get(`/getUserById/${userId}`)
         .then((res) => {
           if (res.data && validRoles.includes(res.data.role)) {
             // Если роль уже одна из допустимых, сразу переходим в меню
@@ -81,14 +81,14 @@ export default function Start() {
       // Если userId нет, тоже показываем выбор роли
       setIsLoading(false);
     }
-  }, [id, navigate, validRoles]);
+  }, [userId, navigate, validRoles]);
 
   const handleNext = async () => {
     try {
-      console.log("userId:", id);
+      console.log("userId:", userId);
       console.log("role:", selected);
 
-      await axios.post("/setRole", { id, role: selected });
+      await axios.post("/setRole", { userId, role: selected });
       navigate("/menu");
     } catch (error) {
       console.error("Ошибка при установке роли:", error);
