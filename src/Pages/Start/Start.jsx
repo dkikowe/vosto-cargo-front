@@ -17,7 +17,7 @@ export default function Start() {
   // ["Грузодатель", "Грузоперевозчик", "Диспетчер"]
 
   const navigate = useNavigate();
-  const userId = localStorage.getItem("id");
+  const id = localStorage.getItem("id");
   const initData = window.Telegram.WebApp.initData;
 
   useEffect(() => {
@@ -60,9 +60,9 @@ export default function Start() {
 
   // Проверяем наличие роли у пользователя при загрузке компонента
   useEffect(() => {
-    if (userId) {
+    if (id) {
       axios
-        .get(`/getUserById/${userId}`)
+        .get(`/getUserById/${id}`)
         .then((res) => {
           if (res.data && validRoles.includes(res.data.role)) {
             // Если роль уже одна из допустимых, сразу переходим в меню
@@ -85,10 +85,10 @@ export default function Start() {
 
   const handleNext = async () => {
     try {
-      console.log("userId:", userId);
+      console.log("userId:", id);
       console.log("role:", selected);
 
-      await axios.post("/setRole", { userId, role: selected });
+      await axios.post("/setRole", { id, role: selected });
       navigate("/menu");
     } catch (error) {
       console.error("Ошибка при установке роли:", error);
