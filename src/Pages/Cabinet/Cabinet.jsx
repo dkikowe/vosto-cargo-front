@@ -67,6 +67,7 @@ export default function Cabinet() {
           setUser(res.data);
           setName(res.data.name || "Ваше имя");
           setRole(res.data.role);
+          setCompany(res.data.company);
           setIsLoading(false);
         }
       });
