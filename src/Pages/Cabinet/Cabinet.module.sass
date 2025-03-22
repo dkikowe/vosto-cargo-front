@@ -1,75 +1,90 @@
 .container
     display: flex
     flex-direction: column
-    background: #f5f5f5
+    background: #f5f5f5 // светлая тема по умолчанию
     gap: 20px
     align-items: center
     padding-top: 90px
     height: calc(100vh - 80px)
 
-    .paymentContainer
-        width: 90%
-        border-radius: 15px
-        background: #ffffff
-        display: flex
-        flex-direction: column
-        .str
-            color: #dadada
-        hr
-            width: 82%
-            color: #e3e3e3
-            align-items: flex-end
-            margin-left: auto
-            display: block
+    &.dark
+        background: #121212 // темный фон
+        color: #ffffff // светлый текст
 
-        .premium
-            gap: 150px
-            padding: 10px
-            margin-left: 10px
-            display: flex
-            justify-content: space-between
-            align-items: center
-            flex-direction: row
-            .iconText
-                display: flex
-                flex-direction: row
-                gap: 20px
-                align-items: center
+.paymentContainer
+    width: 90%
+    border-radius: 15px
+    background: #ffffff
+    display: flex
+    flex-direction: column
 
-        .support
-            gap: 20px
-            padding: 10px
-            margin-left: 10px
-            display: flex
-            justify-content: space-between
-            align-items: center
-            flex-direction: row
-            .iconText
-                display: flex
-                flex-direction: row
-                gap: 20px
+    .dark &  // для темной темы, если контейнер находится внутри .dark
+        background: #1e1e1e
 
-    .title
-        font-weight: 500
-        margin-left: 30px
-        font-size: 24px
-    .profileContainer
-        width: 90%
-        height: 25%
-        border-radius: 15px
-        background: #ffffff
-        display: flex
-        flex-direction: column
-        justify-content: flex-start
-        align-items: center
-        gap: 10px
-        padding: 20px
-        hr
-            width: 100%
-            color: #e3e3e3
-            align-items: flex-end
-            margin-left: auto
-            display: block
+.str
+    color: #dadada
+hr
+    width: 82%
+    color: #e3e3e3
+    align-items: flex-end
+    margin-left: auto
+    display: block
+
+.premium
+    gap: 150px
+    padding: 10px
+    margin-left: 10px
+    display: flex
+    justify-content: space-between
+    align-items: center
+    flex-direction: row
+
+.iconText
+    display: flex
+    flex-direction: row
+    gap: 20px
+    align-items: center
+
+.support
+    gap: 20px
+    padding: 10px
+    margin-left: 10px
+    display: flex
+    justify-content: space-between
+    align-items: center
+    flex-direction: row
+
+.iconText
+    display: flex
+    flex-direction: row
+    gap: 20px
+
+.title
+    font-weight: 500
+    margin-left: 30px
+    font-size: 24px
+
+.profileContainer
+    width: 90%
+    height: 25%
+    border-radius: 15px
+    background: #ffffff
+    display: flex
+    flex-direction: column
+    justify-content: flex-start
+    align-items: center
+    gap: 10px
+    padding: 20px
+
+    &.dark
+        background: #1e1e1e
+
+hr
+    width: 100%
+    color: #e3e3e3
+    align-items: flex-end
+    margin-left: auto
+    display: block
 
 .overlay
     position: fixed
@@ -87,7 +102,6 @@
     background: rgba(0, 0, 0, 0)
     padding: 10px
     border-radius: 12px
-
     text-align: center
     display: flex
     flex-direction: column
@@ -115,29 +129,30 @@ input[type="range"]
 
     &:hover
         background: #0056b3
+
 .profile
     display: flex
     justify-content: left
     align-items: flex-start
     width: 80vw
     gap: 10px
+
 .company
     display: flex
     flex-direction: row
     align-items: center
     justify-content: space-between
-
     width: 90vw
     padding: 10px
 
-    .icon
-        display: flex
-        align-items: center
-        gap: 10px
-        margin-left: 10px
+.icon
+    display: flex
+    align-items: center
+    gap: 10px
+    margin-left: 10px
 
-    .str
-        color: #dadada
+.str
+    color: #dadada
 
 .name
     border: none
@@ -145,9 +160,11 @@ input[type="range"]
     font-weight: 500
     outline: none
     padding: 0
+
 .role
     color: #696969
     font-size: 14px
+
 .profileIcon
     position: relative
     width: 70px
@@ -199,3 +216,9 @@ input:checked + .slider
 
 input:checked + .slider:before
     transform: translateX(26px)
+
+.dark
+    .slider
+        background-color: #555 // более темный фон для переключателя
+    input:checked + .slider
+        background-color: #0d6efd // можно изменить под свои нужды
