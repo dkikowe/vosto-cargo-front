@@ -271,6 +271,27 @@ export default function Cabinet() {
           </div>
         </div>
       </div>
+      <div className={s.paymentContainer}>
+        <div className={s.premium}>
+          <div className={s.iconText}>
+            <LockKeyhole />
+            <p>Политика конфеденцианольсти</p>
+          </div>
+          <div className={s.str}>
+            <ChevronRight />
+          </div>
+        </div>
+        <hr />
+        <div className={s.support}>
+          <div className={s.iconText}>
+            <Settings />
+            <p>Настройки приложения</p>
+          </div>
+          <div className={s.str}>
+            <ChevronRight />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
