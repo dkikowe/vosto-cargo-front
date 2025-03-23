@@ -2,7 +2,15 @@ import React, { useContext, useEffect, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useNavigate } from "react-router-dom";
 import axios from "../../axios";
-import { Star, Headset, ChevronRight, Building2, SunMoon } from "lucide-react";
+import {
+  Star,
+  Headset,
+  ChevronRight,
+  Building2,
+  SunMoon,
+  Settings,
+  LockKeyhole,
+} from "lucide-react";
 import s from "./Cabinet.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
 
