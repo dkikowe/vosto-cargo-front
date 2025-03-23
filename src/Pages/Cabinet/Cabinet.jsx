@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useNavigate } from "react-router-dom";
 import axios from "../../axios";
-import { User, Star, Headset, ChevronRight, Building2 } from "lucide-react";
+import { Star, Headset, ChevronRight, Building2 } from "lucide-react";
 import s from "./Cabinet.module.sass";
+import { ThemeContext } from "../../context/ThemeContext";
 
 export default function Cabinet() {
-  //   const initData =
-  // "user=%7B%22id%22%3A5056024242%2C%22first_name%22%3A%22%3C%5C%2Fabeke%3E%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22abylaikak%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FAj3hfrbNq8PfLLKvsSp3-WizcXTc3HO8Vynsw3R1a1A5spK3fDmZERABNoOGLEQN.svg%22%7D&chat_instance=-4908992446394523843&chat_type=private&auth_date=1735556539&signature=pgNJfzcxYGAcJCJ_jnsYEsmiTJJxOP2tNKb941-fT7QcsUQ2chSkFcItG8KvjR_r3nH0vem4bxtlltuyX-IwBQ&hash=c0b510163f5b1dea53172644df35e63458216a9d5d9a10413af4f5b0204bb493";
   const initData = window.Telegram.WebApp.initData;
   const navigate = useNavigate();
   const id = localStorage.getItem("id");
+
   const [user, setUser] = useState(null);
   const [company, setCompany] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,15 +21,11 @@ export default function Cabinet() {
 
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
-  // Состояние для темы: "light" или "dark"
-  const [theme, setTheme] = useState("light");
 
-  // Загружаем тему из localStorage при монтировании
-  useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") || "light";
-    setTheme(storedTheme);
-  }, []);
+  // Получаем тему и функцию переключения из контекста
+  const { theme, toggleTheme } = useContext(ThemeContext);
 
+  // Инициализация данных из Telegram и получение пользователя
   useEffect(() => {
     try {
       if (initData) {
@@ -39,7 +35,6 @@ export default function Cabinet() {
         if (userData) {
           const userObj = JSON.parse(decodeURIComponent(userData));
           console.log(userObj);
-
           if (!userObj.id) {
             alert("Не удалось получить Telegram ID");
             return;
@@ -76,9 +71,10 @@ export default function Cabinet() {
           setName(res.data.name || "Ваше имя");
           setRole(res.data.role);
           setCompany(res.data.company);
-          // Устанавливаем тему из полученных данных, если она есть
+          // Если серверная тема есть, сохраняем её в localStorage через контекст
           if (res.data.theme) {
-            setTheme(res.data.theme);
+            // Здесь можно вызвать toggleTheme, если значение отличается, или просто сохранить
+            // Для простоты просто сохраняем в localStorage (а контекст уже загружен при монтировании)
             localStorage.setItem("theme", res.data.theme);
           }
           setIsLoading(false);
@@ -87,7 +83,7 @@ export default function Cabinet() {
     }
   }, [id]);
 
-  // Новый useEffect для получения информации о компании
+  // Получение информации о компании (если требуется)
   useEffect(() => {
     if (id) {
       axios
@@ -110,10 +106,7 @@ export default function Cabinet() {
 
   const saveName = () => {
     axios
-      .post("/saveName", {
-        userId: id,
-        name,
-      })
+      .post("/saveName", { userId: id, name })
       .then((res) => res.data)
       .then((data) => {
         if (data) {
@@ -134,19 +127,14 @@ export default function Cabinet() {
 
   const handleSaveAvatar = async () => {
     if (!editor) return;
-
     setIsLoading(true);
-
     const canvas = editor.getImageScaledToCanvas();
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
       formData.append("photo", blob, "avatar.png");
-
       try {
         const response = await axios.post(`/uploadPhoto/${id}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         });
         console.log("Upload successful:", response.data);
         setUser((prev) => ({ ...prev, avatar: URL.createObjectURL(blob) }));
@@ -159,28 +147,12 @@ export default function Cabinet() {
     });
   };
 
-  // Обработчик переключения темы: сохраняем новую тему в localStorage и на сервере
-  const handleThemeToggle = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-
-    axios
-      .post("/saveTheme", { userId: id, theme: newTheme })
-      .then((res) => {
-        console.log("Theme saved:", res.data);
-      })
-      .catch((err) => {
-        console.error("Ошибка при сохранении темы:", err);
-      });
-  };
-
   if (isLoading) {
     return <div>Загрузка...</div>;
   }
 
   return (
-    // Применяем классы в зависимости от выбранной темы: light или dark
+    // Применяем классы в зависимости от выбранной темы
     <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
       <div className={s.profileContainer}>
         <div className={s.profile}>
@@ -251,7 +223,7 @@ export default function Cabinet() {
               <input
                 type="checkbox"
                 checked={theme === "dark"}
-                onChange={handleThemeToggle}
+                onChange={toggleTheme}
               />
               <span className={s.slider}></span>
             </label>
