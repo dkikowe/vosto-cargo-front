@@ -280,7 +280,7 @@ export default function Cabinet() {
         </div>
       </div>
       <div className={s.paymentContainer}>
-        <div className={s.premium}>
+        <div className={s.support}>
           <div className={s.iconText}>
             <LockKeyhole />
             <p>Конфеденцианольсть</p>
