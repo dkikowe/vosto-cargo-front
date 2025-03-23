@@ -39,6 +39,7 @@ export default function Start() {
               name: userObj.username ? userObj.username : userObj.first_name,
             })
             .then((response) => {
+              console.log(response.data);
               if (response.data?.user?._id) {
                 localStorage.setItem("id", response.data.user._id);
               }
