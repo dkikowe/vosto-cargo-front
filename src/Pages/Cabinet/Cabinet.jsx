@@ -283,7 +283,7 @@ export default function Cabinet() {
         <div className={s.premium}>
           <div className={s.iconText}>
             <LockKeyhole />
-            <p>Политика конфеденцианольсти</p>
+            <p>Конфеденцианольсть</p>
           </div>
           <div className={s.str}>
             <ChevronRight />
