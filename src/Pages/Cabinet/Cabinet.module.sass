@@ -214,7 +214,7 @@ input[type="range"]
     border-radius: 50%
 
 input:checked + .slider
-    background-color: #2196f3
+    background-color: #21f32f
 
 input:checked + .slider:before
     transform: translateX(26px)
@@ -224,3 +224,22 @@ input:checked + .slider:before
         background-color: #555 // более темный фон для переключателя
     input:checked + .slider
         background-color: #0d6efd // можно изменить под свои нужды
+
+.themeChanger
+    width: 90%
+    border-radius: 15px
+    background: #ffffff
+    display: flex
+    flex-direction: column
+
+    .dark &  // для темной темы, если контейнер находится внутри .dark
+        background: #1e1e1e
+
+    .change
+        gap: 150px
+        padding: 10px
+        margin-left: 10px
+        display: flex
+        justify-content: space-between
+        align-items: center
+        flex-direction: row

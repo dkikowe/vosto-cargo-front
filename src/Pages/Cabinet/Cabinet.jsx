@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useNavigate } from "react-router-dom";
 import axios from "../../axios";
-import { Star, Headset, ChevronRight, Building2 } from "lucide-react";
+import { Star, Headset, ChevronRight, Building2, SunMoon } from "lucide-react";
 import s from "./Cabinet.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -261,6 +261,24 @@ export default function Cabinet() {
           </div>
           <div className={s.str}>
             <ChevronRight />
+          </div>
+        </div>
+      </div>
+      <div className={s.themeChanger}>
+        <div className={s.change}>
+          <div className={s.iconText}>
+            <SunMoon />
+            <p>{theme === "dark" ? "Тёмная тема" : "Светлая тема"}</p>
+          </div>
+          <div className={s.themeToggle}>
+            <label className={s.switch}>
+              <input
+                type="checkbox"
+                checked={theme === "dark"}
+                onChange={toggleTheme}
+              />
+              <span className={s.slider}></span>
+            </label>
           </div>
         </div>
       </div>
