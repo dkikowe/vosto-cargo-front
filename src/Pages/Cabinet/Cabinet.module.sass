@@ -6,12 +6,14 @@
     align-items: center
     padding-top: 90px
     height: calc(100vh - 80px)
+    transition: background 0.3s ease, color 0.3s ease
 
     &.dark
         background: #121212 // темный фон
         color: #ffffff // светлый текст
         .profileContainer
             background: #1e1e1e
+            transition: background 0.3s ease
 
 .paymentContainer
     width: 90%
@@ -19,6 +21,7 @@
     background: #ffffff
     display: flex
     flex-direction: column
+    transition: background 0.3s ease
 
     .dark &  // для темной темы, если контейнер находится внутри .dark
         background: #1e1e1e
@@ -77,6 +80,7 @@
     align-items: center
     gap: 10px
     padding: 20px
+    transition: background 0.3s ease, color 0.3s ease
 
     .dark &  // для темной темы, если контейнер находится внутри .dark
         background: #1e1e1e
@@ -127,7 +131,7 @@ input[type="range"]
     padding: 10px 15px
     border-radius: 6px
     cursor: pointer
-    transition: background 0.3s
+    transition: background 0.3s ease
 
     &:hover
         background: #0056b3
@@ -199,7 +203,7 @@ input[type="range"]
     right: 0
     bottom: 0
     background-color: #ccc
-    transition: 0.4s
+    transition: background-color 0.3s ease, transform 0.3s ease
     border-radius: 24px
 
 .slider:before
@@ -210,7 +214,7 @@ input[type="range"]
     left: 3px
     bottom: 3px
     background-color: white
-    transition: 0.4s
+    transition: transform 0.3s ease
     border-radius: 50%
 
 input:checked + .slider
@@ -231,12 +235,12 @@ input:checked + .slider:before
     background: #ffffff
     display: flex
     flex-direction: column
+    transition: background 0.3s ease
 
     .dark &  // для темной темы, если контейнер находится внутри .dark
         background: #1e1e1e
 
     .change
-
         padding: 10px
         margin-left: 10px
         display: flex

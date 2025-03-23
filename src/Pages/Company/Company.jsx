@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import s from "./Company.module.sass";
 import axios from "../../axios";
+import { ThemeContext } from "../../context/ThemeContext"; // Импортируем контекст темы
 
 export default function Company() {
+  const { theme } = useContext(ThemeContext);
   const userId = localStorage.getItem("id");
 
   // Состояния для всех полей компании
@@ -86,7 +88,8 @@ export default function Company() {
   };
 
   return (
-    <div className={s.container}>
+    // Применяем классы в зависимости от выбранной темы
+    <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
       <div className={s.innerContainer}>
         <h2>Информация о компании</h2>
         <form onSubmit={handleSubmit} className={s.form}>
