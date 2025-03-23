@@ -218,17 +218,6 @@ export default function Cabinet() {
             <p className={s.role}>{role}</p>
           </div>
           {/* Переключатель темы */}
-          <div className={s.themeToggle}>
-            <label className={s.switch}>
-              <input
-                type="checkbox"
-                checked={theme === "dark"}
-                onChange={toggleTheme}
-              />
-              <span className={s.slider}></span>
-            </label>
-            <span>{theme === "dark" ? "Тёмная тема" : "Светлая тема"}</span>
-          </div>
         </div>
         <hr />
         <div className={s.company} onClick={() => handleNavigate("company")}>
