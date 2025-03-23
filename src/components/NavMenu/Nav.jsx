@@ -39,7 +39,9 @@ export default function Nav() {
             key={index}
             to={item.path}
             className={({ isActive }) =>
-              isActive ? s.iconDivActive : s.iconDiv
+              isActive
+                ? `${s.iconDivActive} ${theme === "dark" ? s.dark : s.light}`
+                : s.iconDiv
             }
           >
             {item.icon}
