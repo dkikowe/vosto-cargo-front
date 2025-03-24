@@ -8,11 +8,16 @@ import { Edit, Trash2 } from "lucide-react";
 export default function CreateOrders() {
   const { theme } = useContext(ThemeContext);
   const userId = localStorage.getItem("id");
+
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [currentTab, setCurrentTab] = useState("active");
   const [orders, setOrders] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+
+  // Состояние редактируемой заявки (если null — создание новой)
+  const [editingOrder, setEditingOrder] = useState(null);
+
   // Форма для создания/редактирования заявки
   const [formData, setFormData] = useState({
     description: "",
@@ -44,9 +49,8 @@ export default function CreateOrders() {
     paymentMethod: "",
     isArchived: false,
   });
-  // Состояние редактируемой заявки (если null — создание новой)
-  const [editingOrder, setEditingOrder] = useState(null);
 
+  // Загружаем заказы
   const fetchUserOrders = async () => {
     try {
       if (!userId) return;
@@ -61,6 +65,7 @@ export default function CreateOrders() {
     fetchUserOrders();
   }, [userId]);
 
+  // Обработчик изменения полей формы
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -69,6 +74,7 @@ export default function CreateOrders() {
     }));
   };
 
+  // Сброс формы и сброс состояния "редактирования"
   const resetForm = () => {
     setFormData({
       description: "",
@@ -103,7 +109,8 @@ export default function CreateOrders() {
     setEditingOrder(null);
   };
 
-  const handleCreateOrUpdateOrder = async (e) => {
+  // Функция для создания нового заказа
+  const handleCreateOrder = async (e) => {
     e.preventDefault();
     if (!userId) return;
 
@@ -149,26 +156,88 @@ export default function CreateOrders() {
     };
 
     try {
-      if (editingOrder) {
-        // Редактирование заявки
-        const { data: updatedOrder } = await axios.put(
-          `/orders/${editingOrder._id}`, // <-- ID заявки в URL
-          payload
-        );
-        console.log("Заявка успешно обновлена:", updatedOrder);
-      } else {
-        // Создание новой заявки
-        const { data: savedOrder } = await axios.post("/orders", payload);
-        console.log("Заявка успешно создана:", savedOrder);
-      }
+      const { data: savedOrder } = await axios.post("/orders", payload);
+      console.log("Заявка успешно создана:", savedOrder);
+
       setShowForm(false);
       resetForm();
       fetchUserOrders();
     } catch (error) {
-      console.error("Ошибка создания/обновления заявки:", error);
+      console.error("Ошибка создания заявки:", error);
     }
   };
 
+  // Функция для обновления существующего заказа
+  const handleUpdateOrder = async (e) => {
+    e.preventDefault();
+    if (!userId || !editingOrder) return;
+
+    const payload = {
+      userId,
+      orderType: currentType,
+      description: formData.description,
+      loadingPlace: formData.loadingPlace,
+      unloadingPlace: formData.unloadingPlace,
+      cargoName: formData.cargoName,
+      volume: formData.volume ? Number(formData.volume) : undefined,
+      weight: formData.weight ? Number(formData.weight) : undefined,
+      temperature: formData.temperature
+        ? Number(formData.temperature)
+        : undefined,
+      bodyType: formData.bodyType,
+      loadingType: formData.loadingType,
+      TIR: formData.TIR,
+      CRM: formData.CRM,
+      medKnizhka: formData.medKnizhka,
+      licensePlate: formData.licensePlate,
+      brandAndModel: formData.brandAndModel,
+      machineType: formData.machineType,
+      payloadCapacity: formData.payloadCapacity
+        ? Number(formData.payloadCapacity)
+        : undefined,
+      bodyVolume: formData.bodyVolume ? Number(formData.bodyVolume) : undefined,
+      loadingTypes: formData.loadingTypes
+        ? formData.loadingTypes.split(",").map((el) => el.trim())
+        : [],
+      route: formData.route,
+      loadingDate: formData.loadingDate || undefined,
+      dateOption: formData.dateOption,
+      loadingPeriod: {
+        from: formData.loadingPeriodFrom || undefined,
+        to: formData.loadingPeriodTo || undefined,
+      },
+      EKMT: formData.EKMT,
+      ADR: formData.ADR ? formData.ADR.split(",").map((el) => el.trim()) : [],
+      gpsMonitoring: formData.gpsMonitoring,
+      paymentMethod: formData.paymentMethod,
+      isArchived: false,
+    };
+
+    try {
+      const { data: updatedOrder } = await axios.put(
+        `/orders/${editingOrder._id}`, // <-- ID заявки в URL
+        payload
+      );
+      console.log("Заявка успешно обновлена:", updatedOrder);
+
+      setShowForm(false);
+      resetForm();
+      fetchUserOrders();
+    } catch (error) {
+      console.error("Ошибка обновления заявки:", error);
+    }
+  };
+
+  // Общий onSubmit, который решает, нужно ли создавать или обновлять
+  const handleSubmitOrder = (e) => {
+    if (editingOrder) {
+      handleUpdateOrder(e);
+    } else {
+      handleCreateOrder(e);
+    }
+  };
+
+  // Архивирование / восстановление
   const handleToggleArchive = async (orderId, currentIsArchived) => {
     try {
       let updatedOrder;
@@ -195,10 +264,11 @@ export default function CreateOrders() {
     }
   };
 
+  // Заполнение формы при нажатии на «Редактировать»
   const handleEditOrder = (order) => {
-    // Заполняем форму данными выбранной заявки
     setEditingOrder(order);
     setCurrentType(order.orderType);
+
     setFormData({
       description: order.description || "",
       loadingPlace: order.loadingPlace || "",
@@ -233,10 +303,11 @@ export default function CreateOrders() {
       paymentMethod: order.paymentMethod || "",
       isArchived: order.isArchived || false,
     });
+
     setShowForm(true);
   };
 
-  // Пример вызова handleDeleteOrder
+  // Удаление заявки
   const handleDeleteOrder = async (orderId) => {
     try {
       await axios.delete("/orders", {
@@ -249,6 +320,7 @@ export default function CreateOrders() {
     }
   };
 
+  // Фильтрация заявок
   const filteredOrders = orders.filter((order) => {
     const isRightType = order.orderType === currentType;
     const isRightArchive =
@@ -256,12 +328,15 @@ export default function CreateOrders() {
     return isRightType && isRightArchive;
   });
 
+  // Визуальное смещение индикатора (Грузы / Машины)
   const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
 
+  // Логика кнопки "+"
   const handlePlusClick = () => {
     setShowMenu((prev) => !prev);
   };
 
+  // Добавить груз
   const handleAddCargo = () => {
     setEditingOrder(null);
     setCurrentType("CargoOrder");
@@ -270,6 +345,7 @@ export default function CreateOrders() {
     setShowMenu(false);
   };
 
+  // Добавить машину
   const handleAddMachine = () => {
     setEditingOrder(null);
     setCurrentType("MachineOrder");
@@ -429,7 +505,8 @@ export default function CreateOrders() {
         currentType={currentType}
         formData={formData}
         onChange={handleChange}
-        onSubmit={handleCreateOrUpdateOrder}
+        // Передаём общий onSubmit, который внутри решит, создавать или обновлять
+        onSubmit={handleSubmitOrder}
       />
     </div>
   );
