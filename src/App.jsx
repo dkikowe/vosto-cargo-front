@@ -29,7 +29,7 @@ function App() {
       <Header />
       <Nav />
       <Routes>
-        <Route path="/" element={<Navigate to="/start" replace />} />
+        <Route path="/" element={<Navigate to="/menu" replace />} />
         <Route path="/start" element={<Start />} />
         <Route path="/menu" element={<Cabinet />} />
         <Route path="/create" element={<Create />} />

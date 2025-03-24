@@ -1,50 +1,55 @@
-import React, { useState, useEffect } from "react";
-import s from "./Create.module.sass";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "../../axios.js";
+import s from "./Create.module.sass";
+import { AddOrderModal } from "./AddOrderModal.jsx";
+import { ThemeContext } from "../../context/ThemeContext";
+import { Edit, Trash2 } from "lucide-react";
 
-export default function Create() {
+export default function CreateOrders() {
+  const { theme } = useContext(ThemeContext);
   const userId = localStorage.getItem("id");
-  const [userRole, setUserRole] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Состояние формы
-  const [formData, setFormData] = useState({
-    weight: "",
-    volume: "",
-    description: "",
-    originCity: "",
-    destinationCity: "",
-    vehicle: "",
-    maxLoad: "",
-    dispatcherComments: "",
-  });
-
-  // Список заказов пользователя
+  const [currentType, setCurrentType] = useState("CargoOrder");
+  const [currentTab, setCurrentTab] = useState("active");
   const [orders, setOrders] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  // Форма для создания/редактирования заявки
+  const [formData, setFormData] = useState({
+    description: "",
+    loadingPlace: "",
+    unloadingPlace: "",
+    cargoName: "",
+    volume: "",
+    weight: "",
+    temperature: "",
+    bodyType: "",
+    loadingType: "",
+    TIR: false,
+    CRM: false,
+    medKnizhka: false,
+    licensePlate: "",
+    brandAndModel: "",
+    machineType: "Грузовик",
+    payloadCapacity: "",
+    bodyVolume: "",
+    loadingTypes: "",
+    route: "",
+    loadingDate: "",
+    dateOption: "Постоянно",
+    loadingPeriodFrom: "",
+    loadingPeriodTo: "",
+    EKMT: false,
+    ADR: "",
+    gpsMonitoring: false,
+    paymentMethod: "",
+    isArchived: false,
+  });
+  // Состояние редактируемой заявки (если null — создание новой)
+  const [editingOrder, setEditingOrder] = useState(null);
 
-  // 1. Загружаем данные о пользователе (получаем роль)
-  useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const { data } = await axios.get(`/getUserById/${userId}`);
-        console.log("User data:", data);
-        setUserRole(data.role);
-      } catch (error) {
-        console.error("Ошибка загрузки пользователя:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    if (userId) {
-      fetchUserData();
-    } else {
-      setIsLoading(false);
-    }
-  }, [userId]);
-
-  // 2. Функция загрузки заказов для этого пользователя
   const fetchUserOrders = async () => {
     try {
+      if (!userId) return;
       const { data } = await axios.get(`/orders?userId=${userId}`);
       setOrders(data);
     } catch (error) {
@@ -52,223 +57,380 @@ export default function Create() {
     }
   };
 
-  // 3. Загружаем заказы, когда роль известна (или сразу после загрузки пользователя)
   useEffect(() => {
-    if (userId) {
-      fetchUserOrders();
-    }
+    fetchUserOrders();
   }, [userId]);
 
-  // Изменение формы
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  // Создание заявки
-  const handleSubmit = async (e) => {
+  const resetForm = () => {
+    setFormData({
+      description: "",
+      loadingPlace: "",
+      unloadingPlace: "",
+      cargoName: "",
+      volume: "",
+      weight: "",
+      temperature: "",
+      bodyType: "",
+      loadingType: "",
+      TIR: false,
+      CRM: false,
+      medKnizhka: false,
+      licensePlate: "",
+      brandAndModel: "",
+      machineType: "Грузовик",
+      payloadCapacity: "",
+      bodyVolume: "",
+      loadingTypes: "",
+      route: "",
+      loadingDate: "",
+      dateOption: "Постоянно",
+      loadingPeriodFrom: "",
+      loadingPeriodTo: "",
+      EKMT: false,
+      ADR: "",
+      gpsMonitoring: false,
+      paymentMethod: "",
+      isArchived: false,
+    });
+    setEditingOrder(null);
+  };
+
+  const handleCreateOrUpdateOrder = async (e) => {
     e.preventDefault();
+    if (!userId) return;
+
+    const payload = {
+      userId,
+      orderType: currentType,
+      description: formData.description,
+      loadingPlace: formData.loadingPlace,
+      unloadingPlace: formData.unloadingPlace,
+      cargoName: formData.cargoName,
+      volume: formData.volume ? Number(formData.volume) : undefined,
+      weight: formData.weight ? Number(formData.weight) : undefined,
+      temperature: formData.temperature
+        ? Number(formData.temperature)
+        : undefined,
+      bodyType: formData.bodyType,
+      loadingType: formData.loadingType,
+      TIR: formData.TIR,
+      CRM: formData.CRM,
+      medKnizhka: formData.medKnizhka,
+      licensePlate: formData.licensePlate,
+      brandAndModel: formData.brandAndModel,
+      machineType: formData.machineType,
+      payloadCapacity: formData.payloadCapacity
+        ? Number(formData.payloadCapacity)
+        : undefined,
+      bodyVolume: formData.bodyVolume ? Number(formData.bodyVolume) : undefined,
+      loadingTypes: formData.loadingTypes
+        ? formData.loadingTypes.split(",").map((el) => el.trim())
+        : [],
+      route: formData.route,
+      loadingDate: formData.loadingDate || undefined,
+      dateOption: formData.dateOption,
+      loadingPeriod: {
+        from: formData.loadingPeriodFrom || undefined,
+        to: formData.loadingPeriodTo || undefined,
+      },
+      EKMT: formData.EKMT,
+      ADR: formData.ADR ? formData.ADR.split(",").map((el) => el.trim()) : [],
+      gpsMonitoring: formData.gpsMonitoring,
+      paymentMethod: formData.paymentMethod,
+      isArchived: false,
+    };
+
     try {
-      const payload = { ...formData, userId, role: userRole };
-      const { data: savedOrder } = await axios.post("/orders", payload, {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      console.log("Заявка успешно создана:", savedOrder);
-      // Очищаем форму
-      setFormData({
-        weight: "",
-        volume: "",
-        description: "",
-        originCity: "",
-        destinationCity: "",
-        vehicle: "",
-        maxLoad: "",
-        dispatcherComments: "",
-      });
-
-      // Повторно загружаем заказы
+      if (editingOrder) {
+        // Редактирование заявки
+        const { data: updatedOrder } = await axios.put(
+          `/orders/${editingOrder._id}`, // <-- ID заявки в URL
+          payload
+        );
+        console.log("Заявка успешно обновлена:", updatedOrder);
+      } else {
+        // Создание новой заявки
+        const { data: savedOrder } = await axios.post("/orders", payload);
+        console.log("Заявка успешно создана:", savedOrder);
+      }
+      setShowForm(false);
+      resetForm();
       fetchUserOrders();
     } catch (error) {
-      console.error("Ошибка создания заявки:", error);
+      console.error("Ошибка создания/обновления заявки:", error);
     }
   };
 
-  if (isLoading) return <p>Загрузка...</p>;
-  if (!userRole) return <p>Ошибка: роль пользователя не найдена</p>;
-  console.log(orders);
+  const handleToggleArchive = async (orderId, currentIsArchived) => {
+    try {
+      let updatedOrder;
+      if (!currentIsArchived) {
+        // Отправляем заказ в архив
+        const response = await axios.post("/orders/archive", {
+          orderId,
+          userId,
+        });
+        updatedOrder = response.data;
+        console.log("Заказ архивирован:", updatedOrder);
+      } else {
+        // Восстанавливаем заказ из архива
+        const response = await axios.post("/orders/restore", {
+          orderId,
+          userId,
+        });
+        updatedOrder = response.data;
+        console.log("Заказ восстановлен:", updatedOrder);
+      }
+      fetchUserOrders();
+    } catch (error) {
+      console.error("Ошибка обновления заявки:", error);
+    }
+  };
+
+  const handleEditOrder = (order) => {
+    // Заполняем форму данными выбранной заявки
+    setEditingOrder(order);
+    setCurrentType(order.orderType);
+    setFormData({
+      description: order.description || "",
+      loadingPlace: order.loadingPlace || "",
+      unloadingPlace: order.unloadingPlace || "",
+      cargoName: order.cargoName || "",
+      volume: order.volume || "",
+      weight: order.weight || "",
+      temperature: order.temperature || "",
+      bodyType: order.bodyType || "",
+      loadingType: order.loadingType || "",
+      TIR: order.TIR || false,
+      CRM: order.CRM || false,
+      medKnizhka: order.medKnizhka || false,
+      licensePlate: order.licensePlate || "",
+      brandAndModel: order.brandAndModel || "",
+      machineType: order.machineType || "Грузовик",
+      payloadCapacity: order.payloadCapacity || "",
+      bodyVolume: order.bodyVolume || "",
+      loadingTypes: order.loadingTypes ? order.loadingTypes.join(", ") : "",
+      route: order.route || "",
+      loadingDate: order.loadingDate ? order.loadingDate.split("T")[0] : "",
+      dateOption: order.dateOption || "Постоянно",
+      loadingPeriodFrom: order.loadingPeriod?.from
+        ? order.loadingPeriod.from.split("T")[0]
+        : "",
+      loadingPeriodTo: order.loadingPeriod?.to
+        ? order.loadingPeriod.to.split("T")[0]
+        : "",
+      EKMT: order.EKMT || false,
+      ADR: order.ADR ? order.ADR.join(", ") : "",
+      gpsMonitoring: order.gpsMonitoring || false,
+      paymentMethod: order.paymentMethod || "",
+      isArchived: order.isArchived || false,
+    });
+    setShowForm(true);
+  };
+
+  // Пример вызова handleDeleteOrder
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      await axios.delete("/orders", {
+        data: { userId, orderId },
+      });
+      console.log("Заявка удалена");
+      fetchUserOrders();
+    } catch (error) {
+      console.error("Ошибка удаления заявки:", error);
+    }
+  };
+
+  const filteredOrders = orders.filter((order) => {
+    const isRightType = order.orderType === currentType;
+    const isRightArchive =
+      currentTab === "archive" ? order.isArchived : !order.isArchived;
+    return isRightType && isRightArchive;
+  });
+
+  const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
+
+  const handlePlusClick = () => {
+    setShowMenu((prev) => !prev);
+  };
+
+  const handleAddCargo = () => {
+    setEditingOrder(null);
+    setCurrentType("CargoOrder");
+    resetForm();
+    setShowForm(true);
+    setShowMenu(false);
+  };
+
+  const handleAddMachine = () => {
+    setEditingOrder(null);
+    setCurrentType("MachineOrder");
+    resetForm();
+    setShowForm(true);
+    setShowMenu(false);
+  };
 
   return (
-    <div className={s.createContainer}>
-      <h2>Создать заявку ({userRole})</h2>
-      <form onSubmit={handleSubmit} className={s.form}>
-        {/* Разные поля в зависимости от роли */}
-        {userRole === "Грузодатель" && (
-          <>
-            <div className={s.formGroup}>
-              <label>Вес:</label>
-              <input
-                type="text"
-                name="weight"
-                value={formData.weight}
-                onChange={handleChange}
-                placeholder="Введите вес груза"
-              />
-            </div>
-            <div className={s.formGroup}>
-              <label>Объем:</label>
-              <input
-                type="text"
-                name="volume"
-                value={formData.volume}
-                onChange={handleChange}
-                placeholder="Введите объем груза"
-              />
-            </div>
-          </>
-        )}
-
-        {userRole === "Грузоперевозчик" && (
-          <>
-            <div className={s.formGroup}>
-              <label>Транспортное средство:</label>
-              <input
-                type="text"
-                name="vehicle"
-                value={formData.vehicle}
-                onChange={handleChange}
-                placeholder="Марка и модель"
-              />
-            </div>
-            <div className={s.formGroup}>
-              <label>Максимальная нагрузка:</label>
-              <input
-                type="text"
-                name="maxLoad"
-                value={formData.maxLoad}
-                onChange={handleChange}
-                placeholder="Введите максимальную нагрузку"
-              />
-            </div>
-          </>
-        )}
-
-        {userRole === "Диспетчер" && (
-          <div className={s.formGroup}>
-            <label>Комментарии диспетчера:</label>
-            <textarea
-              name="dispatcherComments"
-              value={formData.dispatcherComments}
-              onChange={handleChange}
-              placeholder="Введите комментарий"
-            ></textarea>
+    <div className={s.container + " " + (theme === "dark" ? s.dark : s.light)}>
+      {/* Хедер с inline-стилем для изменения фона в зависимости от темы */}
+      <div
+        className={s.header}
+        style={{
+          backgroundColor: theme === "dark" ? "#121212" : undefined,
+        }}
+      >
+        <div className={s.switch}>
+          <div className={s.typeSwitcher}>
+            <div
+              className={s.switchIndicator}
+              style={{ left: typeIndicatorLeft }}
+            />
+            <button
+              className={
+                currentType === "CargoOrder" ? s.activeText : s.switcher
+              }
+              onClick={() => setCurrentType("CargoOrder")}
+            >
+              Грузы
+            </button>
+            <button
+              className={
+                currentType === "MachineOrder" ? s.activeText : s.switcher
+              }
+              onClick={() => setCurrentType("MachineOrder")}
+            >
+              Машины
+            </button>
           </div>
-        )}
-
-        {/* Общие поля */}
-        <div className={s.formGroup}>
-          <label>Описание:</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Опишите заказ"
-          />
+          <div className={s.plusWrapper}>
+            <p className={s.plus} onClick={handlePlusClick}>
+              +
+            </p>
+            {showMenu && (
+              <div className={s.plusMenu}>
+                <button className={s.plusButton} onClick={handleAddCargo}>
+                  Добавить груз
+                </button>
+                <button className={s.plusButton} onClick={handleAddMachine}>
+                  Добавить машину
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <div className={s.formGroup}>
-          <label>Город отправления:</label>
-          <input
-            type="text"
-            name="originCity"
-            value={formData.originCity}
-            onChange={handleChange}
-            placeholder="Введите город отправления"
-          />
+        <div className={s.statusButtons}>
+          <button
+            className={currentTab === "active" ? s.statusActive : s.statusItem}
+            onClick={() => setCurrentTab("active")}
+          >
+            Опубликовано
+          </button>
+          <button
+            className={
+              currentTab === "archive" ? s.statusActiveArchive : s.archive
+            }
+            onClick={() => setCurrentTab("archive")}
+          >
+            Архив
+          </button>
         </div>
-        <div className={s.formGroup}>
-          <label>Город назначения:</label>
-          <input
-            type="text"
-            name="destinationCity"
-            value={formData.destinationCity}
-            onChange={handleChange}
-            placeholder="Введите город назначения"
-          />
-        </div>
-
-        <button type="submit" className={s.submitBtn}>
-          Отправить заявку
-        </button>
-      </form>
-
-      {/* Список заказов пользователя */}
-      <h3>Ваши заказы</h3>
-      <div>
-        {orders.length === 0 ? (
-          <p>У вас пока нет заказов</p>
+      </div>
+      <div className={s.ordersList}>
+        {filteredOrders.length === 0 ? (
+          <p>
+            Здесь будут ваши {currentType === "CargoOrder" ? "грузы" : "машины"}
+            . Добавьте их или восстановите из архива
+          </p>
         ) : (
-          orders.map((order) => (
-            <div key={order._id} className={s.orderItem}>
-              <p>
-                <strong>Тип заказа:</strong> {order.orderType}
-              </p>
-              <p>
-                <strong>Описание:</strong> {order.description}
-              </p>
-
-              {/* Для грузодателя */}
-              {order.orderType === "Грузодатель" && (
+          filteredOrders.map((order) => (
+            <div
+              key={order._id}
+              className={s.orderCard}
+              style={{
+                backgroundColor: theme === "dark" ? "#121212" : undefined,
+              }}
+            >
+              {order.orderType === "CargoOrder" ? (
                 <>
                   <p>
-                    <strong>Вес:</strong> {order.weight ? order.weight : "—"}
+                    <strong>Груз:</strong> {order.cargoName || "—"}
                   </p>
                   <p>
-                    <strong>Объем:</strong> {order.volume ? order.volume : "—"}
+                    <strong>Загрузка:</strong> {order.loadingPlace || "—"}
                   </p>
                   <p>
-                    <strong>Город отправления:</strong>{" "}
-                    {order.origin ? order.origin : "—"}
+                    <strong>Выгрузка:</strong> {order.unloadingPlace || "—"}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p>
+                    <strong>Гос. номер:</strong> {order.licensePlate || "—"}
                   </p>
                   <p>
-                    <strong>Город назначения:</strong>{" "}
-                    {order.destination ? order.destination : "—"}
+                    <strong>Марка и модель:</strong>{" "}
+                    {order.brandAndModel || "—"}
+                  </p>
+                  <p>
+                    <strong>Тип машины:</strong> {order.machineType || "—"}
                   </p>
                 </>
               )}
-
-              {/* Для грузоперевозчика */}
-              {order.orderType === "Грузоперевозчик" && (
-                <>
-                  <p>
-                    <strong>Транспортное средство:</strong>{" "}
-                    {order.vehicle ? order.vehicle : "—"}
-                  </p>
-                  <p>
-                    <strong>Максимальная нагрузка:</strong>{" "}
-                    {order.maxLoad ? order.maxLoad : "—"}
-                  </p>
-                  <p>
-                    <strong>Город отправления:</strong>{" "}
-                    {order.origin ? order.origin : "—"}
-                  </p>
-                  <p>
-                    <strong>Город назначения:</strong>{" "}
-                    {order.destination ? order.destination : "—"}
-                  </p>
-                </>
-              )}
-
-              {/* Для диспетчера */}
-              {order.orderType === "Диспетчер" && (
-                <p>
-                  <strong>Комментарии диспетчера:</strong>{" "}
-                  {order.dispatcherComments ? order.dispatcherComments : "—"}
-                </p>
-              )}
+              <div className={s.actions}>
+                <button
+                  onClick={() => handleEditOrder(order)}
+                  title="Редактировать"
+                >
+                  <Edit size={16} />
+                </button>
+                <button
+                  onClick={() => handleDeleteOrder(order._id)}
+                  title="Удалить"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+              <div className={s.orderActions}>
+                <button
+                  onClick={() =>
+                    handleToggleArchive(order._id, order.isArchived)
+                  }
+                >
+                  {order.isArchived ? "Восстановить" : "В архив"}
+                </button>
+              </div>
             </div>
           ))
         )}
       </div>
+      <div className={s.addButtonWrapper}>
+        <button onClick={() => setShowForm(!showForm)}>
+          {showForm
+            ? "Закрыть форму"
+            : currentType === "CargoOrder"
+            ? "Добавить груз"
+            : "Добавить машину"}
+        </button>
+      </div>
+      <AddOrderModal
+        visible={showForm}
+        onClose={() => {
+          setShowForm(false);
+          resetForm();
+        }}
+        currentType={currentType}
+        formData={formData}
+        onChange={handleChange}
+        onSubmit={handleCreateOrUpdateOrder}
+      />
     </div>
   );
 }

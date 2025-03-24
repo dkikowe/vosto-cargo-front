@@ -8,23 +8,23 @@ export default function Company() {
   const userId = localStorage.getItem("id");
 
   // Состояния для всех полей компании
-  const [name, setName] = useState("");
-  const [inn, setInn] = useState("");
-  const [ogrn, setOgrn] = useState("");
-  const [profile, setProfile] = useState("");
-  const [country, setCountry] = useState("");
-  const [city, setCity] = useState("");
-  const [email, setEmail] = useState("");
-  const [website, setWebsite] = useState("");
-  const [manager, setManager] = useState("");
-  const [phone, setPhone] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
-  const [department, setDepartment] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyInn, setCompanyInn] = useState("");
+  const [companyOgrn, setCompanyOgrn] = useState("");
+  const [companyProfile, setCompanyProfile] = useState("");
+  const [companyCountry, setCompanyCountry] = useState("");
+  const [companyCity, setCompanyCity] = useState("");
+  const [companyEmail, setCompanyEmail] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const [companyManager, setCompanyManager] = useState("");
+  const [companyPhone, setCompanyPhone] = useState("");
+  const [companyJobTitle, setCompanyJobTitle] = useState("");
+  const [companyDepartment, setCompanyDepartment] = useState("");
 
-  // Для вывода сообщения об успехе или ошибке
-  const [message, setMessage] = useState("");
+  // Сообщение об успехе или ошибке
+  const [companyMessage, setCompanyMessage] = useState("");
 
-  // При монтировании компонента, если есть userId, получаем текущую информацию о компании
+  // Получаем информацию о компании при монтировании
   useEffect(() => {
     if (!userId) return;
     axios
@@ -32,18 +32,18 @@ export default function Company() {
       .then((res) => {
         if (res.data && res.data.company) {
           const comp = res.data.company;
-          setName(comp.name || "");
-          setInn(comp.inn || "");
-          setOgrn(comp.ogrn || "");
-          setProfile(comp.profile || "");
-          setCountry(comp.country || "");
-          setCity(comp.city || "");
-          setEmail(comp.email || "");
-          setWebsite(comp.website || "");
-          setManager(comp.manager || "");
-          setPhone(comp.phone || "");
-          setJobTitle(comp.jobTitle || "");
-          setDepartment(comp.department || "");
+          setCompanyName(comp.name || "");
+          setCompanyInn(comp.inn || "");
+          setCompanyOgrn(comp.ogrn || "");
+          setCompanyProfile(comp.profile || "");
+          setCompanyCountry(comp.country || "");
+          setCompanyCity(comp.city || "");
+          setCompanyEmail(comp.email || "");
+          setCompanyWebsite(comp.website || "");
+          setCompanyManager(comp.manager || "");
+          setCompanyPhone(comp.phone || "");
+          setCompanyJobTitle(comp.jobTitle || "");
+          setCompanyDepartment(comp.department || "");
         }
       })
       .catch((err) => {
@@ -54,134 +54,161 @@ export default function Company() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userId) {
-      setMessage("Пользователь не найден (нет ID в localStorage)");
+      setCompanyMessage("Пользователь не найден (нет ID в localStorage)");
       return;
     }
     try {
-      // Собираем данные в объект
       const payload = {
         userId,
-        name,
-        inn,
-        ogrn,
-        profile,
-        country,
-        city,
-        email,
-        website,
-        manager,
-        phone,
-        jobTitle,
-        department,
+        name: companyName,
+        inn: companyInn,
+        ogrn: companyOgrn,
+        profile: companyProfile,
+        country: companyCountry,
+        city: companyCity,
+        email: companyEmail,
+        website: companyWebsite,
+        manager: companyManager,
+        phone: companyPhone,
+        jobTitle: companyJobTitle,
+        department: companyDepartment,
       };
 
-      // Отправляем POST-запрос на эндпоинт для обновления компании
       const response = await axios.post("/updateCompany", payload, {
         headers: { "Content-Type": "application/json" },
       });
 
-      setMessage(response.data.status || "Информация о компании сохранена");
+      setCompanyMessage(
+        response.data.status || "Информация о компании сохранена"
+      );
     } catch (error) {
       console.error("Ошибка при сохранении информации о компании:", error);
-      setMessage("Ошибка при сохранении информации");
+      setCompanyMessage("Ошибка при сохранении информации");
     }
   };
 
   return (
-    // Применяем классы в зависимости от выбранной темы
-    <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
-      <div className={s.innerContainer}>
-        <h2>Информация о компании</h2>
-        <form onSubmit={handleSubmit} className={s.form}>
-          <label>Название компании</label>
+    <div
+      className={`${s.companyContainer} ${
+        theme === "dark" ? s.companyDark : s.companyLight
+      }`}
+    >
+      <div className={s.companyInnerContainer}>
+        <h2 className={s.companyTitle}>Информация о компании</h2>
+        <form onSubmit={handleSubmit} className={s.companyForm}>
+          <label className={s.companyLabel}>Название компании</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
             placeholder="Введите название"
+            className={s.companyInput}
           />
-          <label>ИНН</label>
+
+          <label className={s.companyLabel}>ИНН</label>
           <input
             type="text"
-            value={inn}
-            onChange={(e) => setInn(e.target.value)}
+            value={companyInn}
+            onChange={(e) => setCompanyInn(e.target.value)}
             placeholder="Введите ИНН"
+            className={s.companyInput}
           />
-          <label>ОГРН</label>
+
+          <label className={s.companyLabel}>ОГРН</label>
           <input
             type="text"
-            value={ogrn}
-            onChange={(e) => setOgrn(e.target.value)}
+            value={companyOgrn}
+            onChange={(e) => setCompanyOgrn(e.target.value)}
             placeholder="Введите ОГРН"
+            className={s.companyInput}
           />
-          <label>Профиль</label>
+
+          <label className={s.companyLabel}>Профиль</label>
           <input
             type="text"
-            value={profile}
-            onChange={(e) => setProfile(e.target.value)}
+            value={companyProfile}
+            onChange={(e) => setCompanyProfile(e.target.value)}
             placeholder="Например, экспедитор-перевозчик"
+            className={s.companyInput}
           />
-          <label>Страна</label>
+
+          <label className={s.companyLabel}>Страна</label>
           <input
             type="text"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
+            value={companyCountry}
+            onChange={(e) => setCompanyCountry(e.target.value)}
             placeholder="Страна"
+            className={s.companyInput}
           />
-          <label>Город</label>
+
+          <label className={s.companyLabel}>Город</label>
           <input
             type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
+            value={companyCity}
+            onChange={(e) => setCompanyCity(e.target.value)}
             placeholder="Город"
+            className={s.companyInput}
           />
-          <label>Почта</label>
+
+          <label className={s.companyLabel}>Почта</label>
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={companyEmail}
+            onChange={(e) => setCompanyEmail(e.target.value)}
             placeholder="example@mail.ru"
+            className={s.companyInput}
           />
-          <label>Сайт</label>
+
+          <label className={s.companyLabel}>Сайт</label>
           <input
             type="text"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
+            value={companyWebsite}
+            onChange={(e) => setCompanyWebsite(e.target.value)}
             placeholder="https://example.com"
+            className={s.companyInput}
           />
-          <label>Руководитель</label>
+
+          <label className={s.companyLabel}>Руководитель</label>
           <input
             type="text"
-            value={manager}
-            onChange={(e) => setManager(e.target.value)}
+            value={companyManager}
+            onChange={(e) => setCompanyManager(e.target.value)}
             placeholder="Иванов Иван Иванович"
+            className={s.companyInput}
           />
-          <label>Телефон</label>
+
+          <label className={s.companyLabel}>Телефон</label>
           <input
             type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={companyPhone}
+            onChange={(e) => setCompanyPhone(e.target.value)}
             placeholder="+7 (___) ___-__-__"
+            className={s.companyInput}
           />
-          <label>Должность</label>
+
+          <label className={s.companyLabel}>Должность</label>
           <input
             type="text"
-            value={jobTitle}
-            onChange={(e) => setJobTitle(e.target.value)}
+            value={companyJobTitle}
+            onChange={(e) => setCompanyJobTitle(e.target.value)}
             placeholder="Должность руководителя"
+            className={s.companyInput}
           />
-          <label>Подразделение</label>
+
+          <label className={s.companyLabel}>Подразделение</label>
           <input
             type="text"
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
+            value={companyDepartment}
+            onChange={(e) => setCompanyDepartment(e.target.value)}
             placeholder="Например, главный офис"
+            className={s.companyInput}
           />
-          <button type="submit" className={s.saveButton}>
+
+          <button type="submit" className={s.companySaveButton}>
             Сохранить
           </button>
         </form>
-        {message && <p className={s.message}>{message}</p>}
+        {companyMessage && <p className={s.companyMessage}>{companyMessage}</p>}
       </div>
     </div>
   );
