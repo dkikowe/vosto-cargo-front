@@ -222,8 +222,8 @@ export default function Cabinet() {
               className={s.name}
               onBlur={saveName}
             />
-            <p className={s.idTelega}>Ваш ID: {idTelega}</p>
             <p className={s.role}>{role}</p>
+            <p className={s.idTelega}>Ваш ID: {idTelega}</p>
           </div>
           {/* Переключатель темы */}
         </div>
