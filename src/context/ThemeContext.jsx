@@ -1,13 +1,29 @@
-// Пример реализации toggleTheme в ThemeContext.js
 import React, { createContext, useState, useEffect } from "react";
 import axios from "../axios";
 
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  // Инициализируем тему из localStorage или по умолчанию 'light'
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const userId = localStorage.getItem("id");
+  // Начинаем со значения из localStorage или по умолчанию 'light'
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+  // При монтировании загружаем тему с сервера для пользователя, если userId есть
+  useEffect(() => {
+    if (userId) {
+      axios
+        .get(`/getUserById/${userId}`)
+        .then((res) => {
+          if (res.data && res.data.theme) {
+            setTheme(res.data.theme);
+            localStorage.setItem("theme", res.data.theme);
+          }
+        })
+        .catch((error) =>
+          console.error("Ошибка получения данных пользователя:", error)
+        );
+    }
+  }, [userId]);
 
   const toggleTheme = async () => {
     const newTheme = theme === "dark" ? "light" : "dark";
@@ -21,8 +37,6 @@ export const ThemeProvider = ({ children }) => {
       console.error("Ошибка сохранения темы:", error);
     }
   };
-
-  // При монтировании можно загрузить тему из localStorage (если требуется)
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
