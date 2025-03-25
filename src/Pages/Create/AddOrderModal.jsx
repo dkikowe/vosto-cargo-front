@@ -37,7 +37,7 @@ export function AddOrderModal({
           className={s.createForm}
           style={{
             backgroundColor: theme === "dark" ? "#121212" : undefined,
-            border: theme === "dark" ? "1px solid #fff" : undefined,
+            border: theme === "dark" ? "none" : undefined,
           }}
         >
           <div className={s.formGroup}>
