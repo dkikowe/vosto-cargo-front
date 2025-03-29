@@ -21,33 +21,36 @@ export default function CreateOrders() {
   // Форма для создания/редактирования заявки
   const [formData, setFormData] = useState({
     description: "",
-    loadingPlace: "",
-    unloadingPlace: "",
-    cargoName: "",
-    volume: "",
-    weight: "",
-    temperature: "",
-    bodyType: "",
-    loadingType: "",
-    TIR: false,
-    CRM: false,
-    medKnizhka: false,
-    licensePlate: "",
-    brandAndModel: "",
-    machineType: "Грузовик",
-    payloadCapacity: "",
-    bodyVolume: "",
-    loadingTypes: "",
-    route: "",
-    loadingDate: "",
-    dateOption: "Постоянно",
-    loadingPeriodFrom: "",
-    loadingPeriodTo: "",
-    EKMT: false,
-    ADR: "",
-    gpsMonitoring: false,
     paymentMethod: "",
     isArchived: false,
+
+    // CargoOrder
+    from: "",
+    to: "",
+    cargo: "",
+    weight: "",
+    volume: "",
+    rate: "",
+    ready: "",
+    vehicle: "",
+
+    // MachineOrder
+    url: "",
+    marka: "",
+    tip: "",
+    kuzov: "",
+    tip_zagruzki: "",
+    gruzopodyomnost: "",
+    vmestimost: "",
+    data_gotovnosti: "",
+    otkuda: "",
+    kuda: "",
+    telefon: "",
+    imya: "",
+    firma: "",
+    gorod: "",
+    pochta: "",
+    company: "",
   });
 
   // Загружаем заказы
@@ -74,37 +77,38 @@ export default function CreateOrders() {
     }));
   };
 
-  // Сброс формы и сброс состояния "редактирования"
+  // Сброс формы и состояния редактирования
   const resetForm = () => {
     setFormData({
       description: "",
-      loadingPlace: "",
-      unloadingPlace: "",
-      cargoName: "",
-      volume: "",
-      weight: "",
-      temperature: "",
-      bodyType: "",
-      loadingType: "",
-      TIR: false,
-      CRM: false,
-      medKnizhka: false,
-      licensePlate: "",
-      brandAndModel: "",
-      machineType: "Грузовик",
-      payloadCapacity: "",
-      bodyVolume: "",
-      loadingTypes: "",
-      route: "",
-      loadingDate: "",
-      dateOption: "Постоянно",
-      loadingPeriodFrom: "",
-      loadingPeriodTo: "",
-      EKMT: false,
-      ADR: "",
-      gpsMonitoring: false,
       paymentMethod: "",
       isArchived: false,
+
+      from: "",
+      to: "",
+      cargo: "",
+      weight: "",
+      volume: "",
+      rate: "",
+      ready: "",
+      vehicle: "",
+
+      url: "",
+      marka: "",
+      tip: "",
+      kuzov: "",
+      tip_zagruzki: "",
+      gruzopodyomnost: "",
+      vmestimost: "",
+      data_gotovnosti: "",
+      otkuda: "",
+      kuda: "",
+      telefon: "",
+      imya: "",
+      firma: "",
+      gorod: "",
+      pochta: "",
+      company: "",
     });
     setEditingOrder(null);
   };
@@ -114,51 +118,58 @@ export default function CreateOrders() {
     e.preventDefault();
     if (!userId) return;
 
-    const payload = {
-      userId,
-      orderType: currentType,
-      description: formData.description,
-      loadingPlace: formData.loadingPlace,
-      unloadingPlace: formData.unloadingPlace,
-      cargoName: formData.cargoName,
-      volume: formData.volume ? Number(formData.volume) : undefined,
-      weight: formData.weight ? Number(formData.weight) : undefined,
-      temperature: formData.temperature
-        ? Number(formData.temperature)
-        : undefined,
-      bodyType: formData.bodyType,
-      loadingType: formData.loadingType,
-      TIR: formData.TIR,
-      CRM: formData.CRM,
-      medKnizhka: formData.medKnizhka,
-      licensePlate: formData.licensePlate,
-      brandAndModel: formData.brandAndModel,
-      machineType: formData.machineType,
-      payloadCapacity: formData.payloadCapacity
-        ? Number(formData.payloadCapacity)
-        : undefined,
-      bodyVolume: formData.bodyVolume ? Number(formData.bodyVolume) : undefined,
-      loadingTypes: formData.loadingTypes
-        ? formData.loadingTypes.split(",").map((el) => el.trim())
-        : [],
-      route: formData.route,
-      loadingDate: formData.loadingDate || undefined,
-      dateOption: formData.dateOption,
-      loadingPeriod: {
-        from: formData.loadingPeriodFrom || undefined,
-        to: formData.loadingPeriodTo || undefined,
-      },
-      EKMT: formData.EKMT,
-      ADR: formData.ADR ? formData.ADR.split(",").map((el) => el.trim()) : [],
-      gpsMonitoring: formData.gpsMonitoring,
-      paymentMethod: formData.paymentMethod,
-      isArchived: false,
-    };
+    let payload = {};
+    if (currentType === "CargoOrder") {
+      // Формируем payload для заявки на груз (CargoOrder)
+      payload = {
+        userId,
+        orderType: currentType,
+        description: formData.description,
+        from: formData.loadingPlace,
+        to: formData.unloadingPlace,
+        cargo: formData.cargoName,
+        volume: formData.volume ? formData.volume.toString() : "",
+        weight: formData.weight ? formData.weight.toString() : "",
+        // Для этих полей можно оставить пустые строки, если их не вводят
+        rate: "",
+        ready: "",
+        vehicle: "",
+        paymentMethod: formData.paymentMethod,
+        isArchived: false,
+      };
+    } else if (currentType === "MachineOrder") {
+      // Разбиваем brandAndModel на marka и tip
+
+      // Формируем payload для заявки на машину (MachineOrder)
+      payload = {
+        userId,
+        orderType: currentType,
+        description: formData.description,
+        marka: formData.marka,
+        tip: formData.tip,
+        kuzov: formData.kuzov,
+        tip_zagruzki: formData.tip_zagruzki,
+        gruzopodyomnost: formData.gruzopodyomnost
+          ? formData.gruzopodyomnost.toString()
+          : "",
+        vmestimost: formData.vmestimost ? formData.vmestimost.toString() : "",
+        data_gotovnosti: formData.data_gotovnosti,
+        otkuda: formData.otkuda,
+        kuda: formData.kuda,
+        telefon: formData.telefon,
+        imya: formData.contactName,
+        firma: formData.contactFirm,
+        gorod: formData.contactCity,
+        pochta: formData.contactEmail,
+        company: formData.company,
+        paymentMethod: formData.paymentMethod,
+        isArchived: false,
+      };
+    }
 
     try {
       const { data: savedOrder } = await axios.post("/orders", payload);
       console.log("Заявка успешно создана:", savedOrder);
-
       setShowForm(false);
       resetForm();
       fetchUserOrders();
@@ -172,54 +183,57 @@ export default function CreateOrders() {
     e.preventDefault();
     if (!userId || !editingOrder) return;
 
-    const payload = {
-      userId,
-      orderType: currentType,
-      description: formData.description,
-      loadingPlace: formData.loadingPlace,
-      unloadingPlace: formData.unloadingPlace,
-      cargoName: formData.cargoName,
-      volume: formData.volume ? Number(formData.volume) : undefined,
-      weight: formData.weight ? Number(formData.weight) : undefined,
-      temperature: formData.temperature
-        ? Number(formData.temperature)
-        : undefined,
-      bodyType: formData.bodyType,
-      loadingType: formData.loadingType,
-      TIR: formData.TIR,
-      CRM: formData.CRM,
-      medKnizhka: formData.medKnizhka,
-      licensePlate: formData.licensePlate,
-      brandAndModel: formData.brandAndModel,
-      machineType: formData.machineType,
-      payloadCapacity: formData.payloadCapacity
-        ? Number(formData.payloadCapacity)
-        : undefined,
-      bodyVolume: formData.bodyVolume ? Number(formData.bodyVolume) : undefined,
-      loadingTypes: formData.loadingTypes
-        ? formData.loadingTypes.split(",").map((el) => el.trim())
-        : [],
-      route: formData.route,
-      loadingDate: formData.loadingDate || undefined,
-      dateOption: formData.dateOption,
-      loadingPeriod: {
-        from: formData.loadingPeriodFrom || undefined,
-        to: formData.loadingPeriodTo || undefined,
-      },
-      EKMT: formData.EKMT,
-      ADR: formData.ADR ? formData.ADR.split(",").map((el) => el.trim()) : [],
-      gpsMonitoring: formData.gpsMonitoring,
-      paymentMethod: formData.paymentMethod,
-      isArchived: false,
-    };
+    let payload = {};
+    if (currentType === "CargoOrder") {
+      payload = {
+        userId,
+        orderType: currentType,
+        description: formData.description,
+        from: formData.loadingPlace,
+        to: formData.unloadingPlace,
+        cargo: formData.cargoName,
+        volume: formData.volume ? formData.volume.toString() : "",
+        weight: formData.weight ? formData.weight.toString() : "",
+        rate: "",
+        ready: "",
+        vehicle: "",
+        paymentMethod: formData.paymentMethod,
+        isArchived: false,
+      };
+    } else if (currentType === "MachineOrder") {
+      payload = {
+        marka: formData.marka,
+        tip: formData.tip,
+        userId,
+        orderType: currentType,
+        description: formData.description,
+
+        kuzov: formData.kuzov,
+        tip_zagruzki: formData.tip_zagruzki,
+        gruzopodyomnost: formData.gruzopodyomnost
+          ? formData.gruzopodyomnost.toString()
+          : "",
+        vmestimost: formData.vmestimost ? formData.vmestimost.toString() : "",
+        data_gotovnosti: formData.data_gotovnosti,
+        otkuda: formData.otkuda,
+        kuda: formData.kuda,
+        telefon: formData.telefon,
+        imya: formData.contactName,
+        firma: formData.contactFirm,
+        gorod: formData.contactCity,
+        pochta: formData.contactEmail,
+        company: formData.company,
+        paymentMethod: formData.paymentMethod,
+        isArchived: false,
+      };
+    }
 
     try {
       const { data: updatedOrder } = await axios.put(
-        `/orders/${editingOrder._id}`, // <-- ID заявки в URL
+        `/orders/${editingOrder._id}`,
         payload
       );
       console.log("Заявка успешно обновлена:", updatedOrder);
-
       setShowForm(false);
       resetForm();
       fetchUserOrders();
@@ -228,7 +242,7 @@ export default function CreateOrders() {
     }
   };
 
-  // Общий onSubmit, который решает, нужно ли создавать или обновлять
+  // Общий onSubmit, который решает, создавать или обновлять
   const handleSubmitOrder = (e) => {
     if (editingOrder) {
       handleUpdateOrder(e);
@@ -237,12 +251,11 @@ export default function CreateOrders() {
     }
   };
 
-  // Архивирование / восстановление
+  // Архивирование / восстановление заказа
   const handleToggleArchive = async (orderId, currentIsArchived) => {
     try {
       let updatedOrder;
       if (!currentIsArchived) {
-        // Отправляем заказ в архив
         const response = await axios.post("/orders/archive", {
           orderId,
           userId,
@@ -250,7 +263,6 @@ export default function CreateOrders() {
         updatedOrder = response.data;
         console.log("Заказ архивирован:", updatedOrder);
       } else {
-        // Восстанавливаем заказ из архива
         const response = await axios.post("/orders/restore", {
           orderId,
           userId,
@@ -264,42 +276,37 @@ export default function CreateOrders() {
     }
   };
 
-  // Заполнение формы при нажатии на «Редактировать»
+  // Заполнение формы при нажатии «Редактировать»
   const handleEditOrder = (order) => {
     setEditingOrder(order);
     setCurrentType(order.orderType);
 
     setFormData({
       description: order.description || "",
-      loadingPlace: order.loadingPlace || "",
-      unloadingPlace: order.unloadingPlace || "",
-      cargoName: order.cargoName || "",
+      loadingPlace: order.from || "",
+      unloadingPlace: order.to || "",
+      cargoName: order.cargo || "",
       volume: order.volume || "",
       weight: order.weight || "",
-      temperature: order.temperature || "",
-      bodyType: order.bodyType || "",
-      loadingType: order.loadingType || "",
-      TIR: order.TIR || false,
-      CRM: order.CRM || false,
-      medKnizhka: order.medKnizhka || false,
+      // Для заявки на груз больше никаких полей нет
+
+      // Для машины:
       licensePlate: order.licensePlate || "",
-      brandAndModel: order.brandAndModel || "",
-      machineType: order.machineType || "Грузовик",
-      payloadCapacity: order.payloadCapacity || "",
-      bodyVolume: order.bodyVolume || "",
-      loadingTypes: order.loadingTypes ? order.loadingTypes.join(", ") : "",
-      route: order.route || "",
-      loadingDate: order.loadingDate ? order.loadingDate.split("T")[0] : "",
-      dateOption: order.dateOption || "Постоянно",
-      loadingPeriodFrom: order.loadingPeriod?.from
-        ? order.loadingPeriod.from.split("T")[0]
-        : "",
-      loadingPeriodTo: order.loadingPeriod?.to
-        ? order.loadingPeriod.to.split("T")[0]
-        : "",
-      EKMT: order.EKMT || false,
-      ADR: order.ADR ? order.ADR.join(", ") : "",
-      gpsMonitoring: order.gpsMonitoring || false,
+      brandAndModel: order.brandAndModel || "", // на бэкенде разделится на marka и tip
+      kuzov: order.kuzov || "",
+      tip_zagruzki: order.tip_zagruzki || "",
+      gruzopodyomnost: order.gruzopodyomnost || "",
+      vmestimost: order.vmestimost || "",
+      data_gotovnosti: order.data_gotovnosti || "",
+      otkuda: order.otkuda || "",
+      kuda: order.kuda || "",
+      telefon: order.telefon || "",
+      contactName: order.imya || "",
+      contactFirm: order.firma || "",
+      contactCity: order.gorod || "",
+      contactEmail: order.pochta || "",
+      company: order.company || "",
+
       paymentMethod: order.paymentMethod || "",
       isArchived: order.isArchived || false,
     });
@@ -307,7 +314,7 @@ export default function CreateOrders() {
     setShowForm(true);
   };
 
-  // Удаление заявки
+  // Удаление заказа
   const handleDeleteOrder = async (orderId) => {
     try {
       await axios.delete("/orders", {
@@ -328,7 +335,6 @@ export default function CreateOrders() {
     return isRightType && isRightArchive;
   });
 
-  // Визуальное смещение индикатора (Грузы / Машины)
   const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
 
   // Логика кнопки "+"
@@ -355,13 +361,10 @@ export default function CreateOrders() {
   };
 
   return (
-    <div className={s.container + " " + (theme === "dark" ? s.dark : s.light)}>
-      {/* Хедер с inline-стилем для изменения фона в зависимости от темы */}
+    <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
       <div
         className={s.header}
-        style={{
-          backgroundColor: theme === "dark" ? "#121212" : undefined,
-        }}
+        style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
       >
         <div className={s.switch}>
           <div className={s.typeSwitcher}>
@@ -449,14 +452,13 @@ export default function CreateOrders() {
               ) : (
                 <>
                   <p>
-                    <strong>Гос. номер:</strong> {order.licensePlate || "—"}
+                    <strong>Марка и тип:</strong> {order.marka} {order.tip}
                   </p>
                   <p>
-                    <strong>Марка и модель:</strong>{" "}
-                    {order.brandAndModel || "—"}
+                    <strong>Откуда:</strong> {order.otkuda || "—"}
                   </p>
                   <p>
-                    <strong>Тип машины:</strong> {order.machineType || "—"}
+                    <strong>Куда:</strong> {order.kuda || "—"}
                   </p>
                 </>
               )}
@@ -505,7 +507,6 @@ export default function CreateOrders() {
         currentType={currentType}
         formData={formData}
         onChange={handleChange}
-        // Передаём общий onSubmit, который внутри решит, создавать или обновлять
         onSubmit={handleSubmitOrder}
       />
     </div>

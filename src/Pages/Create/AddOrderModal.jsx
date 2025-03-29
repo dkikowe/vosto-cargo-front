@@ -33,19 +33,12 @@ export function AddOrderModal({
         <h3>
           {currentType === "CargoOrder" ? "Добавить груз" : "Добавить машину"}
         </h3>
-        <form
-          onSubmit={onSubmit}
-          className={s.createForm}
-          style={{
-            backgroundColor: theme === "dark" ? "#121212" : undefined,
-            border: theme === "dark" ? "none" : undefined,
-          }}
-        >
+        <form onSubmit={onSubmit} className={s.createForm}>
           <div className={s.formGroup}>
             <label>Описание</label>
             <textarea
               name="description"
-              value={formData.description}
+              value={formData.description || ""}
               onChange={onChange}
               placeholder="Описание заявки"
             />
@@ -53,40 +46,31 @@ export function AddOrderModal({
 
           {currentType === "CargoOrder" ? (
             <>
-              {/* Место загрузки */}
               <div className={s.formGroup}>
                 <label>Место загрузки</label>
                 <CityAutocomplete
                   onCitySelect={(selectedCity) => {
                     onChange({
-                      target: {
-                        name: "loadingPlace",
-                        value: selectedCity,
-                      },
+                      target: { name: "from", value: selectedCity },
                     });
                   }}
                 />
               </div>
-              {/* Место выгрузки */}
               <div className={s.formGroup}>
                 <label>Место выгрузки</label>
                 <CityAutocomplete
                   onCitySelect={(selectedCity) => {
                     onChange({
-                      target: {
-                        name: "unloadingPlace",
-                        value: selectedCity,
-                      },
+                      target: { name: "to", value: selectedCity },
                     });
                   }}
                 />
               </div>
-
               <div className={s.formGroup}>
                 <label>Наименование груза</label>
                 <input
-                  name="cargoName"
-                  value={formData.cargoName}
+                  name="cargo"
+                  value={formData.cargo || ""}
                   onChange={onChange}
                   placeholder="Например, мебель"
                 />
@@ -96,7 +80,7 @@ export function AddOrderModal({
                 <input
                   type="number"
                   name="volume"
-                  value={formData.volume}
+                  value={formData.volume || ""}
                   onChange={onChange}
                   placeholder="10"
                 />
@@ -106,225 +90,159 @@ export function AddOrderModal({
                 <input
                   type="number"
                   name="weight"
-                  value={formData.weight}
+                  value={formData.weight || ""}
                   onChange={onChange}
                   placeholder="1000"
                 />
-              </div>
-              <div className={s.formGroup}>
-                <label>Температура</label>
-                <input
-                  type="number"
-                  name="temperature"
-                  value={formData.temperature}
-                  onChange={onChange}
-                  placeholder="0"
-                />
-              </div>
-              <div className={s.formGroup}>
-                <label>Тип кузова</label>
-                <input
-                  name="bodyType"
-                  value={formData.bodyType}
-                  onChange={onChange}
-                  placeholder="Рефрижератор, тент..."
-                />
-              </div>
-              <div className={s.formGroup}>
-                <label>Тип загрузки</label>
-                <input
-                  name="loadingType"
-                  value={formData.loadingType}
-                  onChange={onChange}
-                  placeholder="Верхняя, боковая..."
-                />
-              </div>
-              <div className={s.checkboxGroup}>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="TIR"
-                    checked={formData.TIR}
-                    onChange={onChange}
-                  />
-                  TIR
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="CRM"
-                    checked={formData.CRM}
-                    onChange={onChange}
-                  />
-                  CRM
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="medKnizhka"
-                    checked={formData.medKnizhka}
-                    onChange={onChange}
-                  />
-                  Медкнижка
-                </label>
               </div>
             </>
           ) : (
             <>
               <div className={s.formGroup}>
-                <label>Гос. номер</label>
+                <label>Марка</label>
                 <input
-                  name="licensePlate"
-                  value={formData.licensePlate}
+                  name="marka"
+                  value={formData.marka || ""}
                   onChange={onChange}
-                  placeholder="А123ВС"
+                  placeholder="Например, Mercedes"
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Марка и модель</label>
+                <label>Тип</label>
                 <input
-                  name="brandAndModel"
-                  value={formData.brandAndModel}
+                  name="tip"
+                  value={formData.tip || ""}
                   onChange={onChange}
-                  placeholder="Mercedes Actros"
+                  placeholder="Например, Actros"
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Тип машины</label>
-                <select
-                  name="machineType"
-                  value={formData.machineType}
+                <label>Кузов</label>
+                <input
+                  name="kuzov"
+                  value={formData.kuzov || ""}
                   onChange={onChange}
-                >
-                  <option value="Грузовик">Грузовик</option>
-                  <option value="Полуприцеп">Полуприцеп</option>
-                  <option value="Сцепка">Сцепка</option>
-                </select>
+                  placeholder="Например, тент"
+                />
               </div>
               <div className={s.formGroup}>
-                <label>Грузоподъёмность (т)</label>
+                <label>Тип загрузки</label>
+                <input
+                  name="tip_zagruzki"
+                  value={formData.tip_zagruzki || ""}
+                  onChange={onChange}
+                  placeholder="Например, задняя"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>Грузоподъемность (т)</label>
                 <input
                   type="number"
-                  name="payloadCapacity"
-                  value={formData.payloadCapacity}
+                  name="gruzopodyomnost"
+                  value={formData.gruzopodyomnost || ""}
                   onChange={onChange}
                   placeholder="10"
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Объём кузова (м³)</label>
+                <label>Вместимость (м³)</label>
                 <input
                   type="number"
-                  name="bodyVolume"
-                  value={formData.bodyVolume}
+                  name="vmestimost"
+                  value={formData.vmestimost || ""}
                   onChange={onChange}
                   placeholder="40"
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Тип(ы) загрузки (через запятую)</label>
-                <input
-                  name="loadingTypes"
-                  value={formData.loadingTypes}
-                  onChange={onChange}
-                  placeholder="Боковая, Задняя..."
-                />
-              </div>
-              <div className={s.formGroup}>
-                <label>Маршрут</label>
-                <input
-                  name="route"
-                  value={formData.route}
-                  onChange={onChange}
-                  placeholder="Москва - Казань"
-                />
-              </div>
-              <div className={s.formGroup}>
-                <label>Дата загрузки</label>
+                <label>Дата готовности</label>
                 <input
                   type="date"
-                  name="loadingDate"
-                  value={formData.loadingDate}
+                  name="data_gotovnosti"
+                  value={formData.data_gotovnosti || ""}
                   onChange={onChange}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Тип даты</label>
-                <select
-                  name="dateOption"
-                  value={formData.dateOption}
+                <label>Откуда</label>
+                <input
+                  name="otkuda"
+                  value={formData.otkuda || ""}
                   onChange={onChange}
-                >
-                  <option value="Постоянно">Постоянно</option>
-                  <option value="Машина готова">Машина готова</option>
-                  <option value="Период">Период</option>
-                </select>
-              </div>
-              {formData.dateOption === "Период" && (
-                <div className={s.periodGroup}>
-                  <label>С</label>
-                  <input
-                    type="date"
-                    name="loadingPeriodFrom"
-                    value={formData.loadingPeriodFrom}
-                    onChange={onChange}
-                  />
-                  <label>По</label>
-                  <input
-                    type="date"
-                    name="loadingPeriodTo"
-                    value={formData.loadingPeriodTo}
-                    onChange={onChange}
-                  />
-                </div>
-              )}
-              <div className={s.checkboxGroup}>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="TIR"
-                    checked={formData.TIR}
-                    onChange={onChange}
-                  />
-                  TIR
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="EKMT"
-                    checked={formData.EKMT}
-                    onChange={onChange}
-                  />
-                  EKMT
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="gpsMonitoring"
-                    checked={formData.gpsMonitoring}
-                    onChange={onChange}
-                  />
-                  GPS
-                </label>
+                  placeholder="Например, Москва"
+                />
               </div>
               <div className={s.formGroup}>
-                <label>ADR-классы (через запятую)</label>
+                <label>Куда</label>
                 <input
-                  name="ADR"
-                  value={formData.ADR}
+                  name="kuda"
+                  value={formData.kuda || ""}
                   onChange={onChange}
-                  placeholder="ADR1, ADR2..."
+                  placeholder="Например, Казань"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>Контактное лицо</label>
+                <input
+                  name="imya"
+                  value={formData.imya || ""}
+                  onChange={onChange}
+                  placeholder="Имя"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>Должность</label>
+                <input
+                  name="firma"
+                  value={formData.firma || ""}
+                  onChange={onChange}
+                  placeholder="Название фирмы"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>Телефон</label>
+                <input
+                  name="telefon"
+                  value={formData.telefon || ""}
+                  onChange={onChange}
+                  placeholder="+7 912 345-67-89"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>Город</label>
+                <input
+                  name="gorod"
+                  value={formData.gorod || ""}
+                  onChange={onChange}
+                  placeholder="Город"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>Почта</label>
+                <input
+                  name="pochta"
+                  value={formData.pochta || ""}
+                  onChange={onChange}
+                  placeholder="example@mail.com"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>Компания</label>
+                <input
+                  name="company"
+                  value={formData.company || ""}
+                  onChange={onChange}
+                  placeholder="Название компании"
                 />
               </div>
             </>
           )}
 
-          {/* Поле «Способ оплаты» (универсально для любого типа заказа) */}
           <div className={s.formGroup}>
             <label>Способ оплаты</label>
             <select
               name="paymentMethod"
-              value={formData.paymentMethod}
+              value={formData.paymentMethod || ""}
               onChange={onChange}
             >
               <option value="">Выберите способ оплаты</option>

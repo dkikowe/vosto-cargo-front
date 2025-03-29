@@ -14,7 +14,7 @@ export default function Start() {
   const validRoles = roles.map((role) => role.name);
   const navigate = useNavigate();
   const userId = localStorage.getItem("id");
-  const initData = window.Telegram.WebApp.initData;
+  // const initData = window.Telegram.WebApp.initData;
 
   // Новый useEffect для создания пользователя, если его ещё нет
   useEffect(() => {

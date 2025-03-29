@@ -116,23 +116,32 @@ export const ParserSwitcher = ({ theme }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  const handleParse = async (type) => {
+  // Состояния для расширенных фильтров
+  const [cargoFilter, setCargoFilter] = useState({
+    cargo: "",
+    from: "",
+    to: "",
+  });
+  const [machineFilter, setMachineFilter] = useState({
+    marka: "",
+    otkuda: "",
+    kuda: "",
+  });
+
+  const handleParse = async () => {
     setIsLoading(true);
     try {
-      const endpoint =
-        type === "CargoOrder" ? "/parse-cargo" : "/parse-vehicles";
-      const { data } = await axios.get(endpoint);
-      setResult(data.data);
+      const { data } = await axios.get("/allOrders");
+      setResult(data);
     } catch (error) {
-      console.error("Ошибка при парсинге:", error);
+      console.error("Ошибка при загрузке заказов:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    // При загрузке страницы загружаем "Грузы"
-    handleParse("CargoOrder");
+    handleParse();
   }, []);
 
   const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
@@ -142,9 +151,7 @@ export const ParserSwitcher = ({ theme }) => {
       <>
         <div
           className={s.header}
-          style={{
-            backgroundColor: theme === "dark" ? "#121212" : undefined,
-          }}
+          style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
         >
           <div className={s.switch}>
             <div className={s.typeSwitcher}>
@@ -156,10 +163,7 @@ export const ParserSwitcher = ({ theme }) => {
                 className={
                   currentType === "CargoOrder" ? s.activeText : s.switcher
                 }
-                onClick={() => {
-                  setCurrentType("CargoOrder");
-                  handleParse("CargoOrder");
-                }}
+                onClick={() => setCurrentType("CargoOrder")}
               >
                 Грузы
               </button>
@@ -167,10 +171,7 @@ export const ParserSwitcher = ({ theme }) => {
                 className={
                   currentType === "MachineOrder" ? s.activeText : s.switcher
                 }
-                onClick={() => {
-                  setCurrentType("MachineOrder");
-                  handleParse("MachineOrder");
-                }}
+                onClick={() => setCurrentType("MachineOrder")}
               >
                 Машины
               </button>
@@ -181,19 +182,68 @@ export const ParserSwitcher = ({ theme }) => {
       </>
     );
   }
+
   if (!result) {
-    return (
-      <div className={s.placeholder}>Выберите тип данных для парсинга</div>
-    );
+    return <div className={s.placeholder}>Нет данных для отображения</div>;
+  }
+
+  // Фильтрация по типу заявки
+  let filtered = result.filter(
+    (item) => item.orderType === currentType && !item.isArchived
+  );
+
+  // Дополнительная фильтрация в зависимости от типа заявки
+  if (currentType === "CargoOrder") {
+    if (cargoFilter.cargo) {
+      filtered = filtered.filter(
+        (item) =>
+          item.cargo &&
+          item.cargo.toLowerCase().includes(cargoFilter.cargo.toLowerCase())
+      );
+    }
+    if (cargoFilter.from) {
+      filtered = filtered.filter(
+        (item) =>
+          item.from &&
+          item.from.toLowerCase().includes(cargoFilter.from.toLowerCase())
+      );
+    }
+    if (cargoFilter.to) {
+      filtered = filtered.filter(
+        (item) =>
+          item.to &&
+          item.to.toLowerCase().includes(cargoFilter.to.toLowerCase())
+      );
+    }
+  } else {
+    if (machineFilter.marka) {
+      filtered = filtered.filter(
+        (item) =>
+          item.marka &&
+          item.marka.toLowerCase().includes(machineFilter.marka.toLowerCase())
+      );
+    }
+    if (machineFilter.otkuda) {
+      filtered = filtered.filter(
+        (item) =>
+          item.otkuda &&
+          item.otkuda.toLowerCase().includes(machineFilter.otkuda.toLowerCase())
+      );
+    }
+    if (machineFilter.kuda) {
+      filtered = filtered.filter(
+        (item) =>
+          item.kuda &&
+          item.kuda.toLowerCase().includes(machineFilter.kuda.toLowerCase())
+      );
+    }
   }
 
   return (
     <div className={s.parserContainer}>
       <div
         className={s.header}
-        style={{
-          backgroundColor: theme === "dark" ? "#121212" : undefined,
-        }}
+        style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
       >
         <div className={s.switch}>
           <div className={s.typeSwitcher}>
@@ -207,7 +257,7 @@ export const ParserSwitcher = ({ theme }) => {
               }
               onClick={() => {
                 setCurrentType("CargoOrder");
-                handleParse("CargoOrder");
+                setCargoFilter({ cargo: "", from: "", to: "" });
               }}
             >
               Грузы
@@ -218,7 +268,7 @@ export const ParserSwitcher = ({ theme }) => {
               }
               onClick={() => {
                 setCurrentType("MachineOrder");
-                handleParse("MachineOrder");
+                setMachineFilter({ marka: "", otkuda: "", kuda: "" });
               }}
             >
               Машины
@@ -227,11 +277,78 @@ export const ParserSwitcher = ({ theme }) => {
         </div>
       </div>
 
+      {/* Расширенные фильтры */}
+      <div className={s.filters}>
+        {currentType === "CargoOrder" ? (
+          <div className={s.filterGroup}>
+            <input
+              type="text"
+              placeholder="Поиск по грузу"
+              value={cargoFilter.cargo}
+              onChange={(e) =>
+                setCargoFilter({ ...cargoFilter, cargo: e.target.value })
+              }
+              className={s.filterInput}
+            />
+            <input
+              type="text"
+              placeholder="Откуда"
+              value={cargoFilter.from}
+              onChange={(e) =>
+                setCargoFilter({ ...cargoFilter, from: e.target.value })
+              }
+              className={s.filterInput}
+            />
+            <input
+              type="text"
+              placeholder="Куда"
+              value={cargoFilter.to}
+              onChange={(e) =>
+                setCargoFilter({ ...cargoFilter, to: e.target.value })
+              }
+              className={s.filterInput}
+            />
+          </div>
+        ) : (
+          <div className={s.filterGroup}>
+            <input
+              type="text"
+              placeholder="Поиск по марке"
+              value={machineFilter.marka}
+              onChange={(e) =>
+                setMachineFilter({ ...machineFilter, marka: e.target.value })
+              }
+              className={s.filterInput}
+            />
+            <input
+              type="text"
+              placeholder="Откуда"
+              value={machineFilter.otkuda}
+              onChange={(e) =>
+                setMachineFilter({ ...machineFilter, otkuda: e.target.value })
+              }
+              className={s.filterInput}
+            />
+            <input
+              type="text"
+              placeholder="Куда"
+              value={machineFilter.kuda}
+              onChange={(e) =>
+                setMachineFilter({ ...machineFilter, kuda: e.target.value })
+              }
+              className={s.filterInput}
+            />
+          </div>
+        )}
+      </div>
+
       <div className={s.resultContainer}>
         <div className={s.cardsGrid}>
-          {result.map((item, index) => (
-            <Card key={index} data={item} />
-          ))}
+          {filtered.length > 0 ? (
+            filtered.map((item, index) => <Card key={index} data={item} />)
+          ) : (
+            <p className={s.placeholder}>Нет заявок по выбранному типу</p>
+          )}
         </div>
       </div>
     </div>
