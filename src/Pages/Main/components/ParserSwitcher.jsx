@@ -110,13 +110,11 @@ export const Card = ({ data }) => {
   }
 };
 
-// ------------------------- ParserSwitcher с пагинацией -------------------------
+// ------------------------- ParserSwitcher (без пагинации) -------------------------
 export const ParserSwitcher = ({ theme }) => {
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
 
   const handleParse = async (type) => {
     setIsLoading(true);
@@ -125,7 +123,6 @@ export const ParserSwitcher = ({ theme }) => {
         type === "CargoOrder" ? "/parse-cargo" : "/parse-vehicles";
       const { data } = await axios.get(endpoint);
       setResult(data.data);
-      setCurrentPage(1); // сбрасываем страницу при смене типа
     } catch (error) {
       console.error("Ошибка при парсинге:", error);
     } finally {
@@ -134,13 +131,13 @@ export const ParserSwitcher = ({ theme }) => {
   };
 
   useEffect(() => {
-    // При загрузке страницы загружаем грузы по умолчанию
+    // При загрузке страницы сразу грузим "Грузы"
     handleParse("CargoOrder");
   }, []);
 
   const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
 
-  // Если нет данных, показать либо лоадер, либо плейсхолдер
+  // Лоадер / Плейсхолдер
   if (isLoading) {
     return (
       <>
@@ -181,80 +178,16 @@ export const ParserSwitcher = ({ theme }) => {
             </div>
           </div>
         </div>
-        <div className={s.loading}>Загрузка...</div>;
+        <div className={s.loading}>Загрузка...</div>
       </>
     );
   }
+
   if (!result) {
     return (
       <div className={s.placeholder}>Выберите тип данных для парсинга</div>
     );
   }
-
-  // ---------- ПАГИНАЦИЯ: вычисляем массив страниц с учётом «...»
-  const totalPages = Math.ceil(result.length / itemsPerPage);
-  const displayedResults = result.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  function getPagesArray() {
-    // Если страниц <= 7, показываем все
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    // Если страниц > 7, делаем схему: 1, 2, ..., X-1, X, X+1, ..., totalPages
-    const pages = [];
-    // Всегда показываем первую и последнюю
-    const firstPage = 1;
-    const lastPage = totalPages;
-
-    // Порог для показа многоточий
-    const leftGap = currentPage - 2;
-    const rightGap = currentPage + 2;
-
-    // Добавляем первую страницу
-    pages.push(firstPage);
-
-    // Если currentPage > 4, добавляем '...'
-    if (currentPage > 4) {
-      pages.push("...");
-    }
-
-    // Добавляем диапазон [currentPage-1, currentPage, currentPage+1] с учётом границ
-    for (
-      let i = Math.max(leftGap, 2);
-      i <= Math.min(rightGap, lastPage - 1);
-      i++
-    ) {
-      pages.push(i);
-    }
-
-    // Если currentPage < totalPages - 3, добавляем '...'
-    if (currentPage < totalPages - 3) {
-      pages.push("...");
-    }
-
-    // Добавляем последнюю страницу
-    pages.push(lastPage);
-
-    return pages;
-  }
-
-  const pagesToShow = getPagesArray();
-
-  // Функции для смены страницы
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
-  const handlePageClick = (page) => {
-    if (page === "...") return;
-    setCurrentPage(page);
-  };
 
   return (
     <div className={s.parserContainer}>
@@ -298,52 +231,10 @@ export const ParserSwitcher = ({ theme }) => {
 
       <div className={s.resultContainer}>
         <div className={s.cardsGrid}>
-          {displayedResults.map((item, index) => (
+          {result.map((item, index) => (
             <Card key={index} data={item} />
           ))}
         </div>
-
-        {/* ПАГИНАЦИЯ (если страниц > 1) */}
-        {totalPages > 1 && (
-          <div className={s.pagination}>
-            <div
-              className={`${s.pageItem} ${currentPage === 1 ? s.disabled : ""}`}
-              onClick={handlePrev}
-            >
-              &lt;
-            </div>
-
-            {pagesToShow.map((page, i) => {
-              if (page === "...") {
-                return (
-                  <div key={i} className={s.ellipsis}>
-                    ...
-                  </div>
-                );
-              }
-              return (
-                <div
-                  key={i}
-                  className={`${s.pageItem} ${
-                    page === currentPage ? s.activePage : ""
-                  }`}
-                  onClick={() => handlePageClick(page)}
-                >
-                  {page}
-                </div>
-              );
-            })}
-
-            <div
-              className={`${s.pageItem} ${
-                currentPage === totalPages ? s.disabled : ""
-              }`}
-              onClick={handleNext}
-            >
-              &gt;
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
