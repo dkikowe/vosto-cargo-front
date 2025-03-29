@@ -10,7 +10,7 @@ export default function Nav() {
   const { theme } = useContext(ThemeContext);
 
   const navItems = [
-    { path: "/home", icon: <House className={s.icon} />, label: "Главная" },
+    { path: "/home", icon: <House className={s.icon} />, label: "Заявки" },
     { path: "/search", icon: <Search className={s.icon} />, label: "Поиск" },
     {
       path: "/create",

@@ -17,7 +17,7 @@ import { Main } from "./Pages/Main/Main";
 function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
-    // tg.requestFullscreen();
+    tg.requestFullscreen();
     tg.disableVerticalSwipes();
     tg.ready();
 
