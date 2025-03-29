@@ -2,15 +2,18 @@ import React, { useState, useEffect } from "react";
 import s from "../Main.module.sass";
 import axios from "../../../axios";
 
-// ------------------------- Card (не меняем) -------------------------
 export const Card = ({ data }) => {
+  // Если в данных есть `cargo`, считаем это "груз"
   const isCargo = Boolean(data.cargo);
 
   if (isCargo) {
+    // ----- Отображаем "груз" -----
     return (
       <div className={s.card}>
         <div className={s.cardHeader}>
+          {/* Название груза */}
           <h3>{data.cargo || "Без названия груза"}</h3>
+          {/* Дата готовности (ready) */}
           <span className={s.date}>{data.ready}</span>
         </div>
 
@@ -28,10 +31,11 @@ export const Card = ({ data }) => {
             <span>{data.rate || "—"}</span>
           </div>
           <div className={s.cardRow}>
-            <span className={s.label}>Тип ТС:</span>
+            <span className={s.label}>Тип требуемого ТС:</span>
             <span>{data.vehicle || "—"}</span>
           </div>
 
+          {/* Откуда / Куда */}
           <div className={s.cardRoute}>
             <div>
               <span className={s.label}>Откуда:</span>
@@ -46,6 +50,7 @@ export const Card = ({ data }) => {
       </div>
     );
   } else {
+    // ----- Отображаем "транспорт" (машины) -----
     return (
       <div className={s.card}>
         <div className={s.cardHeader}>
@@ -73,6 +78,7 @@ export const Card = ({ data }) => {
             <span>{data.vmestimost || "—"}</span>
           </div>
 
+          {/* Откуда / Куда */}
           <div className={s.cardRoute}>
             <div>
               <span className={s.label}>Откуда:</span>
@@ -84,6 +90,7 @@ export const Card = ({ data }) => {
             </div>
           </div>
 
+          {/* Контакты */}
           <div className={s.cardContact}>
             <div>
               <span className={s.label}>Контакт:</span>
@@ -110,7 +117,6 @@ export const Card = ({ data }) => {
   }
 };
 
-// ------------------------- ParserSwitcher (убрана пагинация) -------------------------
 export const ParserSwitcher = ({ theme }) => {
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [isLoading, setIsLoading] = useState(false);
@@ -130,58 +136,12 @@ export const ParserSwitcher = ({ theme }) => {
     }
   };
 
+  // При загрузке страницы сразу загружаем грузы по умолчанию
   useEffect(() => {
-    // При загрузке страницы сразу загружаем "Грузы"
     handleParse("CargoOrder");
   }, []);
 
   const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
-
-  // Лоадер / Плейсхолдер
-  if (isLoading) {
-    return (
-      <>
-        <div
-          className={s.header}
-          style={{
-            backgroundColor: theme === "dark" ? "#121212" : undefined,
-          }}
-        >
-          <div className={s.switch}>
-            <div className={s.typeSwitcher}>
-              <div
-                className={s.switchIndicator}
-                style={{ left: typeIndicatorLeft }}
-              />
-              <button
-                className={
-                  currentType === "CargoOrder" ? s.activeText : s.switcher
-                }
-                onClick={() => {
-                  setCurrentType("CargoOrder");
-                  handleParse("CargoOrder");
-                }}
-              >
-                Грузы
-              </button>
-              <button
-                className={
-                  currentType === "MachineOrder" ? s.activeText : s.switcher
-                }
-                onClick={() => {
-                  setCurrentType("MachineOrder");
-                  handleParse("MachineOrder");
-                }}
-              >
-                Машины
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className={s.loading}>Загрузка...</div>
-      </>
-    );
-  }
 
   return (
     <div className={s.parserContainer}>
@@ -224,11 +184,17 @@ export const ParserSwitcher = ({ theme }) => {
       </div>
 
       <div className={s.resultContainer}>
-        <div className={s.cardsGrid}>
-          {result.map((item, index) => (
-            <Card key={index} data={item} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className={s.loading}>Загрузка...</div>
+        ) : result ? (
+          <div className={s.cardsGrid}>
+            {result.map((item, index) => (
+              <Card key={index} data={item} />
+            ))}
+          </div>
+        ) : (
+          <div className={s.placeholder}>Выберите тип данных для парсинга</div>
+        )}
       </div>
     </div>
   );
