@@ -110,7 +110,7 @@ export const Card = ({ data }) => {
   }
 };
 
-// ------------------------- ParserSwitcher (без пагинации) -------------------------
+// ------------------------- ParserSwitcher (убрана пагинация) -------------------------
 export const ParserSwitcher = ({ theme }) => {
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [isLoading, setIsLoading] = useState(false);
@@ -131,7 +131,7 @@ export const ParserSwitcher = ({ theme }) => {
   };
 
   useEffect(() => {
-    // При загрузке страницы сразу грузим "Грузы"
+    // При загрузке страницы сразу загружаем "Грузы"
     handleParse("CargoOrder");
   }, []);
 
