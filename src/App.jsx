@@ -12,11 +12,12 @@ import Cabinet from "./Pages/Cabinet/Cabinet";
 import Start from "./Pages/Start/Start";
 import Create from "./Pages/Create/Create";
 import Company from "./Pages/Company/Company";
+import { Main } from "./Pages/Main/Main";
 
 function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
-    tg.requestFullscreen();
+    // tg.requestFullscreen();
     tg.disableVerticalSwipes();
     tg.ready();
 
@@ -34,6 +35,7 @@ function App() {
         <Route path="/menu" element={<Cabinet />} />
         <Route path="/create" element={<Create />} />
         <Route path="/company" element={<Company />} />
+        <Route path="/home" element={<Main />} />
       </Routes>
     </Router>
   );

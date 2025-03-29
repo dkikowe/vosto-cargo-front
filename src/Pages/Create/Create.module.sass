@@ -4,6 +4,42 @@
     background: #f5f5f5
     transition: background 0.3s ease, color 0.3s ease
 
+.autocompleteWrapper
+    position: relative
+    width: 100%
+
+.input
+    width: 100%
+    padding: 8px 12px
+    font-size: 16px
+    border: 1px solid #ccc
+    border-radius: 4px
+
+.loading
+    margin-top: 4px
+    font-size: 14px
+    color: #888
+
+.dropdown
+    position: absolute
+    top: calc(100% + 4px)
+    left: 0
+    right: 0
+    background: #fff
+    border: 1px solid #ccc
+    border-radius: 4px
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15)
+    z-index: 1000
+    max-height: 200px
+    overflow-y: auto
+
+.dropdownItem
+    padding: 8px 12px
+    cursor: pointer
+    transition: background 0.2s ease
+    &:hover
+        background: #f0f0f0
+
 .dark
     background: #121212
     color: #ffffff
@@ -175,7 +211,7 @@
     border-radius: 4px
     padding: 10px
     background-color: #fefefe
-    max-height: 450px
+    max-height: 400px
     overflow: scroll
 
     input,

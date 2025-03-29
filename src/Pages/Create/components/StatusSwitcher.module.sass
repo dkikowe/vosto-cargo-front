@@ -1,0 +1,37 @@
+.statusButtons
+    display: flex
+    gap: 8px
+
+.statusItem, .archive
+    padding: 8px 16px
+    border: 1px solid #ddd
+    background: none
+    border-radius: 4px
+    cursor: pointer
+    font-size: 14px
+    color: #666
+    transition: all 0.3s ease
+
+&:hover
+    background: #f5f5f5
+    border-color: #ccc
+
+.statusActive
+    @extend .statusItem
+    background: #007AFF
+    border-color: #007AFF
+    color: white
+
+&:hover
+    background: #0056b3
+    border-color: #0056b3
+
+.statusActiveArchive
+    @extend .archive
+    background: #6c757d
+    border-color: #6c757d
+    color: white
+
+&:hover
+    background: #5a6268
+    border-color: #5a6268

@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import s from "./Create.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
+import { CityAutocomplete } from "./CityAutoComplete";
 
 export function AddOrderModal({
   visible,
@@ -52,24 +53,35 @@ export function AddOrderModal({
 
           {currentType === "CargoOrder" ? (
             <>
+              {/* Место загрузки */}
               <div className={s.formGroup}>
                 <label>Место загрузки</label>
-                <input
-                  name="loadingPlace"
-                  value={formData.loadingPlace}
-                  onChange={onChange}
-                  placeholder="Например, Москва"
+                <CityAutocomplete
+                  onCitySelect={(selectedCity) => {
+                    onChange({
+                      target: {
+                        name: "loadingPlace",
+                        value: selectedCity,
+                      },
+                    });
+                  }}
                 />
               </div>
+              {/* Место выгрузки */}
               <div className={s.formGroup}>
                 <label>Место выгрузки</label>
-                <input
-                  name="unloadingPlace"
-                  value={formData.unloadingPlace}
-                  onChange={onChange}
-                  placeholder="Например, Санкт-Петербург"
+                <CityAutocomplete
+                  onCitySelect={(selectedCity) => {
+                    onChange({
+                      target: {
+                        name: "unloadingPlace",
+                        value: selectedCity,
+                      },
+                    });
+                  }}
                 />
               </div>
+
               <div className={s.formGroup}>
                 <label>Наименование груза</label>
                 <input
@@ -244,7 +256,6 @@ export function AddOrderModal({
                   onChange={onChange}
                 >
                   <option value="Постоянно">Постоянно</option>
-                  {/* Если в схеме вместо "Регулярно" используется "Машина готова" */}
                   <option value="Машина готова">Машина готова</option>
                   <option value="Период">Период</option>
                 </select>
