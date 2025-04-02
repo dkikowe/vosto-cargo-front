@@ -16,7 +16,7 @@ export default function Nav() {
       icon: <PackagePlus className={s.icon} />,
       label: "Создать",
     },
-    { path: "/site", img: "/images/logo.png" },
+    { path: "/site", img: "/images/log.png" },
     { path: "/menu", icon: <Menu className={s.icon} />, label: "Меню" },
   ];
 
