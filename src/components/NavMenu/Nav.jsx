@@ -11,17 +11,12 @@ export default function Nav() {
 
   const navItems = [
     { path: "/home", icon: <House className={s.icon} />, label: "Заявки" },
-    { path: "/search", icon: <Search className={s.icon} />, label: "Поиск" },
     {
       path: "/create",
       icon: <PackagePlus className={s.icon} />,
       label: "Создать",
     },
-    {
-      path: "/notifications",
-      icon: <Bell className={s.icon} />,
-      label: "Уведомления",
-    },
+    { path: "/site", img: "/images/logo.png" },
     { path: "/menu", icon: <Menu className={s.icon} />, label: "Меню" },
   ];
 
@@ -44,8 +39,20 @@ export default function Nav() {
                 : s.iconDiv
             }
           >
-            {item.icon}
-            <p className={s.navText}>{item.label}</p>
+            {item.img ? (
+              <img
+                src={item.img}
+                width={60}
+                height={60}
+                alt="Logo"
+                className={s.logo}
+              />
+            ) : (
+              <>
+                {item.icon}
+                <p className={s.navText}>{item.label}</p>
+              </>
+            )}
           </NavLink>
         ))}
       </div>

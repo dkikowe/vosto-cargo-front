@@ -55,7 +55,7 @@ function RoleSelect({ userId }) {
       >
         {roles.map((r) => (
           <option key={r} value={r}>
-            {r}
+            {r} ▼
           </option>
         ))}
       </select>

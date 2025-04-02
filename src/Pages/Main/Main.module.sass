@@ -195,10 +195,13 @@ p
     width: 100vw
 
 .filterGroup
+    margin-top: 20px
     display: flex
     gap: 12px
     margin-bottom: 20px
     flex-direction: column
+    padding: 10px
+    justify-content: center
 
 .filterInput
     flex: 1
@@ -206,3 +209,77 @@ p
     border: 1px solid #dcdcdc
     border-radius: 4px
     font-size: 14px
+
+.filterLabel
+    display: flex
+    flex-direction: column
+
+.buttonGroup
+    display: flex
+    justify-content: center
+    width: 100vw
+    gap: 20px
+    .searchButton
+        border-radius: 15px
+        padding: 10px
+        background: #004d9f
+        color: white
+        align-self: center
+        justify-content: center
+        align-items: center
+        margin-bottom: 20px
+    .reset
+        border-radius: 15px
+        padding: 10px
+        background: #b9b9b9
+        color: white
+        align-self: center
+        justify-content: center
+        align-items: center
+        margin-bottom: 20px
+
+.filterContainer
+    display: flex
+    flex-direction: column
+    justify-content: center
+
+.statusButtons
+    display: flex
+    justify-content: space-between
+    margin: 10px 0
+    padding-left: 15px
+    align-items: center
+    margin-top: 30px
+    .archive
+        background: none
+        border: none
+        font-weight: 500
+        cursor: pointer
+        padding: 0
+        color: #c7c7c7a5
+        margin-right: 40px
+        font-size: 14px
+
+    .statusItem,
+    .statusActive,
+    .archive
+        background: none
+        border: none
+        font-weight: 500
+        cursor: pointer
+        padding: 0
+        color: #c7c7c7a5
+        font-size: 14px
+
+    .statusActiveArchive
+        margin-right: 40px
+        color: white
+        font-weight: 600
+        border-bottom: 2px solid #fff
+        font-size: 14px
+
+    .statusActive
+        font-weight: 600
+        border-bottom: 2px solid #fff
+        color: white
+        font-size: 14px
