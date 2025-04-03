@@ -46,12 +46,16 @@ function RoleSelect({ userId }) {
   };
 
   return (
-    <div className="role-select">
+    <div
+      className="role-select"
+      style={{ position: "relative", display: "inline-block" }}
+    >
       <select
         id="roleSelect"
         className="role-select__dropdown"
         value={role}
         onChange={handleChange}
+        style={{ paddingRight: "2.5em" }}
       >
         {roles.map((r) => (
           <option key={r} value={r}>
@@ -59,6 +63,20 @@ function RoleSelect({ userId }) {
           </option>
         ))}
       </select>
+      <img
+        src="/images/down.svg"
+        alt="arrow down"
+        className="role-select__arrow"
+        style={{
+          position: "absolute",
+          pointerEvents: "none",
+          top: "50%",
+          right: "10px",
+          transform: "translateY(-50%)",
+          width: "16px",
+          height: "auto",
+        }}
+      />
     </div>
   );
 }
