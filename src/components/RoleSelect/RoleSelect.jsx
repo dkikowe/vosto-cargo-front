@@ -55,7 +55,6 @@ function RoleSelect({ userId }) {
         className="role-select__dropdown"
         value={role}
         onChange={handleChange}
-        style={{ paddingRight: "2.5em" }}
       >
         {roles.map((r) => (
           <option key={r} value={r}>
