@@ -46,10 +46,7 @@ function RoleSelect({ userId }) {
   };
 
   return (
-    <div
-      className="role-select"
-      style={{ position: "relative", display: "inline-block" }}
-    >
+    <div className="role-select">
       <select
         id="roleSelect"
         className="role-select__dropdown"
