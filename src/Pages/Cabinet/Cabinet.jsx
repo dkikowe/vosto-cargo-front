@@ -10,6 +10,7 @@ import {
   SunMoon,
   Settings,
   LockKeyhole,
+  Bell,
 } from "lucide-react";
 import s from "./Cabinet.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
@@ -283,8 +284,18 @@ export default function Cabinet() {
       <div className={s.paymentContainer}>
         <div className={s.support}>
           <div className={s.iconText}>
+            <Bell />
+            <p>Уведомления</p>
+          </div>
+          <div className={s.str}>
+            <ChevronRight />
+          </div>
+        </div>
+        <hr />
+        <div className={s.support}>
+          <div className={s.iconText}>
             <LockKeyhole />
-            <p>Конфеденцианольсть</p>
+            <p>Конфеденциальность</p>
           </div>
           <div className={s.str}>
             <ChevronRight />

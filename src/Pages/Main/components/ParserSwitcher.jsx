@@ -65,104 +65,133 @@ function parseRange(readyStr, yearArg) {
 
 // ------------------------- Card (не меняем) -------------------------
 export const Card = ({ data }) => {
-  const isCargo = Boolean(data.orderType === "CargoOrder");
+  const isCargo = data.orderType === "CargoOrder";
 
   if (isCargo) {
     return (
       <div className={s.card}>
         <div className={s.cardHeader}>
-          <h3>{data.cargo || "Без названия груза"}</h3>
-          <span className={s.date}>{data.ready}</span>
+          {data.cargo && <h3>{data.cargo}</h3>}
+          {data.ready && <span className={s.date}>{data.ready}</span>}
         </div>
         <div className={s.cardBody}>
-          <div className={s.cardRow}>
-            <span className={s.label}>Вес:</span>
-            <span>{data.weight || "—"}</span>
-          </div>
-          <div className={s.cardRow}>
-            <span className={s.label}>Объём:</span>
-            <span>{data.volume || "—"}</span>
-          </div>
-          <div className={s.cardRow}>
-            <span className={s.label}>Ставка:</span>
-            <span>{data.rate || "—"}</span>
-          </div>
-          <div className={s.cardRow}>
-            <span className={s.label}>Тип ТС:</span>
-            <span>{data.vehicle || "—"}</span>
-          </div>
-
-          <div className={s.cardRoute}>
-            <div>
-              <span className={s.label}>Откуда:</span>
-              <p>{data.from || "—"}</p>
+          {data.weight && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Вес:</span>
+              <span>{data.weight}</span>
             </div>
-            <div>
-              <span className={s.label}>Куда:</span>
-              <p>{data.to || "—"}</p>
+          )}
+          {data.volume && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Объём:</span>
+              <span>{data.volume}</span>
             </div>
-          </div>
-          <div className={s.cardContact}>
-            <div>
-              <span className={s.label}>Контакт:</span>
-
-              <p>Тел: {data.telefon || "—"}</p>
+          )}
+          {data.rate && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Ставка:</span>
+              <span>{data.rate}</span>
             </div>
-          </div>
+          )}
+          {data.vehicle && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Тип ТС:</span>
+              <span>{data.vehicle}</span>
+            </div>
+          )}
+          {(data.from || data.to) && (
+            <div className={s.cardRoute}>
+              {data.from && (
+                <div>
+                  <span className={s.label}>Откуда:</span>
+                  <p>{data.from}</p>
+                </div>
+              )}
+              {data.to && (
+                <div>
+                  <span className={s.label}>Куда:</span>
+                  <p>{data.to}</p>
+                </div>
+              )}
+            </div>
+          )}
+          {data.telefon && (
+            <div className={s.cardContact}>
+              <div>
+                <span className={s.label}>Контакт:</span>
+                <p>Тел: {data.telefon}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
   } else {
-    // Машина
     return (
       <div className={s.card}>
         <div className={s.cardHeader}>
-          <h3>
-            {data.marka || "Без марки"} {data.tip || ""}
-          </h3>
-          <span className={s.date}>{data.data_gotovnosti || ""}</span>
+          {(data.marka || data.tip) && (
+            <h3>
+              {data.marka} {data.tip}
+            </h3>
+          )}
+          {data.data_gotovnosti && (
+            <span className={s.date}>{data.data_gotovnosti}</span>
+          )}
         </div>
 
         <div className={s.cardBody}>
-          <div className={s.cardRow}>
-            <span className={s.label}>Кузов:</span>
-            <span>{data.kuzov || "—"}</span>
-          </div>
-          <div className={s.cardRow}>
-            <span className={s.label}>Тип загрузки:</span>
-            <span>{data.tip_zagruzki || "—"}</span>
-          </div>
-          <div className={s.cardRow}>
-            <span className={s.label}>Грузоподъемность:</span>
-            <span>{data.gruzopodyomnost || "—"}</span>
-          </div>
-          <div className={s.cardRow}>
-            <span className={s.label}>Вместимость:</span>
-            <span>{data.vmestimost || "—"}</span>
-          </div>
-
-          <div className={s.cardRoute}>
-            <div>
-              <span className={s.label}>Откуда:</span>
-              <p>{data.otkuda || "—"}</p>
+          {data.kuzov && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Кузов:</span>
+              <span>{data.kuzov}</span>
             </div>
-            <div>
-              <span className={s.label}>Куда:</span>
-              <p>{data.kuda || "—"}</p>
+          )}
+          {data.tip_zagruzki && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Тип загрузки:</span>
+              <span>{data.tip_zagruzki}</span>
             </div>
-          </div>
-
-          <div className={s.cardContact}>
-            <div>
-              <span className={s.label}>Контакт:</span>
-              <p>
-                {data.imya || "—"} {data.firma ? `(${data.firma})` : ""}
-              </p>
-              <p>Тел: {data.telefon || "—"}</p>
+          )}
+          {data.gruzopodyomnost && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Грузоподъемность:</span>
+              <span>{data.gruzopodyomnost}</span>
             </div>
-          </div>
+          )}
+          {data.vmestimost && (
+            <div className={s.cardRow}>
+              <span className={s.label}>Вместимость:</span>
+              <span>{data.vmestimost}</span>
+            </div>
+          )}
+          {(data.otkuda || data.kuda) && (
+            <div className={s.cardRoute}>
+              {data.otkuda && (
+                <div>
+                  <span className={s.label}>Откуда:</span>
+                  <p>{data.otkuda}</p>
+                </div>
+              )}
+              {data.kuda && (
+                <div>
+                  <span className={s.label}>Куда:</span>
+                  <p>{data.kuda}</p>
+                </div>
+              )}
+            </div>
+          )}
+          {(data.imya || data.firma || data.telefon) && (
+            <div className={s.cardContact}>
+              <div>
+                <span className={s.label}>Контакт:</span>
+                {data.imya && <p>{data.imya}</p>}
+                {data.firma && <p>({data.firma})</p>}
+                {data.telefon && <p>Тел: {data.telefon}</p>}
+              </div>
+            </div>
+          )}
         </div>
-
         {data.url && (
           <a
             href={data.url}
@@ -292,9 +321,9 @@ export const ParserSwitcher = ({ theme }) => {
   }
 
   // -------------------- ЛЕНТА --------------------
-  const feedData = result.filter(
-    (item) => item.orderType === currentType && !item.isArchived
-  );
+  const feedData = result
+    .filter((item) => item.orderType === currentType && !item.isArchived)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   // -------------------- Поиск: ГРУЗЫ --------------------
   const handleSearchCargo = () => {

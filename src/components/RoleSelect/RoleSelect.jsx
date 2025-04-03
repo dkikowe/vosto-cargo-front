@@ -9,7 +9,7 @@ function RoleSelect({ userId }) {
   const [role, setRole] = useState("");
 
   // Список доступных ролей
-  const roles = ["Грузодатель", "Грузоперевозчик", "Диспетчер", "Экспедитор"];
+  const roles = ["Заказчик", "Перевозчик", "Диспетчер", "Экспедитор"];
 
   // При первом рендере (и при изменении userId) — запросить актуальные данные о пользователе
   useEffect(() => {
@@ -55,7 +55,7 @@ function RoleSelect({ userId }) {
       >
         {roles.map((r) => (
           <option key={r} value={r}>
-            {r} ▼
+            {r}
           </option>
         ))}
       </select>
