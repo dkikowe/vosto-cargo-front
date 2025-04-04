@@ -33,7 +33,13 @@ export function AddOrderModal({
         <h3>
           {currentType === "CargoOrder" ? "Добавить груз" : "Добавить машину"}
         </h3>
-        <form onSubmit={onSubmit} className={s.createForm}>
+        <form
+          onSubmit={onSubmit}
+          className={s.createForm}
+          style={{
+            backgroundColor: theme === "dark" ? "#121212" : undefined,
+          }}
+        >
           <div className={s.formGroup}>
             <label>Описание</label>
             <textarea

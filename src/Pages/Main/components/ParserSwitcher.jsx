@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import s from "../Main.module.sass";
 import axios from "../../../axios";
+import PullToRefresh from "react-pull-to-refresh";
+import { ThemeContext } from "../../../context/ThemeContext";
 
 // ---------- Парсинг одного поля "ДД.ММ" + год ----------
 // Принимает, например, "31.03" + yearArg=2025 => возвращает Date(2025,2,31)
@@ -266,6 +268,22 @@ export const ParserSwitcher = ({ theme }) => {
     });
     setSearchResults([]);
   };
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axios.get("/allOrders");
+      setResult(data);
+    } catch (error) {
+      console.error("Ошибка при загрузке заказов:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleRefresh = async () => {
+    await fetchData();
+    // Для react-pull-to-refresh нужно вернуть промис
+    return Promise.resolve();
+  };
 
   const handleResetMachine = () => {
     setMachineSearch({
@@ -310,7 +328,27 @@ export const ParserSwitcher = ({ theme }) => {
               </button>
             </div>
           </div>
+          <div className={s.statusButtons}>
+            <button
+              className={currentTab === "feed" ? s.statusActive : s.statusItem}
+              onClick={() => setCurrentTab("feed")}
+            >
+              Лента
+            </button>
+            <button
+              className={
+                currentTab === "search" ? s.statusActiveArchive : s.archive
+              }
+              onClick={() => {
+                setCurrentTab("search");
+                setSearchResults([]);
+              }}
+            >
+              Поиск
+            </button>
+          </div>
         </div>
+
         <div className={s.loading}>Загрузка...</div>
       </>
     );
@@ -543,17 +581,54 @@ export const ParserSwitcher = ({ theme }) => {
       </div>
 
       {/* ------ Вкладка ЛЕНТА ------ */}
-      {currentTab === "feed" && (
-        <div className={s.resultContainer}>
-          <div className={s.cardsGrid}>
-            {feedData.length > 0 ? (
-              feedData.map((item, index) => <Card key={index} data={item} />)
-            ) : (
-              <p className={s.placeholder}>Нет заявок по выбранному типу</p>
-            )}
+      <PullToRefresh
+        onRefresh={handleRefresh}
+        pullDownContent={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "10px",
+            }}
+          >
+            <div className="custom-spinner" />
           </div>
-        </div>
-      )}
+        }
+        releaseContent={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "10px",
+            }}
+          >
+            <span>Отпустите для обновления</span>
+          </div>
+        }
+        refreshingContent={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "10px",
+            }}
+          >
+            <div className="custom-spinner loadingR" />
+          </div>
+        }
+      >
+        {currentTab === "feed" && (
+          <div className={s.resultContainer}>
+            <div className={s.cardsGrid}>
+              {feedData.length > 0 ? (
+                feedData.map((item, index) => <Card key={index} data={item} />)
+              ) : (
+                <p className={s.placeholder}>Нет заявок по выбранному типу</p>
+              )}
+            </div>
+          </div>
+        )}
+      </PullToRefresh>
 
       {/* ------ Вкладка ПОИСК ------ */}
       {currentTab === "search" && (

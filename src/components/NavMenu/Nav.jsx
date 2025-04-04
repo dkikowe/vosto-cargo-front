@@ -42,8 +42,8 @@ export default function Nav() {
             {item.img ? (
               <img
                 src={item.img}
-                width={60}
-                height={60}
+                width={75}
+                height={75}
                 alt="Logo"
                 className={s.logo}
               />

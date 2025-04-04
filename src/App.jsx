@@ -17,7 +17,7 @@ import { Main } from "./Pages/Main/Main";
 function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
-    // tg.requestFullscreen();
+    tg.requestFullscreen();
     tg.disableVerticalSwipes();
     tg.ready();
 
@@ -30,7 +30,7 @@ function App() {
       <Header />
       <Nav />
       <Routes>
-        <Route path="/" element={<Navigate to="/menu" replace />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/start" element={<Start />} />
         <Route path="/menu" element={<Cabinet />} />
         <Route path="/create" element={<Create />} />

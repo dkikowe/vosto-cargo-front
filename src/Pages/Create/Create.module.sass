@@ -60,6 +60,8 @@
     width: 100vw
     background: #3a5c9f
     padding: 100px 20px 10px 20px
+    position: fixed
+    top: 0
 
 .switch
     display: flex
@@ -132,11 +134,12 @@
 
 .statusButtons
     display: flex
-    justify-content: space-between
+    justify-content: center
+    gap: 110px
     margin: 10px 0
-    padding-left: 15px
+
     align-items: center
-    margin-top: 30px
+
     .archive
         background: none
         border: none
@@ -144,7 +147,7 @@
         cursor: pointer
         padding: 0
         color: #c7c7c7a5
-        margin-right: 40px
+
         font-size: 14px
 
     .statusItem,
@@ -159,7 +162,7 @@
         font-size: 14px
 
     .statusActiveArchive
-        margin-right: 40px
+
         color: white
         font-weight: 600
         border-bottom: 2px solid #fff
@@ -172,7 +175,7 @@
         font-size: 14px
 
 .ordersList
-    margin-top: 10px
+    margin-top: 205px
     display: flex
     flex-direction: column
     gap: 10px
@@ -204,6 +207,12 @@
 .addButtonWrapper
     margin-top: 20px
     text-align: center
+    position: fixed
+    bottom: 100px
+    width: 100vw
+    display: flex
+    justify-content: center
+    align-items: center
 
 .createForm
     margin-top: 20px
@@ -283,6 +292,7 @@ label
     color: #fff
     cursor: pointer
     transition: background-color 0.2s ease
+    width: 80vw
 
 .modalOverlay
     position: fixed
@@ -311,5 +321,5 @@ label
         right: 10px
         border: none
         background: none
-        font-size: 20px
+        font-size: 30px
         cursor: pointer
