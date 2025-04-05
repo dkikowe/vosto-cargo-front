@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import s from "../Main.module.sass";
 import axios from "../../../axios";
+import ReactPullToRefresh from "react-simple-pull-to-refresh";
 
-// ---------- Утилиты парсинга ----------
+// ---------- Парсинг дат (не меняем) ----------
 function tryParseDate(ddmm, yearArg) {
   if (!ddmm) return null;
   const [dd, mm] = ddmm.split(".");
@@ -44,7 +45,7 @@ function parseRange(readyStr, yearArg) {
   return [null, null];
 }
 
-// ---------- Компонент карточки ----------
+// ---------- Компонент карточки (не меняем) ----------
 export const Card = ({ data }) => {
   const isCargo = data.orderType === "CargoOrder";
   if (isCargo) {
@@ -189,9 +190,9 @@ export const Card = ({ data }) => {
 // ---------- Основной компонент ----------
 export const ParserSwitcher = ({ theme }) => {
   const [currentType, setCurrentType] = useState("CargoOrder");
+  const [currentTab, setCurrentTab] = useState("feed");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
-  const [currentTab, setCurrentTab] = useState("feed");
 
   // Поля поиска
   const [cargoSearch, setCargoSearch] = useState({
@@ -211,116 +212,25 @@ export const ParserSwitcher = ({ theme }) => {
   });
   const [searchResults, setSearchResults] = useState([]);
 
-  // Поля для pull-to-refresh
-  const [pullStartY, setPullStartY] = useState(0);
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const feedRef = useRef(null);
-
+  // Загрузим данные при первом рендере
   useEffect(() => {
-    // Допустим, при каждом заходе на вкладку "feed"
-    if (currentTab === "feed") {
-      setPullDistance(0);
-      setPullStartY(0);
-      // при необходимости - scrollTop = 0
-      if (feedRef.current) {
-        feedRef.current.scrollTop = 0;
-      }
-    }
-  }, [currentTab]);
-
-  // Загрузка данных при первом рендере
-  useEffect(() => {
-    const handleParse = async () => {
-      setIsLoading(true);
-      try {
-        const { data } = await axios.get("/allOrders");
-        setResult(data);
-      } catch (error) {
-        console.error("Ошибка при загрузке заказов:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    handleParse();
+    fetchData();
   }, []);
 
-  // Добавляем обработчики touch-событий для pull-to-refresh
-  useEffect(() => {
-    const el = feedRef.current;
-    if (!el) return;
-
-    function onTouchStart(e) {
-      // Сбрасываем состояние
-      setPullDistance(0);
-      setPullStartY(0);
-
-      // Проверяем, действительно ли мы на самом верху
-      if (el.scrollTop <= 0) {
-        setPullStartY(e.touches[0].clientY);
-      }
-    }
-
-    function onTouchMove(e) {
-      // Если pullStartY == 0, значит жест не начался с самого верха
-      if (pullStartY === 0) return;
-
-      // Текущее смещение
-      const dist = e.touches[0].clientY - pullStartY;
-
-      // Если пользователь тянет вниз
-      if (dist > 0) {
-        // Блокируем дефолтный скролл, чтобы не "соскальзывать"
-        e.preventDefault();
-        setPullDistance(dist);
-      } else {
-        // Если потянули в обратную сторону, сбрасываем
-        setPullDistance(0);
-      }
-    }
-
-    function onTouchEnd() {
-      if (pullDistance > 5) {
-        setIsRefreshing(true);
-        handleRefresh().then(() => {
-          setIsRefreshing(false);
-        });
-      }
-      setPullDistance(0);
-      setPullStartY(0);
-    }
-
-    el.addEventListener("touchstart", onTouchStart, { passive: false });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: false });
-
-    return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-    };
-  }, [pullStartY, pullDistance]);
-
-  // Перезапрашивает данные
+  // Функция для обновления (используется и в pull-to-refresh, и вручную)
   const fetchData = async () => {
     setIsLoading(true);
     try {
       const { data } = await axios.get("/allOrders");
       setResult(data);
     } catch (error) {
-      console.error("Ошибка при загрузке заказов:", error);
+      console.error("Ошибка загрузки:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRefresh = async () => {
-    await fetchData();
-    // Можно вернуть Promise.resolve(), если где-то требуется then
-    return Promise.resolve();
-  };
-
-  // Сброс полей поиска
+  // Сброс форм
   const handleResetCargo = () => {
     setCargoSearch({
       fromDate: "",
@@ -344,92 +254,19 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults([]);
   };
 
-  // Если идёт загрузка
-  if (isLoading) {
-    return (
-      <>
-        <div
-          className={s.header}
-          style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
-        >
-          <div className={s.switch}>
-            <div className={s.typeSwitcher}>
-              <div
-                className={s.switchIndicator}
-                style={{
-                  left: currentType === "CargoOrder" ? "0%" : "50%",
-                }}
-              />
-              <button
-                className={
-                  currentType === "CargoOrder" ? s.activeText : s.switcher
-                }
-                onClick={() => setCurrentType("CargoOrder")}
-              >
-                Грузы
-              </button>
-              <button
-                className={
-                  currentType === "MachineOrder" ? s.activeText : s.switcher
-                }
-                onClick={() => setCurrentType("MachineOrder")}
-              >
-                Машины
-              </button>
-            </div>
-          </div>
-          <div className={s.statusButtons}>
-            <button
-              className={currentTab === "feed" ? s.statusActive : s.statusItem}
-              onClick={() => setCurrentTab("feed")}
-            >
-              Лента
-            </button>
-            <button
-              className={
-                currentTab === "search" ? s.statusActiveArchive : s.archive
-              }
-              onClick={() => {
-                setCurrentTab("search");
-                setSearchResults([]);
-              }}
-            >
-              Поиск
-            </button>
-          </div>
-        </div>
-        <div className={s.loading}>Загрузка...</div>
-      </>
-    );
-  }
-
-  // Если данные не пришли
-  if (!result) {
-    return <div className={s.placeholder}>Нет данных для отображения</div>;
-  }
-
-  // Фильтрация по ленте
-  const feedData = result
-    .filter((item) => item.orderType === currentType && !item.isArchived)
-    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-  // Обработка поиска (грузы)
+  // Поиск (грузы)
   const handleSearchCargo = () => {
+    if (!result) return;
     let filtered = result.filter(
       (item) => item.orderType === "CargoOrder" && !item.isArchived
     );
-    // Дата
+
     if (cargoSearch.fromDate || cargoSearch.toDate) {
-      let fromD = null;
-      if (cargoSearch.fromDate) {
-        fromD = new Date(cargoSearch.fromDate);
-        fromD.setHours(0, 0, 0, 0);
-      }
-      let toD = null;
-      if (cargoSearch.toDate) {
-        toD = new Date(cargoSearch.toDate);
-        toD.setHours(23, 59, 59, 999);
-      }
+      let fromD = cargoSearch.fromDate ? new Date(cargoSearch.fromDate) : null;
+      if (fromD) fromD.setHours(0, 0, 0, 0);
+      let toD = cargoSearch.toDate ? new Date(cargoSearch.toDate) : null;
+      if (toD) toD.setHours(23, 59, 59, 999);
+
       const usedYear =
         fromD?.getFullYear() || toD?.getFullYear() || new Date().getFullYear();
       filtered = filtered.filter((item) => {
@@ -440,7 +277,6 @@ export const ParserSwitcher = ({ theme }) => {
         return true;
       });
     }
-    // Тип груза
     if (cargoSearch.cargoType) {
       filtered = filtered.filter((item) => {
         if (!item.cargo) return false;
@@ -449,7 +285,6 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(cargoSearch.cargoType.toLowerCase());
       });
     }
-    // Откуда
     if (cargoSearch.fromLocation) {
       filtered = filtered.filter((item) => {
         if (!item.from) return false;
@@ -458,7 +293,6 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(cargoSearch.fromLocation.toLowerCase());
       });
     }
-    // Куда
     if (cargoSearch.toLocation) {
       filtered = filtered.filter((item) => {
         if (!item.to) return false;
@@ -470,23 +304,21 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults(filtered);
   };
 
-  // Обработка поиска (машины)
+  // Поиск (машины)
   const handleSearchMachine = () => {
+    if (!result) return;
     let filtered = result.filter(
       (item) => item.orderType === "MachineOrder" && !item.isArchived
     );
-    // Даты
+
     if (machineSearch.fromDate || machineSearch.toDate) {
-      let fromD = null;
-      if (machineSearch.fromDate) {
-        fromD = new Date(machineSearch.fromDate);
-        fromD.setHours(0, 0, 0, 0);
-      }
-      let toD = null;
-      if (machineSearch.toDate) {
-        toD = new Date(machineSearch.toDate);
-        toD.setHours(23, 59, 59, 999);
-      }
+      let fromD = machineSearch.fromDate
+        ? new Date(machineSearch.fromDate)
+        : null;
+      if (fromD) fromD.setHours(0, 0, 0, 0);
+      let toD = machineSearch.toDate ? new Date(machineSearch.toDate) : null;
+      if (toD) toD.setHours(23, 59, 59, 999);
+
       filtered = filtered.filter((item) => {
         if (!item.data_gotovnosti) return false;
         let itemDate;
@@ -496,15 +328,12 @@ export const ParserSwitcher = ({ theme }) => {
         } else {
           itemDate = new Date(item.data_gotovnosti);
         }
-        if (isNaN(itemDate.getTime())) {
-          return false;
-        }
+        if (isNaN(itemDate.getTime())) return false;
         if (fromD && itemDate < fromD) return false;
         if (toD && itemDate > toD) return false;
         return true;
       });
     }
-    // Тоннаж
     if (machineSearch.tonnage) {
       filtered = filtered.filter((item) => {
         if (!item.gruzopodyomnost) return false;
@@ -513,7 +342,6 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(machineSearch.tonnage.toLowerCase());
       });
     }
-    // Откуда
     if (machineSearch.fromLocation) {
       filtered = filtered.filter((item) => {
         if (!item.otkuda) return false;
@@ -522,7 +350,6 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(machineSearch.fromLocation.toLowerCase());
       });
     }
-    // Куда
     if (machineSearch.toLocation) {
       filtered = filtered.filter((item) => {
         if (!item.kuda) return false;
@@ -531,7 +358,6 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(machineSearch.toLocation.toLowerCase());
       });
     }
-    // Тип кузова
     if (machineSearch.bodyType) {
       filtered = filtered.filter((item) => {
         if (!item.kuzov) return false;
@@ -543,11 +369,10 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults(filtered);
   };
 
-  // Смена вкладки «Грузы / Машины»
+  // Переключатель вкладок (Грузы / Машины, Лента / Поиск)
   const handleTypeSwitch = (type) => {
     setCurrentType(type);
     setCurrentTab("feed");
-    // Сброс полей поиска и результатов
     setCargoSearch({
       fromDate: "",
       toDate: "",
@@ -566,12 +391,30 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults([]);
   };
 
+  // Собираем данные для ленты
+  const feedData = result
+    ? result
+        .filter((item) => item.orderType === currentType && !item.isArchived)
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    : [];
+
+  // Покажем лоадер, если идёт загрузка
+  if (isLoading) {
+    return <div className={s.loading}>Загрузка...</div>;
+  }
+
+  // Если данных нет вовсе
+  if (!result) {
+    return <div className={s.placeholder}>Нет данных</div>;
+  }
+
   return (
     <div className={s.parserContainer}>
       <div
         className={s.header}
         style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
       >
+        {/* Переключатели Грузы / Машины */}
         <div className={s.switch}>
           <div className={s.typeSwitcher}>
             <div
@@ -598,6 +441,7 @@ export const ParserSwitcher = ({ theme }) => {
             </button>
           </div>
         </div>
+        {/* Переключатели Лента / Поиск */}
         <div className={s.statusButtons}>
           <button
             className={currentTab === "feed" ? s.statusActive : s.statusItem}
@@ -619,43 +463,27 @@ export const ParserSwitcher = ({ theme }) => {
         </div>
       </div>
 
-      {/* Вкладка «Лента» */}
+      {/* Вкладка ЛЕНТА – оборачиваем в ReactPullToRefresh */}
       {currentTab === "feed" && (
-        <div
-          className={s.resultContainer}
-          ref={feedRef}
-          style={{
-            overflowY: "auto",
-            WebkitOverflowScrolling: "touch",
-          }}
+        <ReactPullToRefresh
+          onRefresh={fetchData}
+          pullingContent={<div className={s.loading}>Потяните вниз</div>}
+          refreshingContent={<div className={s.loading}>Обновляем...</div>}
+          resistance={2.5}
         >
-          {/* Блок индикатора pull-to-refresh */}
-          <div
-            className={s.pullIndicator}
-            style={{
-              height: isRefreshing ? 50 : pullDistance,
-              transition: isRefreshing ? "height 0.2s" : "none",
-            }}
-          >
-            {isRefreshing ? (
-              <div className={s.loadingR}>Обновление...</div>
-            ) : (
-              pullDistance > 0 && <div className={s.custom_spinner} />
-            )}
+          <div className={s.resultContainer} style={{ overflowY: "auto" }}>
+            <div className={s.cardsGrid}>
+              {feedData.length > 0 ? (
+                feedData.map((item, index) => <Card key={index} data={item} />)
+              ) : (
+                <p className={s.placeholder}>Нет заявок по выбранному типу</p>
+              )}
+            </div>
           </div>
-
-          {/* Список карточек */}
-          <div className={s.cardsGrid}>
-            {feedData.length > 0 ? (
-              feedData.map((item, index) => <Card key={index} data={item} />)
-            ) : (
-              <p className={s.placeholder}>Нет заявок по выбранному типу</p>
-            )}
-          </div>
-        </div>
+        </ReactPullToRefresh>
       )}
 
-      {/* Вкладка «Поиск» */}
+      {/* Вкладка ПОИСК */}
       {currentTab === "search" && (
         <div className={s.searchContainer}>
           {currentType === "CargoOrder" ? (
