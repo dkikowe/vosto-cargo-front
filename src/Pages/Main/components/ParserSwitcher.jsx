@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import s from "../Main.module.sass";
 import axios from "../../../axios";
 import ReactPullToRefresh from "react-simple-pull-to-refresh";
+// Импортируем наш контекст темы
+import { ThemeContext } from "../../../context/ThemeContext";
 
 // ---------- Парсинг дат (не меняем) ----------
 function tryParseDate(ddmm, yearArg) {
@@ -47,10 +49,23 @@ function parseRange(readyStr, yearArg) {
 
 // ---------- Компонент карточки (не меняем) ----------
 export const Card = ({ data }) => {
+  // Считываем тему
+  const { theme } = useContext(ThemeContext);
+
+  // Определяем стили под тёмную тему
+  const isDark = theme === "dark";
+
+  // Для фона и текста карточки используем inline-стили (или добавляем класс)
+  const cardStyle = {
+    backgroundColor: isDark ? "#111" : "#fff", // фон карточки
+    color: isDark ? "#fff" : "#000", // текст
+  };
+
   const isCargo = data.orderType === "CargoOrder";
+
   if (isCargo) {
     return (
-      <div className={s.card}>
+      <div className={s.card} style={cardStyle}>
         <div className={s.cardHeader}>
           {data.cargo && <h3>{data.cargo}</h3>}
           {data.ready && <span className={s.date}>{data.ready}</span>}
@@ -109,7 +124,7 @@ export const Card = ({ data }) => {
     );
   } else {
     return (
-      <div className={s.card}>
+      <div className={s.card} style={cardStyle}>
         <div className={s.cardHeader}>
           {(data.marka || data.tip) && (
             <h3>
@@ -186,9 +201,11 @@ export const Card = ({ data }) => {
     );
   }
 };
-
 // ---------- Основной компонент ----------
-export const ParserSwitcher = ({ theme }) => {
+export const ParserSwitcher = () => {
+  // Забираем тему из контекста
+  const { theme } = useContext(ThemeContext);
+
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [currentTab, setCurrentTab] = useState("feed");
   const [isLoading, setIsLoading] = useState(false);
@@ -212,12 +229,10 @@ export const ParserSwitcher = ({ theme }) => {
   });
   const [searchResults, setSearchResults] = useState([]);
 
-  // Загрузим данные при первом рендере
   useEffect(() => {
     fetchData();
   }, []);
 
-  // Функция для обновления (используется и в pull-to-refresh, и вручную)
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -230,7 +245,6 @@ export const ParserSwitcher = ({ theme }) => {
     }
   };
 
-  // Сброс форм
   const handleResetCargo = () => {
     setCargoSearch({
       fromDate: "",
@@ -254,19 +268,16 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults([]);
   };
 
-  // Поиск (грузы)
   const handleSearchCargo = () => {
     if (!result) return;
     let filtered = result.filter(
       (item) => item.orderType === "CargoOrder" && !item.isArchived
     );
-
     if (cargoSearch.fromDate || cargoSearch.toDate) {
       let fromD = cargoSearch.fromDate ? new Date(cargoSearch.fromDate) : null;
       if (fromD) fromD.setHours(0, 0, 0, 0);
       let toD = cargoSearch.toDate ? new Date(cargoSearch.toDate) : null;
       if (toD) toD.setHours(23, 59, 59, 999);
-
       const usedYear =
         fromD?.getFullYear() || toD?.getFullYear() || new Date().getFullYear();
       filtered = filtered.filter((item) => {
@@ -304,13 +315,11 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults(filtered);
   };
 
-  // Поиск (машины)
   const handleSearchMachine = () => {
     if (!result) return;
     let filtered = result.filter(
       (item) => item.orderType === "MachineOrder" && !item.isArchived
     );
-
     if (machineSearch.fromDate || machineSearch.toDate) {
       let fromD = machineSearch.fromDate
         ? new Date(machineSearch.fromDate)
@@ -318,7 +327,6 @@ export const ParserSwitcher = ({ theme }) => {
       if (fromD) fromD.setHours(0, 0, 0, 0);
       let toD = machineSearch.toDate ? new Date(machineSearch.toDate) : null;
       if (toD) toD.setHours(23, 59, 59, 999);
-
       filtered = filtered.filter((item) => {
         if (!item.data_gotovnosti) return false;
         let itemDate;
@@ -369,7 +377,6 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults(filtered);
   };
 
-  // Переключатель вкладок (Грузы / Машины, Лента / Поиск)
   const handleTypeSwitch = (type) => {
     setCurrentType(type);
     setCurrentTab("feed");
@@ -391,30 +398,41 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults([]);
   };
 
-  // Собираем данные для ленты
+  // Формируем список для «Ленты»
   const feedData = result
     ? result
         .filter((item) => item.orderType === currentType && !item.isArchived)
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
     : [];
 
-  // Покажем лоадер, если идёт загрузка
+  // Если идёт загрузка
   if (isLoading) {
     return <div className={s.loading}>Загрузка...</div>;
   }
 
-  // Если данных нет вовсе
+  // Если данных нет
   if (!result) {
     return <div className={s.placeholder}>Нет данных</div>;
   }
 
+  // ---------------------------------------------------------
+  // Тут мы будем применять стили для dark/light:
+  // Можно добавить класс s.darkTheme, s.lightTheme, или inline-стили
+  // ---------------------------------------------------------
+  const containerStyle = {
+    backgroundColor: theme === "dark" ? "#1A1A1A" : undefined,
+    color: theme === "dark" ? "#ddd" : undefined,
+    minHeight: "100vh", // чтобы фон точно покрывал экран
+  };
+
   return (
-    <div className={s.parserContainer}>
+    <div className={s.parserContainer} style={containerStyle}>
       <div
         className={s.header}
-        style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
+        style={{
+          backgroundColor: theme === "dark" ? "#121212" : "",
+        }}
       >
-        {/* Переключатели Грузы / Машины */}
         <div className={s.switch}>
           <div className={s.typeSwitcher}>
             <div
@@ -441,7 +459,6 @@ export const ParserSwitcher = ({ theme }) => {
             </button>
           </div>
         </div>
-        {/* Переключатели Лента / Поиск */}
         <div className={s.statusButtons}>
           <button
             className={currentTab === "feed" ? s.statusActive : s.statusItem}
@@ -463,7 +480,7 @@ export const ParserSwitcher = ({ theme }) => {
         </div>
       </div>
 
-      {/* Вкладка ЛЕНТА – оборачиваем в ReactPullToRefresh */}
+      {/* Вкладка ЛЕНТА – Pull to Refresh */}
       {currentTab === "feed" && (
         <ReactPullToRefresh
           onRefresh={fetchData}
@@ -471,7 +488,13 @@ export const ParserSwitcher = ({ theme }) => {
           refreshingContent={<div className={s.loading}>Обновляем...</div>}
           resistance={2.5}
         >
-          <div className={s.resultContainer} style={{ overflowY: "auto" }}>
+          <div
+            className={s.resultContainer}
+            style={{
+              overflowY: "auto",
+              backgroundColor: theme === "dark" ? "#000" : "#fff",
+            }}
+          >
             <div className={s.cardsGrid}>
               {feedData.length > 0 ? (
                 feedData.map((item, index) => <Card key={index} data={item} />)
