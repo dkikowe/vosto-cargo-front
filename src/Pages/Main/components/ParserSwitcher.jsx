@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import s from "../Main.module.sass";
 import axios from "../../../axios";
 
-import { ThemeContext } from "../../../context/ThemeContext";
-
+// ---------- Утилиты парсинга ----------
 function tryParseDate(ddmm, yearArg) {
   if (!ddmm) return null;
   const [dd, mm] = ddmm.split(".");
@@ -45,6 +44,7 @@ function parseRange(readyStr, yearArg) {
   return [null, null];
 }
 
+// ---------- Компонент карточки ----------
 export const Card = ({ data }) => {
   const isCargo = data.orderType === "CargoOrder";
   if (isCargo) {
@@ -186,11 +186,14 @@ export const Card = ({ data }) => {
   }
 };
 
+// ---------- Основной компонент ----------
 export const ParserSwitcher = ({ theme }) => {
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [currentTab, setCurrentTab] = useState("feed");
+
+  // Поля поиска
   const [cargoSearch, setCargoSearch] = useState({
     fromDate: "",
     toDate: "",
@@ -208,11 +211,25 @@ export const ParserSwitcher = ({ theme }) => {
   });
   const [searchResults, setSearchResults] = useState([]);
 
+  // Поля для pull-to-refresh
   const [pullStartY, setPullStartY] = useState(0);
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const feedRef = useRef(null);
 
+  useEffect(() => {
+    // Допустим, при каждом заходе на вкладку "feed"
+    if (currentTab === "feed") {
+      setPullDistance(0);
+      setPullStartY(0);
+      // при необходимости - scrollTop = 0
+      if (feedRef.current) {
+        feedRef.current.scrollTop = 0;
+      }
+    }
+  }, [currentTab]);
+
+  // Загрузка данных при первом рендере
   useEffect(() => {
     const handleParse = async () => {
       setIsLoading(true);
@@ -228,31 +245,42 @@ export const ParserSwitcher = ({ theme }) => {
     handleParse();
   }, []);
 
-  // Регистрируем обработчики на touch для pull-to-refresh
+  // Добавляем обработчики touch-событий для pull-to-refresh
   useEffect(() => {
     const el = feedRef.current;
     if (!el) return;
 
     function onTouchStart(e) {
-      if (el.scrollTop === 0) {
+      // Сбрасываем состояние
+      setPullDistance(0);
+      setPullStartY(0);
+
+      // Проверяем, действительно ли мы на самом верху
+      if (el.scrollTop <= 0) {
         setPullStartY(e.touches[0].clientY);
-      } else {
-        setPullStartY(0);
       }
     }
 
     function onTouchMove(e) {
-      if (el.scrollTop === 0 && pullStartY !== 0) {
-        const dist = e.touches[0].clientY - pullStartY;
-        if (dist > 0) {
-          e.preventDefault();
-          setPullDistance(dist);
-        }
+      // Если pullStartY == 0, значит жест не начался с самого верха
+      if (pullStartY === 0) return;
+
+      // Текущее смещение
+      const dist = e.touches[0].clientY - pullStartY;
+
+      // Если пользователь тянет вниз
+      if (dist > 0) {
+        // Блокируем дефолтный скролл, чтобы не "соскальзывать"
+        e.preventDefault();
+        setPullDistance(dist);
+      } else {
+        // Если потянули в обратную сторону, сбрасываем
+        setPullDistance(0);
       }
     }
 
     function onTouchEnd() {
-      if (pullDistance > 50) {
+      if (pullDistance > 5) {
         setIsRefreshing(true);
         handleRefresh().then(() => {
           setIsRefreshing(false);
@@ -273,6 +301,7 @@ export const ParserSwitcher = ({ theme }) => {
     };
   }, [pullStartY, pullDistance]);
 
+  // Перезапрашивает данные
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -287,9 +316,11 @@ export const ParserSwitcher = ({ theme }) => {
 
   const handleRefresh = async () => {
     await fetchData();
+    // Можно вернуть Promise.resolve(), если где-то требуется then
     return Promise.resolve();
   };
 
+  // Сброс полей поиска
   const handleResetCargo = () => {
     setCargoSearch({
       fromDate: "",
@@ -313,6 +344,7 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults([]);
   };
 
+  // Если идёт загрузка
   if (isLoading) {
     return (
       <>
@@ -371,18 +403,22 @@ export const ParserSwitcher = ({ theme }) => {
     );
   }
 
+  // Если данные не пришли
   if (!result) {
     return <div className={s.placeholder}>Нет данных для отображения</div>;
   }
 
+  // Фильтрация по ленте
   const feedData = result
     .filter((item) => item.orderType === currentType && !item.isArchived)
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
+  // Обработка поиска (грузы)
   const handleSearchCargo = () => {
     let filtered = result.filter(
       (item) => item.orderType === "CargoOrder" && !item.isArchived
     );
+    // Дата
     if (cargoSearch.fromDate || cargoSearch.toDate) {
       let fromD = null;
       if (cargoSearch.fromDate) {
@@ -404,6 +440,7 @@ export const ParserSwitcher = ({ theme }) => {
         return true;
       });
     }
+    // Тип груза
     if (cargoSearch.cargoType) {
       filtered = filtered.filter((item) => {
         if (!item.cargo) return false;
@@ -412,6 +449,7 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(cargoSearch.cargoType.toLowerCase());
       });
     }
+    // Откуда
     if (cargoSearch.fromLocation) {
       filtered = filtered.filter((item) => {
         if (!item.from) return false;
@@ -420,6 +458,7 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(cargoSearch.fromLocation.toLowerCase());
       });
     }
+    // Куда
     if (cargoSearch.toLocation) {
       filtered = filtered.filter((item) => {
         if (!item.to) return false;
@@ -431,10 +470,12 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults(filtered);
   };
 
+  // Обработка поиска (машины)
   const handleSearchMachine = () => {
     let filtered = result.filter(
       (item) => item.orderType === "MachineOrder" && !item.isArchived
     );
+    // Даты
     if (machineSearch.fromDate || machineSearch.toDate) {
       let fromD = null;
       if (machineSearch.fromDate) {
@@ -463,6 +504,7 @@ export const ParserSwitcher = ({ theme }) => {
         return true;
       });
     }
+    // Тоннаж
     if (machineSearch.tonnage) {
       filtered = filtered.filter((item) => {
         if (!item.gruzopodyomnost) return false;
@@ -471,6 +513,7 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(machineSearch.tonnage.toLowerCase());
       });
     }
+    // Откуда
     if (machineSearch.fromLocation) {
       filtered = filtered.filter((item) => {
         if (!item.otkuda) return false;
@@ -479,6 +522,7 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(machineSearch.fromLocation.toLowerCase());
       });
     }
+    // Куда
     if (machineSearch.toLocation) {
       filtered = filtered.filter((item) => {
         if (!item.kuda) return false;
@@ -487,6 +531,7 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(machineSearch.toLocation.toLowerCase());
       });
     }
+    // Тип кузова
     if (machineSearch.bodyType) {
       filtered = filtered.filter((item) => {
         if (!item.kuzov) return false;
@@ -498,9 +543,11 @@ export const ParserSwitcher = ({ theme }) => {
     setSearchResults(filtered);
   };
 
+  // Смена вкладки «Грузы / Машины»
   const handleTypeSwitch = (type) => {
     setCurrentType(type);
     setCurrentTab("feed");
+    // Сброс полей поиска и результатов
     setCargoSearch({
       fromDate: "",
       toDate: "",
@@ -572,12 +619,17 @@ export const ParserSwitcher = ({ theme }) => {
         </div>
       </div>
 
+      {/* Вкладка «Лента» */}
       {currentTab === "feed" && (
         <div
           className={s.resultContainer}
           ref={feedRef}
-          style={{ overflowY: "auto" }}
+          style={{
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+          }}
         >
+          {/* Блок индикатора pull-to-refresh */}
           <div
             className={s.pullIndicator}
             style={{
@@ -588,10 +640,11 @@ export const ParserSwitcher = ({ theme }) => {
             {isRefreshing ? (
               <div className={s.loadingR}>Обновление...</div>
             ) : (
-              pullDistance > 0 && <div className={s.custom_spinner}></div>
+              pullDistance > 0 && <div className={s.custom_spinner} />
             )}
           </div>
 
+          {/* Список карточек */}
           <div className={s.cardsGrid}>
             {feedData.length > 0 ? (
               feedData.map((item, index) => <Card key={index} data={item} />)
@@ -602,6 +655,7 @@ export const ParserSwitcher = ({ theme }) => {
         </div>
       )}
 
+      {/* Вкладка «Поиск» */}
       {currentTab === "search" && (
         <div className={s.searchContainer}>
           {currentType === "CargoOrder" ? (
@@ -782,12 +836,10 @@ export const ParserSwitcher = ({ theme }) => {
             </div>
           )}
           {searchResults.length > 0 ? (
-            <div className={s.resultContainer}>
-              <div className={s.cardsGrid}>
-                {searchResults.map((item, index) => (
-                  <Card key={index} data={item} />
-                ))}
-              </div>
+            <div className={s.cardsGrid}>
+              {searchResults.map((item, index) => (
+                <Card key={index} data={item} />
+              ))}
             </div>
           ) : (
             searchResults.length === 0 && (
