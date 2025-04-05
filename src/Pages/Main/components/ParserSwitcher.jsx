@@ -581,44 +581,7 @@ export const ParserSwitcher = ({ theme }) => {
       </div>
 
       {/* ------ Вкладка ЛЕНТА ------ */}
-      <PullToRefresh
-        onRefresh={handleRefresh}
-        pullDownContent={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              padding: "10px",
-              marginTop: "300px",
-            }}
-          >
-            <div className="custom-spinner" />
-          </div>
-        }
-        releaseContent={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              padding: "10px",
-              marginTop: "300px",
-            }}
-          >
-            <span>Отпустите для обновления</span>
-          </div>
-        }
-        refreshingContent={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              padding: "10px",
-            }}
-          >
-            <div className="custom-spinner loadingR" />
-          </div>
-        }
-      >
+      <PullToRefresh onRefresh={handleRefresh}>
         {currentTab === "feed" && (
           <div className={s.resultContainer}>
             <div className={s.cardsGrid}>
