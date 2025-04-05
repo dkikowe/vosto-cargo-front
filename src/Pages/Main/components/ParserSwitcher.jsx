@@ -589,6 +589,7 @@ export const ParserSwitcher = ({ theme }) => {
               display: "flex",
               justifyContent: "center",
               padding: "10px",
+              marginTop: "300px",
             }}
           >
             <div className="custom-spinner" />
@@ -600,6 +601,7 @@ export const ParserSwitcher = ({ theme }) => {
               display: "flex",
               justifyContent: "center",
               padding: "10px",
+              marginTop: "300px",
             }}
           >
             <span>Отпустите для обновления</span>
