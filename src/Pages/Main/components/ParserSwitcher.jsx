@@ -1,74 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import s from "../Main.module.sass";
 import axios from "../../../axios";
-import PullToRefresh from "react-pull-to-refresh";
+
 import { ThemeContext } from "../../../context/ThemeContext";
 
-// ---------- Парсинг одного поля "ДД.ММ" + год ----------
-// Принимает, например, "31.03" + yearArg=2025 => возвращает Date(2025,2,31)
 function tryParseDate(ddmm, yearArg) {
   if (!ddmm) return null;
-
   const [dd, mm] = ddmm.split(".");
   if (!dd || !mm) return null;
-
   const day = parseInt(dd, 10);
   const month = parseInt(mm, 10);
   if (isNaN(day) || isNaN(month) || month < 1 || month > 12) {
     return null;
   }
-
-  // Если извлечён год или передали, используем его
   const year = yearArg || new Date().getFullYear();
   return new Date(year, month - 1, day);
 }
 
-// ---------- Парсинг строки "01.04 – 02.04" + год ----------
 function parseRange(readyStr, yearArg) {
   if (!readyStr || typeof readyStr !== "string") {
     return [null, null];
   }
-
-  // Приведём возможные тире к одному виду
   const rangeStr = readyStr.replace(/[—–-]/g, "–").trim();
-
-  // Разделим по "–"
   const parts = rangeStr.split("–").map((p) => p.trim());
-
-  // Если всего одна дата, например "01.04"
   if (parts.length === 1) {
     const singleDate = tryParseDate(parts[0], yearArg);
     if (!singleDate) return [null, null];
-
     const start = new Date(singleDate);
     start.setHours(0, 0, 0, 0);
     const end = new Date(singleDate);
     end.setHours(23, 59, 59, 999);
     return [start, end];
   }
-
-  // Если две даты, например "31.03 – 03.04"
   if (parts.length >= 2) {
     const d1 = tryParseDate(parts[0], yearArg);
     const d2 = tryParseDate(parts[1], yearArg);
     if (!d1 && !d2) return [null, null];
-
     let start = d1 ? new Date(d1) : null;
     if (start) start.setHours(0, 0, 0, 0);
-
     let end = d2 ? new Date(d2) : null;
     if (end) end.setHours(23, 59, 59, 999);
-
     return [start, end];
   }
-
   return [null, null];
 }
 
-// ------------------------- Card (не меняем) -------------------------
 export const Card = ({ data }) => {
   const isCargo = data.orderType === "CargoOrder";
-
   if (isCargo) {
     return (
       <div className={s.card}>
@@ -141,7 +119,6 @@ export const Card = ({ data }) => {
             <span className={s.date}>{data.data_gotovnosti}</span>
           )}
         </div>
-
         <div className={s.cardBody}>
           {data.kuzov && (
             <div className={s.cardRow}>
@@ -209,15 +186,11 @@ export const Card = ({ data }) => {
   }
 };
 
-// ------------------------- ParserSwitcher -------------------------
 export const ParserSwitcher = ({ theme }) => {
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
-
   const [currentTab, setCurrentTab] = useState("feed");
-
-  // Грузы
   const [cargoSearch, setCargoSearch] = useState({
     fromDate: "",
     toDate: "",
@@ -225,8 +198,6 @@ export const ParserSwitcher = ({ theme }) => {
     fromLocation: "",
     toLocation: "",
   });
-
-  // Машины
   const [machineSearch, setMachineSearch] = useState({
     fromDate: "",
     toDate: "",
@@ -235,9 +206,12 @@ export const ParserSwitcher = ({ theme }) => {
     toLocation: "",
     bodyType: "",
   });
-
-  // Результаты поиска
   const [searchResults, setSearchResults] = useState([]);
+
+  const [pullStartY, setPullStartY] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const feedRef = useRef(null);
 
   useEffect(() => {
     const handleParse = async () => {
@@ -245,7 +219,6 @@ export const ParserSwitcher = ({ theme }) => {
       try {
         const { data } = await axios.get("/allOrders");
         setResult(data);
-        console.log(data);
       } catch (error) {
         console.error("Ошибка при загрузке заказов:", error);
       } finally {
@@ -255,19 +228,51 @@ export const ParserSwitcher = ({ theme }) => {
     handleParse();
   }, []);
 
-  const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
+  // Регистрируем обработчики на touch для pull-to-refresh
+  useEffect(() => {
+    const el = feedRef.current;
+    if (!el) return;
 
-  // Функции сброса фильтров для грузов и машин
-  const handleResetCargo = () => {
-    setCargoSearch({
-      fromDate: "",
-      toDate: "",
-      cargoType: "",
-      fromLocation: "",
-      toLocation: "",
-    });
-    setSearchResults([]);
-  };
+    function onTouchStart(e) {
+      if (el.scrollTop === 0) {
+        setPullStartY(e.touches[0].clientY);
+      } else {
+        setPullStartY(0);
+      }
+    }
+
+    function onTouchMove(e) {
+      if (el.scrollTop === 0 && pullStartY !== 0) {
+        const dist = e.touches[0].clientY - pullStartY;
+        if (dist > 0) {
+          e.preventDefault();
+          setPullDistance(dist);
+        }
+      }
+    }
+
+    function onTouchEnd() {
+      if (pullDistance > 50) {
+        setIsRefreshing(true);
+        handleRefresh().then(() => {
+          setIsRefreshing(false);
+        });
+      }
+      setPullDistance(0);
+      setPullStartY(0);
+    }
+
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: false });
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [pullStartY, pullDistance]);
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -279,10 +284,21 @@ export const ParserSwitcher = ({ theme }) => {
       setIsLoading(false);
     }
   };
+
   const handleRefresh = async () => {
     await fetchData();
-    // Для react-pull-to-refresh нужно вернуть промис
     return Promise.resolve();
+  };
+
+  const handleResetCargo = () => {
+    setCargoSearch({
+      fromDate: "",
+      toDate: "",
+      cargoType: "",
+      fromLocation: "",
+      toLocation: "",
+    });
+    setSearchResults([]);
   };
 
   const handleResetMachine = () => {
@@ -308,7 +324,9 @@ export const ParserSwitcher = ({ theme }) => {
             <div className={s.typeSwitcher}>
               <div
                 className={s.switchIndicator}
-                style={{ left: typeIndicatorLeft }}
+                style={{
+                  left: currentType === "CargoOrder" ? "0%" : "50%",
+                }}
               />
               <button
                 className={
@@ -348,7 +366,6 @@ export const ParserSwitcher = ({ theme }) => {
             </button>
           </div>
         </div>
-
         <div className={s.loading}>Загрузка...</div>
       </>
     );
@@ -358,49 +375,35 @@ export const ParserSwitcher = ({ theme }) => {
     return <div className={s.placeholder}>Нет данных для отображения</div>;
   }
 
-  // -------------------- ЛЕНТА --------------------
   const feedData = result
     .filter((item) => item.orderType === currentType && !item.isArchived)
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-  // -------------------- Поиск: ГРУЗЫ --------------------
   const handleSearchCargo = () => {
     let filtered = result.filter(
       (item) => item.orderType === "CargoOrder" && !item.isArchived
     );
-
     if (cargoSearch.fromDate || cargoSearch.toDate) {
-      // Парсим fromDate / toDate из "YYYY-MM-DD"
       let fromD = null;
       if (cargoSearch.fromDate) {
         fromD = new Date(cargoSearch.fromDate);
         fromD.setHours(0, 0, 0, 0);
       }
-
       let toD = null;
       if (cargoSearch.toDate) {
         toD = new Date(cargoSearch.toDate);
         toD.setHours(23, 59, 59, 999);
       }
-
-      // Определяем год, в который парсим "31.03" — "03.04"
       const usedYear =
         fromD?.getFullYear() || toD?.getFullYear() || new Date().getFullYear();
-
       filtered = filtered.filter((item) => {
         const [startDate, endDate] = parseRange(item.ready, usedYear);
         if (!startDate || !endDate) return false;
-
-        if (fromD && startDate < fromD) {
-          return false;
-        }
-        if (toD && endDate > toD) {
-          return false;
-        }
+        if (fromD && startDate < fromD) return false;
+        if (toD && endDate > toD) return false;
         return true;
       });
     }
-
     if (cargoSearch.cargoType) {
       filtered = filtered.filter((item) => {
         if (!item.cargo) return false;
@@ -425,32 +428,26 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(cargoSearch.toLocation.toLowerCase());
       });
     }
-
     setSearchResults(filtered);
   };
 
-  // -------------------- Поиск: МАШИНЫ --------------------
   const handleSearchMachine = () => {
     let filtered = result.filter(
       (item) => item.orderType === "MachineOrder" && !item.isArchived
     );
-
     if (machineSearch.fromDate || machineSearch.toDate) {
       let fromD = null;
       if (machineSearch.fromDate) {
         fromD = new Date(machineSearch.fromDate);
         fromD.setHours(0, 0, 0, 0);
       }
-
       let toD = null;
       if (machineSearch.toDate) {
         toD = new Date(machineSearch.toDate);
         toD.setHours(23, 59, 59, 999);
       }
-
       filtered = filtered.filter((item) => {
         if (!item.data_gotovnosti) return false;
-
         let itemDate;
         const ddmmParsed = tryParseDate(item.data_gotovnosti);
         if (ddmmParsed) {
@@ -458,17 +455,14 @@ export const ParserSwitcher = ({ theme }) => {
         } else {
           itemDate = new Date(item.data_gotovnosti);
         }
-
         if (isNaN(itemDate.getTime())) {
           return false;
         }
-
         if (fromD && itemDate < fromD) return false;
         if (toD && itemDate > toD) return false;
         return true;
       });
     }
-
     if (machineSearch.tonnage) {
       filtered = filtered.filter((item) => {
         if (!item.gruzopodyomnost) return false;
@@ -501,11 +495,9 @@ export const ParserSwitcher = ({ theme }) => {
           .includes(machineSearch.bodyType.toLowerCase());
       });
     }
-
     setSearchResults(filtered);
   };
 
-  // Сброс фильтров при переключении типа
   const handleTypeSwitch = (type) => {
     setCurrentType(type);
     setCurrentTab("feed");
@@ -529,7 +521,6 @@ export const ParserSwitcher = ({ theme }) => {
 
   return (
     <div className={s.parserContainer}>
-      {/* Шапка (Грузы / Машины) + (Лента / Поиск) */}
       <div
         className={s.header}
         style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
@@ -538,7 +529,9 @@ export const ParserSwitcher = ({ theme }) => {
           <div className={s.typeSwitcher}>
             <div
               className={s.switchIndicator}
-              style={{ left: typeIndicatorLeft }}
+              style={{
+                left: currentType === "CargoOrder" ? "0%" : "50%",
+              }}
             />
             <button
               className={
@@ -558,7 +551,6 @@ export const ParserSwitcher = ({ theme }) => {
             </button>
           </div>
         </div>
-
         <div className={s.statusButtons}>
           <button
             className={currentTab === "feed" ? s.statusActive : s.statusItem}
@@ -580,49 +572,36 @@ export const ParserSwitcher = ({ theme }) => {
         </div>
       </div>
 
-      {/* ------ Вкладка ЛЕНТА ------ */}
-      <PullToRefresh
-        onRefresh={handleRefresh}
-        style={{
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
-          height: "100vh",
-        }}
-        icon={
+      {currentTab === "feed" && (
+        <div
+          className={s.resultContainer}
+          ref={feedRef}
+          style={{ overflowY: "auto" }}
+        >
           <div
+            className={s.pullIndicator}
             style={{
-              display: "flex",
-              justifyContent: "center",
+              height: isRefreshing ? 50 : pullDistance,
+              transition: isRefreshing ? "height 0.2s" : "none",
             }}
           >
-            <div className="custom-spinner" />
+            {isRefreshing ? (
+              <div className={s.loadingR}>Обновление...</div>
+            ) : (
+              pullDistance > 0 && <div className={s.custom_spinner}></div>
+            )}
           </div>
-        }
-        loading={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <div className="custom-spinner loadingR" />
-          </div>
-        }
-      >
-        {currentTab === "feed" && (
-          <div className={s.resultContainer}>
-            <div className={s.cardsGrid}>
-              {feedData.length > 0 ? (
-                feedData.map((item, index) => <Card key={index} data={item} />)
-              ) : (
-                <p className={s.placeholder}>Нет заявок по выбранному типу</p>
-              )}
-            </div>
-          </div>
-        )}
-      </PullToRefresh>
 
-      {/* ------ Вкладка ПОИСК ------ */}
+          <div className={s.cardsGrid}>
+            {feedData.length > 0 ? (
+              feedData.map((item, index) => <Card key={index} data={item} />)
+            ) : (
+              <p className={s.placeholder}>Нет заявок по выбранному типу</p>
+            )}
+          </div>
+        </div>
+      )}
+
       {currentTab === "search" && (
         <div className={s.searchContainer}>
           {currentType === "CargoOrder" ? (
@@ -642,19 +621,20 @@ export const ParserSwitcher = ({ theme }) => {
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Дата (по):
                   <input
                     type="date"
                     value={cargoSearch.toDate}
                     onChange={(e) =>
-                      setCargoSearch({ ...cargoSearch, toDate: e.target.value })
+                      setCargoSearch({
+                        ...cargoSearch,
+                        toDate: e.target.value,
+                      })
                     }
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Тип груза:
                   <input
@@ -670,7 +650,6 @@ export const ParserSwitcher = ({ theme }) => {
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Откуда:
                   <input
@@ -686,7 +665,6 @@ export const ParserSwitcher = ({ theme }) => {
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Куда:
                   <input
@@ -703,7 +681,6 @@ export const ParserSwitcher = ({ theme }) => {
                   />
                 </label>
               </div>
-
               <div className={s.buttonGroup}>
                 <button className={s.searchButton} onClick={handleSearchCargo}>
                   Найти
@@ -730,7 +707,6 @@ export const ParserSwitcher = ({ theme }) => {
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Тоннаж:
                   <input
@@ -746,7 +722,6 @@ export const ParserSwitcher = ({ theme }) => {
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Откуда:
                   <input
@@ -762,7 +737,6 @@ export const ParserSwitcher = ({ theme }) => {
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Куда:
                   <input
@@ -778,7 +752,6 @@ export const ParserSwitcher = ({ theme }) => {
                     className={s.filterInput}
                   />
                 </label>
-
                 <label className={s.filterLabel}>
                   Тип кузова:
                   <input
@@ -795,7 +768,6 @@ export const ParserSwitcher = ({ theme }) => {
                   />
                 </label>
               </div>
-
               <div className={s.buttonGroup}>
                 <button
                   className={s.searchButton}
@@ -809,7 +781,6 @@ export const ParserSwitcher = ({ theme }) => {
               </div>
             </div>
           )}
-
           {searchResults.length > 0 ? (
             <div className={s.resultContainer}>
               <div className={s.cardsGrid}>
