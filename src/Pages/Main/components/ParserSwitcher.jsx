@@ -581,7 +581,34 @@ export const ParserSwitcher = ({ theme }) => {
       </div>
 
       {/* ------ Вкладка ЛЕНТА ------ */}
-      <PullToRefresh onRefresh={handleRefresh}>
+      <PullToRefresh
+        onRefresh={handleRefresh}
+        style={{
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+          height: "100vh",
+        }}
+        icon={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div className="custom-spinner" />
+          </div>
+        }
+        loading={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div className="custom-spinner loadingR" />
+          </div>
+        }
+      >
         {currentTab === "feed" && (
           <div className={s.resultContainer}>
             <div className={s.cardsGrid}>
