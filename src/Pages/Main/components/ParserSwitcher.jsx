@@ -73,25 +73,33 @@ export const Card = ({ data }) => {
         <div className={s.cardBody}>
           {data.weight && (
             <div className={s.cardRow}>
-              <span className={s.label}>Вес:</span>
+              <span className={s.label} style={cardStyle}>
+                Вес:
+              </span>
               <span>{data.weight}</span>
             </div>
           )}
           {data.volume && (
             <div className={s.cardRow}>
-              <span className={s.label}>Объём:</span>
+              <span className={s.label} style={cardStyle}>
+                Объём:
+              </span>
               <span>{data.volume}</span>
             </div>
           )}
           {data.rate && (
             <div className={s.cardRow}>
-              <span className={s.label}>Ставка:</span>
+              <span className={s.label} style={cardStyle}>
+                Ставка:
+              </span>
               <span>{data.rate}</span>
             </div>
           )}
           {data.vehicle && (
             <div className={s.cardRow}>
-              <span className={s.label}>Тип ТС:</span>
+              <span className={s.label} style={cardStyle}>
+                Тип ТС:
+              </span>
               <span>{data.vehicle}</span>
             </div>
           )}
@@ -99,13 +107,17 @@ export const Card = ({ data }) => {
             <div className={s.cardRoute}>
               {data.from && (
                 <div>
-                  <span className={s.label}>Откуда:</span>
+                  <span className={s.label} style={cardStyle}>
+                    Откуда:
+                  </span>
                   <p>{data.from}</p>
                 </div>
               )}
               {data.to && (
                 <div>
-                  <span className={s.label}>Куда:</span>
+                  <span className={s.label} style={cardStyle}>
+                    Куда:
+                  </span>
                   <p>{data.to}</p>
                 </div>
               )}
@@ -114,7 +126,9 @@ export const Card = ({ data }) => {
           {data.telefon && (
             <div className={s.cardContact}>
               <div>
-                <span className={s.label}>Контакт:</span>
+                <span className={s.label} style={cardStyle}>
+                  Контакт:
+                </span>
                 <p>Тел: {data.telefon}</p>
               </div>
             </div>
@@ -138,25 +152,33 @@ export const Card = ({ data }) => {
         <div className={s.cardBody}>
           {data.kuzov && (
             <div className={s.cardRow}>
-              <span className={s.label}>Кузов:</span>
+              <span className={s.label} style={cardStyle}>
+                Кузов:
+              </span>
               <span>{data.kuzov}</span>
             </div>
           )}
           {data.tip_zagruzki && (
             <div className={s.cardRow}>
-              <span className={s.label}>Тип загрузки:</span>
+              <span className={s.label} style={cardStyle}>
+                Тип загрузки:
+              </span>
               <span>{data.tip_zagruzki}</span>
             </div>
           )}
           {data.gruzopodyomnost && (
             <div className={s.cardRow}>
-              <span className={s.label}>Грузоподъемность:</span>
+              <span className={s.label} style={cardStyle}>
+                Грузоподъемность:
+              </span>
               <span>{data.gruzopodyomnost}</span>
             </div>
           )}
           {data.vmestimost && (
             <div className={s.cardRow}>
-              <span className={s.label}>Вместимость:</span>
+              <span className={s.label} style={cardStyle}>
+                Вместимость:
+              </span>
               <span>{data.vmestimost}</span>
             </div>
           )}
@@ -164,13 +186,17 @@ export const Card = ({ data }) => {
             <div className={s.cardRoute}>
               {data.otkuda && (
                 <div>
-                  <span className={s.label}>Откуда:</span>
+                  <span className={s.label} style={cardStyle}>
+                    Откуда:
+                  </span>
                   <p>{data.otkuda}</p>
                 </div>
               )}
               {data.kuda && (
                 <div>
-                  <span className={s.label}>Куда:</span>
+                  <span className={s.label} style={cardStyle}>
+                    Куда:
+                  </span>
                   <p>{data.kuda}</p>
                 </div>
               )}
@@ -179,7 +205,9 @@ export const Card = ({ data }) => {
           {(data.imya || data.firma || data.telefon) && (
             <div className={s.cardContact}>
               <div>
-                <span className={s.label}>Контакт:</span>
+                <span className={s.label} style={cardStyle}>
+                  Контакт:
+                </span>
                 {data.imya && <p>{data.imya}</p>}
                 {data.firma && <p>({data.firma})</p>}
                 {data.telefon && <p>Тел: {data.telefon}</p>}
@@ -407,7 +435,63 @@ export const ParserSwitcher = () => {
 
   // Если идёт загрузка
   if (isLoading) {
-    return <div className={s.loading}>Загрузка...</div>;
+    return (
+      <div className={s.loading}>
+        <div
+          className={s.header}
+          style={{
+            backgroundColor: theme === "dark" ? "#121212" : "",
+          }}
+        >
+          <div className={s.switch}>
+            <div className={s.typeSwitcher}>
+              <div
+                className={s.switchIndicator}
+                style={{
+                  left: currentType === "CargoOrder" ? "0%" : "50%",
+                }}
+              />
+              <button
+                className={
+                  currentType === "CargoOrder" ? s.activeText : s.switcher
+                }
+                onClick={() => handleTypeSwitch("CargoOrder")}
+              >
+                Грузы
+              </button>
+              <button
+                className={
+                  currentType === "MachineOrder" ? s.activeText : s.switcher
+                }
+                onClick={() => handleTypeSwitch("MachineOrder")}
+              >
+                Машины
+              </button>
+            </div>
+          </div>
+          <div className={s.statusButtons}>
+            <button
+              className={currentTab === "feed" ? s.statusActive : s.statusItem}
+              onClick={() => setCurrentTab("feed")}
+            >
+              Лента
+            </button>
+            <button
+              className={
+                currentTab === "search" ? s.statusActiveArchive : s.archive
+              }
+              onClick={() => {
+                setCurrentTab("search");
+                setSearchResults([]);
+              }}
+            >
+              Поиск
+            </button>
+          </div>
+        </div>
+        Загрузка...
+      </div>
+    );
   }
 
   // Если данных нет

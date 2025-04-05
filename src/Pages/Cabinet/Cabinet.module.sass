@@ -329,3 +329,98 @@ input:checked + .slider:before
 
     &:hover
         background-color: #a56de7
+
+.overlay
+    position: fixed
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background-color: rgba(0, 0, 0, 0.5)
+    display: flex
+    align-items: center
+    justify-content: center
+    z-index: 999
+
+.popupCalculator
+    background-color: #fff
+    padding: 24px
+    border-radius: 16px
+    width: 100%
+    max-width: 400px
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1)
+    display: flex
+    flex-direction: column
+    gap: 16px
+    transition: all 0.3s ease
+    position: relative
+    .closeBtn
+        background: none
+        border: none
+        font-size: 22px
+        position: absolute
+        top: 20px
+        right: 20px
+        cursor: pointer
+
+.title
+    font-size: 20px
+    font-weight: 600
+    margin-bottom: 8px
+
+.field
+    display: flex
+    flex-direction: column
+    gap: 6px
+
+label
+    font-size: 14px
+    font-weight: 500
+    color: #333
+
+input
+    padding: 10px 14px
+    font-size: 14px
+    border: 1px solid #ccc
+    border-radius: 8px
+    transition: 0.2s ease
+    &:focus
+        border-color: #3b82f6
+        outline: none
+
+.calculateBtn
+    background-color: #3b82f6
+    color: white
+    padding: 12px
+    font-weight: 500
+    border: none
+    border-radius: 8px
+    cursor: pointer
+    transition: 0.2s ease
+    &:hover
+        background-color: #2563eb
+
+.result
+    font-size: 15px
+    line-height: 1.4
+    margin-top: 8px
+    p
+        margin: 0
+
+.dark
+    .popupCalculator
+        background-color: #1e1e1e
+        color: #fff
+
+    .field label
+        color: #ccc
+
+    .field input
+        background-color: #2b2b2b
+        color: #fff
+        border: 1px solid #444
+
+    .calculateBtn
+        background-color: #4f46e5
+        &:hover
+            background-color: #4338ca

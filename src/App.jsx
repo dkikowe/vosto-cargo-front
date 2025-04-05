@@ -13,6 +13,7 @@ import Start from "./Pages/Start/Start";
 import Create from "./Pages/Create/Create";
 import Company from "./Pages/Company/Company";
 import { Main } from "./Pages/Main/Main";
+import CalculatorPopup from "./components/Calculator/Calculator";
 
 function App() {
   useEffect(() => {
