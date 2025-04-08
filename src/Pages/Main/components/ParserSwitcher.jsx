@@ -48,28 +48,81 @@ function parseRange(readyStr, yearArg) {
 }
 
 // ---------- Компонент карточки (не меняем) ----------
+
 export const Card = ({ data }) => {
-  // Считываем тему
   const { theme } = useContext(ThemeContext);
-
-  // Определяем стили под тёмную тему
   const isDark = theme === "dark";
+  const [mapLink, setMapLink] = useState(null);
+  const [showContact, setShowContact] = useState(false);
+  const isCargo = data.orderType === "CargoOrder";
 
-  // Для фона и текста карточки используем inline-стили (или добавляем класс)
   const cardStyle = {
-    backgroundColor: isDark ? "#111" : "#fff", // фон карточки
-    color: isDark ? "#fff" : "#000", // текст
+    backgroundColor: isDark ? "#111" : "#fff",
+    color: isDark ? "#fff" : "#000",
   };
 
-  const isCargo = data.orderType === "CargoOrder";
+  useEffect(() => {
+    const fetchMapLink = async () => {
+      if (data.from && data.to) {
+        try {
+          const response = await axios.get("/api/distance", {
+            params: {
+              cityA: data.from,
+              cityB: data.to,
+            },
+          });
+
+          setMapLink(response.data.routeUrl);
+        } catch (error) {
+          console.error("Ошибка при получении маршрута:", error);
+        }
+      }
+    };
+
+    if (isCargo) {
+      fetchMapLink();
+    }
+  }, [data.from, data.to]);
+
+  const handleShowContact = () => setShowContact(true);
 
   if (isCargo) {
     return (
       <div className={s.card} style={cardStyle}>
         <div className={s.cardHeader}>
+          {data.orderNumber && <h3>Груз номер: Nº{data.orderNumber}</h3>}
           {data.cargo && <h3>{data.cargo}</h3>}
-          {data.ready && <span className={s.date}>{data.ready}</span>}
         </div>
+        {(data.from || data.to) && (
+          <div className={s.cardRoute}>
+            {data.from && (
+              <div>
+                <span className={s.label} style={cardStyle}>
+                  Откуда:
+                </span>
+                <p>{data.from}</p>
+              </div>
+            )}
+            {data.to && (
+              <div>
+                <span className={s.label} style={cardStyle}>
+                  Куда:
+                </span>
+                <p>{data.to}</p>
+              </div>
+            )}
+            {mapLink && (
+              <a
+                className={s.routeButton}
+                href={mapLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Показать маршрут на карте
+              </a>
+            )}
+          </div>
+        )}
         <div className={s.cardBody}>
           {data.weight && (
             <div className={s.cardRow}>
@@ -103,34 +156,21 @@ export const Card = ({ data }) => {
               <span>{data.vehicle}</span>
             </div>
           )}
-          {(data.from || data.to) && (
-            <div className={s.cardRoute}>
-              {data.from && (
-                <div>
-                  <span className={s.label} style={cardStyle}>
-                    Откуда:
-                  </span>
-                  <p>{data.from}</p>
-                </div>
-              )}
-              {data.to && (
-                <div>
-                  <span className={s.label} style={cardStyle}>
-                    Куда:
-                  </span>
-                  <p>{data.to}</p>
-                </div>
-              )}
-            </div>
-          )}
+
           {data.telefon && (
             <div className={s.cardContact}>
-              <div>
-                <span className={s.label} style={cardStyle}>
-                  Контакт:
-                </span>
-                <p>Тел: {data.telefon}</p>
-              </div>
+              {!showContact ? (
+                <button className={s.contactButton} onClick={handleShowContact}>
+                  Связаться с заказчиком
+                </button>
+              ) : (
+                <div>
+                  <span className={s.label} style={cardStyle}>
+                    Контакт:
+                  </span>
+                  <p>Тел: {data.telefon}</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -140,6 +180,7 @@ export const Card = ({ data }) => {
     return (
       <div className={s.card} style={cardStyle}>
         <div className={s.cardHeader}>
+          {data.orderNumber && <h3>Груз номер: Nº{data.orderNumber}</h3>}
           {(data.marka || data.tip) && (
             <h3>
               {data.marka} {data.tip}
@@ -204,31 +245,28 @@ export const Card = ({ data }) => {
           )}
           {(data.imya || data.firma || data.telefon) && (
             <div className={s.cardContact}>
-              <div>
-                <span className={s.label} style={cardStyle}>
-                  Контакт:
-                </span>
-                {data.imya && <p>{data.imya}</p>}
-                {data.firma && <p>({data.firma})</p>}
-                {data.telefon && <p>Тел: {data.telefon}</p>}
-              </div>
+              {!showContact ? (
+                <button className={s.contactButton} onClick={handleShowContact}>
+                  Связаться с перевозчиком
+                </button>
+              ) : (
+                <div>
+                  <span className={s.label} style={cardStyle}>
+                    Контакт:
+                  </span>
+                  {data.imya && <p>{data.imya}</p>}
+                  {data.firma && <p>({data.firma})</p>}
+                  {data.telefon && <p>Тел: {data.telefon}</p>}
+                </div>
+              )}
             </div>
           )}
         </div>
-        {data.url && (
-          <a
-            href={data.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={s.cardLink}
-          >
-            Подробнее
-          </a>
-        )}
       </div>
     );
   }
 };
+
 // ---------- Основной компонент ----------
 export const ParserSwitcher = () => {
   // Забираем тему из контекста

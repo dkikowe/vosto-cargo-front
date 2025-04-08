@@ -166,20 +166,27 @@ export default function Cabinet() {
   function CalculatorPopup({ onClose }) {
     const [cityA, setCityA] = useState("");
     const [cityB, setCityB] = useState("");
-    const [rate, setRate] = useState("");
+    const [weight, setWeight] = useState("");
+    const [volume, setVolume] = useState("");
     const [distance, setDistance] = useState(0);
     const [price, setPrice] = useState(0);
+    const [services, setServices] = useState({
+      seal: false,
+      documents: false,
+      supportDocs: false,
+      packaging: false,
+    });
+
+    const servicePrices = {
+      seal: 300,
+      documents: 400,
+      supportDocs: 500,
+      packaging: 450,
+    };
 
     async function handleCalculate() {
-      if (!cityA || !cityB || !rate) return;
+      if (!cityA || !cityB || !weight || !volume) return;
       try {
-        // Предполагаем, что на бэкенде есть маршрут:
-        //   GET /api/distance?cityA=...&cityB=...
-        // который возвращает данные в том же формате, что и Google Distance Matrix
-        // (или хотя бы { rows: [ { elements: [ { distance: { value: 1234 } } ] } ] })
-
-        // Делаем запрос через axios (baseURL настроен в ../../axios)
-        // Допустим, /api/distance ведёт к http://localhost:3001/api/distance
         const response = await axios.get(
           `/api/distance?cityA=${encodeURIComponent(
             cityA
@@ -187,21 +194,30 @@ export default function Cabinet() {
         );
 
         const data = response.data;
-        // Путь к значению дистанции в метрах
+        console.log(response);
         const distMeters = data?.rows?.[0]?.elements?.[0]?.distance?.value;
-        if (!distMeters) {
-          throw new Error("Не удалось получить расстояние от бэкенда");
-        }
+        if (!distMeters) throw new Error("Не удалось получить расстояние");
 
         const distKm = distMeters / 1000;
         setDistance(distKm);
 
-        // Формула: руб/км = ставка / пройденные км
-        setPrice(Number(rate) / distKm);
+        let basePrice =
+          parseFloat(weight) * 1 + // можно изменить формулу по логике
+          parseFloat(volume) * 2;
+
+        Object.keys(services).forEach((key) => {
+          if (services[key]) basePrice += servicePrices[key];
+        });
+
+        setPrice(basePrice / distKm);
       } catch (error) {
         console.error(error);
       }
     }
+
+    const handleCheckboxChange = (key) => {
+      setServices((prev) => ({ ...prev, [key]: !prev[key] }));
+    };
 
     return (
       <div className={`${s.overlay} ${theme === "dark" ? s.dark : s.light}`}>
@@ -209,7 +225,7 @@ export default function Cabinet() {
           <button className={s.closeBtn} onClick={onClose}>
             ×
           </button>
-          <h2 className={s.title}>Калькулятор цены за км</h2>
+          <h2 className={s.title}>Калькулятор стоимости доставки</h2>
 
           <div className={s.field}>
             <label>Город A</label>
@@ -217,7 +233,6 @@ export default function Cabinet() {
               type="text"
               value={cityA}
               onChange={(e) => setCityA(e.target.value)}
-              placeholder="Введите город отправления"
             />
           </div>
 
@@ -227,18 +242,60 @@ export default function Cabinet() {
               type="text"
               value={cityB}
               onChange={(e) => setCityB(e.target.value)}
-              placeholder="Введите город назначения"
             />
           </div>
 
           <div className={s.field}>
-            <label>Ставка (₽)</label>
+            <label>Общий вес, кг</label>
             <input
               type="number"
-              value={rate}
-              onChange={(e) => setRate(e.target.value)}
-              placeholder="Укажите ставку"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
             />
+          </div>
+
+          <div className={s.field}>
+            <label>Общий объем, м³</label>
+            <input
+              type="number"
+              value={volume}
+              onChange={(e) => setVolume(e.target.value)}
+            />
+          </div>
+
+          <div className={s.extraServices}>
+            <label>
+              <input
+                type="checkbox"
+                checked={services.seal}
+                onChange={() => handleCheckboxChange("seal")}
+              />
+              Пломбировка груза (+300₽)
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={services.documents}
+                onChange={() => handleCheckboxChange("documents")}
+              />
+              Возврат документов (+400₽)
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={services.supportDocs}
+                onChange={() => handleCheckboxChange("supportDocs")}
+              />
+              Перевозка сопроводительных документов (+500₽)
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={services.packaging}
+                onChange={() => handleCheckboxChange("packaging")}
+              />
+              Защитная упаковка (+450₽)
+            </label>
           </div>
 
           <button className={s.calculateBtn} onClick={handleCalculate}>
@@ -253,6 +310,7 @@ export default function Cabinet() {
       </div>
     );
   }
+
   // =======================================================================
 
   return (
