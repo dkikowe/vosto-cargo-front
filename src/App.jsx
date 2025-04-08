@@ -18,7 +18,7 @@ import CalculatorPopup from "./components/Calculator/Calculator";
 function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
-    // tg.requestFullscreen();
+    tg.requestFullscreen();
     tg.disableVerticalSwipes();
     tg.ready();
 
