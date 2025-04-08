@@ -169,23 +169,27 @@ export default function Cabinet() {
     const [carType, setCarType] = useState("тент");
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     async function handleCalculate() {
+      setError(null);
+      setResult(null);
       if (!cityA || !cityB || !carType) return;
 
       try {
-        const response = await axios.get("/getShippingCalculation", {
-          params: { cityA, cityB, carType },
-        });
-
-        if (response.data) {
-          setResult(response.data);
-          setError(null);
-        } else {
-          setError("Ошибка: нет ответа от сервера.");
-        }
+        setLoading(true);
+        axios
+          .get("/getShippingCalculation", {
+            params: { cityA, cityB, carType },
+          })
+          .then((res) => res.data)
+          .then((data) => {
+            setLoading(false);
+            setResult(data);
+          });
       } catch (err) {
         console.error("Ошибка при расчете:", err);
+        setLoading(false);
         setError("Ошибка при запросе к серверу.");
       }
     }
@@ -230,26 +234,29 @@ export default function Cabinet() {
             </select>
           </div>
 
-          <button className={s.calculateBtn} onClick={handleCalculate}>
-            Рассчитать
-          </button>
+          {loading == true ? (
+            <button className={s.calculateBtn} disabled>
+              Рассчитываем...
+            </button>
+          ) : (
+            <button className={s.calculateBtn} onClick={handleCalculate}>
+              Рассчитать
+            </button>
+          )}
 
           {error && <p className={s.error}>{error}</p>}
 
-          {result && (
+          {result && !loading && (
             <div className={s.result}>
-              <p>
-                Расстояние:{" "}
-                {parseFloat(result.price) / parseFloat(result.tariff)} км
-              </p>
+              <p>Расстояние: {result.price / result.tariff} км</p>
               <p>Тариф: {result.tariff} ₽/км</p>
               <p className={s.total}>Итоговая стоимость: {result.price} ₽</p>
-              <p className={s.warn}>
-                Цена является приблизительной , за точной ценой обратитесь к
-                менеджеру
-              </p>
             </div>
           )}
+
+          <p className={s.warn}>
+            Цены являются примерными, за точными ценами обращайтесь к менеджеру
+          </p>
         </div>
       </div>
     );
