@@ -166,58 +166,29 @@ export default function Cabinet() {
   function CalculatorPopup({ onClose }) {
     const [cityA, setCityA] = useState("");
     const [cityB, setCityB] = useState("");
-    const [weight, setWeight] = useState("");
-    const [volume, setVolume] = useState("");
-    const [distance, setDistance] = useState(0);
-    const [price, setPrice] = useState(0);
-    const [services, setServices] = useState({
-      seal: false,
-      documents: false,
-      supportDocs: false,
-      packaging: false,
-    });
-
-    const servicePrices = {
-      seal: 300,
-      documents: 400,
-      supportDocs: 500,
-      packaging: 450,
-    };
+    const [carType, setCarType] = useState("тент");
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState(null);
 
     async function handleCalculate() {
-      if (!cityA || !cityB || !weight || !volume) return;
+      if (!cityA || !cityB || !carType) return;
+
       try {
-        const response = await axios.get(
-          `/api/distance?cityA=${encodeURIComponent(
-            cityA
-          )}&cityB=${encodeURIComponent(cityB)}`
-        );
-
-        const data = response.data;
-        console.log(response);
-        const distMeters = data?.rows?.[0]?.elements?.[0]?.distance?.value;
-        if (!distMeters) throw new Error("Не удалось получить расстояние");
-
-        const distKm = distMeters / 1000;
-        setDistance(distKm);
-
-        let basePrice =
-          parseFloat(weight) * 1 + // можно изменить формулу по логике
-          parseFloat(volume) * 2;
-
-        Object.keys(services).forEach((key) => {
-          if (services[key]) basePrice += servicePrices[key];
+        const response = await axios.get("/getShippingCalculation", {
+          params: { cityA, cityB, carType },
         });
 
-        setPrice(basePrice / distKm);
-      } catch (error) {
-        console.error(error);
+        if (response.data) {
+          setResult(response.data);
+          setError(null);
+        } else {
+          setError("Ошибка: нет ответа от сервера.");
+        }
+      } catch (err) {
+        console.error("Ошибка при расчете:", err);
+        setError("Ошибка при запросе к серверу.");
       }
     }
-
-    const handleCheckboxChange = (key) => {
-      setServices((prev) => ({ ...prev, [key]: !prev[key] }));
-    };
 
     return (
       <div className={`${s.overlay} ${theme === "dark" ? s.dark : s.light}`}>
@@ -228,84 +199,57 @@ export default function Cabinet() {
           <h2 className={s.title}>Калькулятор стоимости доставки</h2>
 
           <div className={s.field}>
-            <label>Город A</label>
+            <label>Город отправления</label>
             <input
               type="text"
               value={cityA}
               onChange={(e) => setCityA(e.target.value)}
+              placeholder="Например, Москва"
             />
           </div>
 
           <div className={s.field}>
-            <label>Город B</label>
+            <label>Город назначения</label>
             <input
               type="text"
               value={cityB}
               onChange={(e) => setCityB(e.target.value)}
+              placeholder="Например, Санкт-Петербург"
             />
           </div>
 
           <div className={s.field}>
-            <label>Общий вес, кг</label>
-            <input
-              type="number"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-            />
-          </div>
-
-          <div className={s.field}>
-            <label>Общий объем, м³</label>
-            <input
-              type="number"
-              value={volume}
-              onChange={(e) => setVolume(e.target.value)}
-            />
-          </div>
-
-          <div className={s.extraServices}>
-            <label>
-              <input
-                type="checkbox"
-                checked={services.seal}
-                onChange={() => handleCheckboxChange("seal")}
-              />
-              Пломбировка груза (+300₽)
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={services.documents}
-                onChange={() => handleCheckboxChange("documents")}
-              />
-              Возврат документов (+400₽)
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={services.supportDocs}
-                onChange={() => handleCheckboxChange("supportDocs")}
-              />
-              Перевозка сопроводительных документов (+500₽)
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={services.packaging}
-                onChange={() => handleCheckboxChange("packaging")}
-              />
-              Защитная упаковка (+450₽)
-            </label>
+            <label>Тип машины</label>
+            <select
+              value={carType}
+              onChange={(e) => setCarType(e.target.value)}
+              className={s.select}
+            >
+              <option value="тент">Тентованная</option>
+              <option value="рефрижератор">Рефрижератор</option>
+            </select>
           </div>
 
           <button className={s.calculateBtn} onClick={handleCalculate}>
             Рассчитать
           </button>
 
-          <div className={s.result}>
-            <p>Расстояние: {distance ? `${distance.toFixed(2)} км` : "-"}</p>
-            <p>Цена за км: {price ? `${price.toFixed(2)} руб.` : "-"}</p>
-          </div>
+          {error && <p className={s.error}>{error}</p>}
+
+          {result && (
+            <div className={s.result}>
+              <p>
+                Расстояние:{" "}
+                {parseFloat(result.price) / parseFloat(result.tariff)} км
+              </p>
+              <p>Тариф: {result.tariff} ₽/км</p>
+              <p className={s.total}>Итоговая стоимость: {result.price} ₽</p>
+              <p className={s.warn}>
+                Цена является приблизительной , за точной ценой обратитесь к
+                менеджеру
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
