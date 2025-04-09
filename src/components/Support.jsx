@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../axios";
 import styles from "./Support.module.scss";
 import { ChevronLeft } from "lucide-react";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Support = () => {
   const navigate = useNavigate();
+  const { theme } = useContext(ThemeContext);
   const initData = window.Telegram.WebApp.initData;
 
   // const initData =
@@ -58,10 +60,27 @@ const Support = () => {
     }
   };
 
+  const darkStyles = {
+    backgroundColor: "#000",
+    color: "#fff",
+  };
+
+  const inputDark = {
+    backgroundColor: "#000",
+    color: "#fff",
+    border: "1px solid #fff",
+  };
+
   return (
-    <div className={styles.supportContainer}>
-      <div className={styles.header}>
-        <ChevronLeft onClick={() => navigate("/menu")} />
+    <div
+      className={styles.supportContainer}
+      style={theme === "dark" ? darkStyles : {}}
+    >
+      <div className={styles.header} style={theme === "dark" ? darkStyles : {}}>
+        <ChevronLeft
+          onClick={() => navigate("/menu")}
+          style={theme === "dark" ? { color: "#fff" } : {}}
+        />
         <h2 className={styles.title}>Техническая поддержка</h2>
       </div>
 
@@ -75,6 +94,7 @@ const Support = () => {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Введите тему обращения"
             required
+            style={theme === "dark" ? inputDark : {}}
           />
         </div>
         <div className={styles.inputGroup}>
@@ -85,6 +105,7 @@ const Support = () => {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Опишите вашу проблему подробно"
             required
+            style={theme === "dark" ? inputDark : {}}
           />
         </div>
         <button type="submit" className={styles.submitButton}>
