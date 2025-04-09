@@ -163,10 +163,14 @@ export default function Cabinet() {
   };
 
   // ======================= Калькулятор через БЭКЕНД =======================
+
   function CalculatorPopup({ onClose }) {
     const [cityA, setCityA] = useState("");
     const [cityB, setCityB] = useState("");
     const [carType, setCarType] = useState("тент");
+    const [cargoType, setCargoType] = useState("full");
+    const [volume, setVolume] = useState("");
+    const [weight, setWeight] = useState("");
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -174,23 +178,37 @@ export default function Cabinet() {
     async function handleCalculate() {
       setError(null);
       setResult(null);
+
       if (!cityA || !cityB || !carType) return;
+
+      if (cargoType === "groupage" && (!volume || !weight)) {
+        setError("Для сборного груза укажите вес и объем.");
+        return;
+      }
 
       try {
         setLoading(true);
-        axios
-          .get("/getShippingCalculation", {
-            params: { cityA, cityB, carType },
-          })
-          .then((res) => res.data)
-          .then((data) => {
-            setLoading(false);
-            setResult(data);
-          });
+
+        const params = {
+          cityA,
+          cityB,
+          carType,
+          cargoType,
+        };
+
+        if (cargoType === "groupage") {
+          params.volume = volume;
+          params.weight = weight;
+        }
+
+        const res = await axios.get("/getShippingCalculation", { params });
+        setResult(res.data);
+        console.log(res.data);
       } catch (err) {
         console.error("Ошибка при расчете:", err);
-        setLoading(false);
         setError("Ошибка при запросе к серверу.");
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -222,19 +240,60 @@ export default function Cabinet() {
             />
           </div>
 
-          <div className={s.field}>
-            <label>Тип машины</label>
-            <select
-              value={carType}
-              onChange={(e) => setCarType(e.target.value)}
-              className={s.select}
-            >
-              <option value="тент">Тентованная</option>
-              <option value="рефрижератор">Рефрижератор</option>
-            </select>
+          <div className={s.selects}>
+            <div className={s.field}>
+              <label>Тип машины</label>
+              <select
+                value={carType}
+                onChange={(e) => setCarType(e.target.value)}
+                className={s.select}
+              >
+                <option value="тент">Тентованная</option>
+                <option value="рефрижератор">Рефрижератор</option>
+              </select>
+            </div>
+
+            <div className={s.field}>
+              <label>Тип перевозки</label>
+              <select
+                value={cargoType}
+                onChange={(e) => setCargoType(e.target.value)}
+                className={s.select}
+              >
+                <option value="full">Отдельная машина</option>
+                <option value="groupage">Сборный груз</option>
+              </select>
+            </div>
           </div>
 
-          {loading == true ? (
+          {cargoType === "groupage" && (
+            <>
+              <div className={s.field}>
+                <label>Объем (м³)</label>
+                <input
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => setVolume(e.target.value)}
+                  placeholder="Например, 3.5"
+                />
+              </div>
+              <div className={s.field}>
+                <label>Вес (кг)</label>
+                <input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  placeholder="Например, 1000"
+                />
+              </div>
+            </>
+          )}
+
+          {loading ? (
             <button className={s.calculateBtn} disabled>
               Рассчитываем...
             </button>
@@ -248,9 +307,11 @@ export default function Cabinet() {
 
           {result && !loading && (
             <div className={s.result}>
-              <p>Расстояние: {result.price / result.tariff} км</p>
+              <p>Расстояние: {result.distance} км</p>
               <p>Тариф: {result.tariff} ₽/км</p>
-              <p className={s.total}>Итоговая стоимость: {result.price} ₽</p>
+              <p className={s.total}>
+                Итоговая стоимость: {parseFloat(result.price).toFixed(2)} ₽
+              </p>
             </div>
           )}
 
