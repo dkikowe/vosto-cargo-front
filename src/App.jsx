@@ -14,11 +14,12 @@ import Create from "./Pages/Create/Create";
 import Company from "./Pages/Company/Company";
 import { Main } from "./Pages/Main/Main";
 import CalculatorPopup from "./components/Calculator/Calculator";
+import Support from "./components/Support";
 
 function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
-    tg.requestFullscreen();
+    // tg.requestFullscreen();
     tg.disableVerticalSwipes();
     tg.ready();
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="/create" element={<Create />} />
         <Route path="/company" element={<Company />} />
         <Route path="/home" element={<Main />} />
+        <Route path="/support" element={<Support />} />
       </Routes>
     </Router>
   );

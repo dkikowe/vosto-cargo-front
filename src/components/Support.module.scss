@@ -1,0 +1,95 @@
+.supportContainer {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 80px)
+    
+}
+
+.header{
+    width: 100vw;
+    display: flex;
+    gap: 70px;
+}
+
+.title {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.backButton {
+    margin-bottom: 1rem;
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  
+    &:hover {
+      background-color: #d5d5d5;
+    }
+  }
+  
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+        font-size: 0.9rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    input,
+    textarea {
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+    }
+
+    textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+}
+
+.submitButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+} 
