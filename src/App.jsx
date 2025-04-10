@@ -15,6 +15,8 @@ import Company from "./Pages/Company/Company";
 import { Main } from "./Pages/Main/Main";
 import CalculatorPopup from "./components/Calculator/Calculator";
 import Support from "./components/Support";
+import Conf from "./components/Conf/Conf";
+import PremiumSubscription from "./components/PremiumSubscription/PremiumSubscription";
 
 function App() {
   useEffect(() => {
@@ -39,6 +41,8 @@ function App() {
         <Route path="/company" element={<Company />} />
         <Route path="/home" element={<Main />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/conf" element={<Conf />} />
+        <Route path="/prem" element={<PremiumSubscription />} />
       </Routes>
     </Router>
   );

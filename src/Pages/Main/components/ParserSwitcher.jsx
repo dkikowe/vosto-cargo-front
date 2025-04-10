@@ -92,6 +92,7 @@ export const Card = ({ data }) => {
         <div className={s.cardHeader}>
           {data.orderNumber && <h3>Груз номер: Nº{data.orderNumber}</h3>}
           {data.cargo && <h3>{data.cargo}</h3>}
+          {data.ready && <p>{data.ready}</p>}
         </div>
         {(data.from || data.to) && (
           <div className={s.cardRoute}>

@@ -421,7 +421,7 @@ export default function Cabinet() {
 
       {/* Блок с подпиской и поддержкой */}
       <div className={s.paymentContainer}>
-        <div className={s.premium}>
+        <div className={s.premium} onClick={() => handleNavigate("prem")}>
           <div className={s.iconText}>
             <Star />
             <p>Подписка</p>
@@ -474,20 +474,10 @@ export default function Cabinet() {
           </div>
         </div>
         <hr />
-        <div className={s.support}>
+        <div className={s.support} onClick={() => handleNavigate("conf")}>
           <div className={s.iconText}>
             <LockKeyhole />
             <p>Конфеденциальность</p>
-          </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
-        </div>
-        <hr />
-        <div className={s.support}>
-          <div className={s.iconText}>
-            <Settings />
-            <p>Настройки приложения</p>
           </div>
           <div className={s.str}>
             <ChevronRight />
