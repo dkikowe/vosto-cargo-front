@@ -28,6 +28,9 @@
 
     .str
         color: #dadada
+    .stars
+        display: flex
+
     hr
         width: 82%
         color: #e3e3e3
@@ -73,7 +76,7 @@
 
 .profileContainer
     width: 90%
-    height: 22%
+    height: 25.2%
     border-radius: 15px
     background: #ffffff
     display: flex
@@ -86,6 +89,15 @@
 
     .dark &  // для темной темы, если контейнер находится внутри .dark
         background: #1e1e1e
+
+.rating
+    display: flex
+    justify-content: flex-start
+    gap: 5px
+    align-items: center
+    .ratingNum
+        font-size: 12px
+        margin: 0
 
 hr
     width: 100%

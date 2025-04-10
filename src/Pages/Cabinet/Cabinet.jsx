@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useNavigate } from "react-router-dom";
 import axios from "../../axios"; // <-- Подключаем ваш настроенный axios (с baseURL = "http://localhost:3001" или другой)
@@ -36,6 +36,7 @@ export default function Cabinet() {
   const [idTelega, setIdTelega] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
+  const [rating, setRating] = useState("");
 
   // Управление видимостью попапа «Калькулятор»
   const [showCalculator, setShowCalculator] = useState(false);
@@ -90,6 +91,7 @@ export default function Cabinet() {
           setRole(res.data.role);
           setIdTelega(res.data.telegramId);
           setCompany(res.data.company);
+          setRating(res.data.rating);
           if (res.data.theme) {
             localStorage.setItem("theme", res.data.theme);
           }
@@ -389,6 +391,10 @@ export default function Cabinet() {
               className={s.name}
               onBlur={saveName}
             />
+            <div className={s.rating}>
+              <Star height={12} width={12} />
+              <p className={s.ratingNum}>{rating === 5 ? "5.0" : rating}</p>
+            </div>
             <RoleSelect userId={id} />
             <p className={s.idTelega}>Ваш ID: {idTelega}</p>
           </div>

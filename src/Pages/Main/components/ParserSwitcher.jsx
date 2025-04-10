@@ -4,6 +4,7 @@ import axios from "../../../axios";
 import ReactPullToRefresh from "react-simple-pull-to-refresh";
 // Импортируем наш контекст темы
 import { ThemeContext } from "../../../context/ThemeContext";
+import { Star, StarOff } from "lucide-react";
 
 // ---------- Парсинг дат (не меняем) ----------
 function tryParseDate(ddmm, yearArg) {
@@ -49,12 +50,47 @@ function parseRange(readyStr, yearArg) {
 
 // ---------- Компонент карточки (не меняем) ----------
 
+// ---------- Компонент карточки (с добавлением рейтинга) ----------
 export const Card = ({ data }) => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
   const [mapLink, setMapLink] = useState(null);
   const [showContact, setShowContact] = useState(false);
+
+  // Новые стейты для рейтинга
+  const [showRatingForm, setShowRatingForm] = useState(false);
+  const [ratingValue, setRatingValue] = useState("");
+  const [ratingReason, setRatingReason] = useState("");
+
   const isCargo = data.orderType === "CargoOrder";
+
+  const renderStars = () => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      const isActive = i <= ratingValue;
+      stars.push(
+        <span
+          key={i}
+          onClick={() => setRatingValue(i)}
+          onMouseEnter={() => setRatingValue(i)}
+          style={{
+            cursor: "pointer",
+            transition: "color 0.2s",
+            color: isDark
+              ? isActive
+                ? "#facc15"
+                : "#555"
+              : isActive
+              ? "#facc15"
+              : "#ccc",
+          }}
+        >
+          {isActive ? <Star size={24} /> : <StarOff size={24} />}
+        </span>
+      );
+    }
+    return stars;
+  };
 
   const cardStyle = {
     backgroundColor: isDark ? "#111" : "#fff",
@@ -71,7 +107,6 @@ export const Card = ({ data }) => {
               cityB: data.to,
             },
           });
-
           setMapLink(response.data.routeUrl);
         } catch (error) {
           console.error("Ошибка при получении маршрута:", error);
@@ -84,8 +119,34 @@ export const Card = ({ data }) => {
     }
   }, [data.from, data.to]);
 
+  // Показать контакт
   const handleShowContact = () => setShowContact(true);
 
+  // Показать форму рейтинга
+  const handleShowRatingForm = () => {
+    setShowRatingForm(true);
+  };
+
+  // Отправка рейтинга
+  const handleSubmitRating = async () => {
+    try {
+      await axios.post(`/api/rating/rate/${data.createdBy}`, {
+        rating: Number(ratingValue),
+        reason: ratingReason,
+      });
+
+      alert("Рейтинг успешно установлен!");
+      setShowRatingForm(false);
+      // при необходимости сбросить поля формы:
+      // setRatingValue("");
+      // setRatingReason("");
+    } catch (error) {
+      console.error("Ошибка при выставлении рейтинга:", error);
+      alert("Не удалось отправить рейтинг. Попробуйте снова.");
+    }
+  };
+
+  // Вёрстка для грузов
   if (isCargo) {
     return (
       <div className={s.card} style={cardStyle}>
@@ -170,6 +231,44 @@ export const Card = ({ data }) => {
                     Контакт:
                   </span>
                   <p>Тел: {data.telefon}</p>
+
+                  {/* Если у заявки есть createdBy, показываем кнопку рейтинга */}
+                  {data.createdBy && !showRatingForm && (
+                    <button
+                      className={s.contactButton}
+                      onClick={handleShowRatingForm}
+                    >
+                      Оставить рейтинг
+                    </button>
+                  )}
+
+                  {/* Форма рейтинга */}
+                  {showRatingForm && (
+                    <div className={s.ratingForm}>
+                      <label style={cardStyle}>
+                        Рейтинг:
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.4rem",
+                            marginTop: "0.3rem",
+                          }}
+                        >
+                          {renderStars()}
+                        </div>
+                      </label>
+
+                      <label style={cardStyle}>
+                        Причина/Комментарий:
+                        <textarea
+                          rows={3}
+                          value={ratingReason}
+                          onChange={(e) => setRatingReason(e.target.value)}
+                        />
+                      </label>
+                      <button onClick={handleSubmitRating}>Сохранить</button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -177,7 +276,10 @@ export const Card = ({ data }) => {
         </div>
       </div>
     );
-  } else {
+  }
+
+  // Вёрстка для машин
+  else {
     return (
       <div className={s.card} style={cardStyle}>
         <div className={s.cardHeader}>
@@ -244,6 +346,7 @@ export const Card = ({ data }) => {
               )}
             </div>
           )}
+
           {(data.imya || data.firma || data.telefon) && (
             <div className={s.cardContact}>
               {!showContact ? (
@@ -258,6 +361,44 @@ export const Card = ({ data }) => {
                   {data.imya && <p>{data.imya}</p>}
                   {data.firma && <p>({data.firma})</p>}
                   {data.telefon && <p>Тел: {data.telefon}</p>}
+
+                  {/* Если у заявки есть createdBy, показываем кнопку рейтинга */}
+                  {data.createdBy && !showRatingForm && (
+                    <button
+                      className={s.contactButton}
+                      onClick={handleShowRatingForm}
+                    >
+                      Оставить рейтинг
+                    </button>
+                  )}
+
+                  {/* Форма рейтинга */}
+                  {showRatingForm && (
+                    <div className={s.ratingForm}>
+                      <label style={cardStyle}>
+                        Рейтинг:
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.4rem",
+                            marginTop: "0.3rem",
+                          }}
+                        >
+                          {renderStars()}
+                        </div>
+                      </label>
+
+                      <label style={cardStyle}>
+                        Причина/Комментарий:
+                        <textarea
+                          rows={3}
+                          value={ratingReason}
+                          onChange={(e) => setRatingReason(e.target.value)}
+                        />
+                      </label>
+                      <button onClick={handleSubmitRating}>Сохранить</button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

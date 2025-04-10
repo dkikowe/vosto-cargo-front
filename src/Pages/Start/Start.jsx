@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import s from "./Start.module.sass";
+import Nav from "../../components/NavMenu/Nav";
 
 export default function Start() {
   useEffect(() => {
@@ -8,7 +9,7 @@ export default function Start() {
 
   return (
     <div className={s.linkContainer}>
-      <p>Перенаправление на сайт заказчика...</p>
+      <Nav />
     </div>
   );
 }
