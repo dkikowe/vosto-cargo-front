@@ -17,6 +17,7 @@ import CalculatorPopup from "./components/Calculator/Calculator";
 import Support from "./components/Support";
 import Conf from "./components/Conf/Conf";
 import PremiumSubscription from "./components/PremiumSubscription/PremiumSubscription";
+import Notifications from "./components/Notifications/Notifications";
 
 function App() {
   useEffect(() => {
@@ -43,6 +44,7 @@ function App() {
         <Route path="/support" element={<Support />} />
         <Route path="/conf" element={<Conf />} />
         <Route path="/prem" element={<PremiumSubscription />} />
+        <Route path="/notification" element={<Notifications />} />
       </Routes>
     </Router>
   );

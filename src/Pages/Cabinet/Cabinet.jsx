@@ -470,7 +470,10 @@ export default function Cabinet() {
 
       {/* Уведомления, конфиденциальность, настройки */}
       <div className={s.paymentContainer}>
-        <div className={s.support}>
+        <div
+          className={s.support}
+          onClick={() => handleNavigate("notification")}
+        >
           <div className={s.iconText}>
             <Bell />
             <p>Уведомления</p>

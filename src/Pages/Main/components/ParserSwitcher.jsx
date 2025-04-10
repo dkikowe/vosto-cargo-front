@@ -63,6 +63,26 @@ export const Card = ({ data }) => {
   const [ratingReason, setRatingReason] = useState("");
 
   const isCargo = data.orderType === "CargoOrder";
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [hasRated, setHasRated] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+
+  useEffect(() => {
+    const localId = localStorage.getItem("id");
+    setCurrentUserId(localId);
+
+    if (data.createdBy && localId) {
+      axios.get(`/getUserById/${data.createdBy}`).then((res) => {
+        const history = res.data?.ratingHistory || [];
+        const found = history.find((r) => r.fromUser === localId);
+
+        if (found) {
+          setHasRated(true);
+          setUserRating(found);
+        }
+      });
+    }
+  }, [data.createdBy]);
 
   const renderStars = () => {
     const stars = [];
@@ -133,6 +153,7 @@ export const Card = ({ data }) => {
       await axios.post(`/api/rating/rate/${data.createdBy}`, {
         rating: Number(ratingValue),
         reason: ratingReason,
+        fromUserId: currentUserId,
       });
 
       alert("Рейтинг успешно установлен!");
@@ -233,14 +254,29 @@ export const Card = ({ data }) => {
                   <p>Тел: {data.telefon}</p>
 
                   {/* Если у заявки есть createdBy, показываем кнопку рейтинга */}
-                  {data.createdBy && !showRatingForm && (
-                    <button
-                      className={s.contactButton}
-                      onClick={handleShowRatingForm}
-                    >
-                      Оставить рейтинг
-                    </button>
-                  )}
+                  {data.createdBy &&
+                    (hasRated ? (
+                      <div className={s.rated} style={{ marginTop: "0.5rem" }}>
+                        <p style={{ fontWeight: "bold" }}>Ваш отзыв:</p>
+                        <p className={s.ratedStars}>
+                          {[...Array(userRating?.value)].map((_, i) => (
+                            <Star key={i} size={18} color="#facc15" />
+                          ))}
+                        </p>
+                        <p style={{ fontStyle: "italic" }}>
+                          {userRating?.reason || "Без комментария"}
+                        </p>
+                      </div>
+                    ) : (
+                      !showRatingForm && (
+                        <button
+                          className={s.contactButton}
+                          onClick={handleShowRatingForm}
+                        >
+                          Оставить рейтинг
+                        </button>
+                      )
+                    ))}
 
                   {/* Форма рейтинга */}
                   {showRatingForm && (
@@ -363,14 +399,29 @@ export const Card = ({ data }) => {
                   {data.telefon && <p>Тел: {data.telefon}</p>}
 
                   {/* Если у заявки есть createdBy, показываем кнопку рейтинга */}
-                  {data.createdBy && !showRatingForm && (
-                    <button
-                      className={s.contactButton}
-                      onClick={handleShowRatingForm}
-                    >
-                      Оставить рейтинг
-                    </button>
-                  )}
+                  {data.createdBy &&
+                    (hasRated ? (
+                      <div className={s.rated} style={{ marginTop: "0.5rem" }}>
+                        <p style={{ fontWeight: "bold" }}>Ваш отзыв:</p>
+                        <p className={s.ratedStars}>
+                          {[...Array(userRating?.value)].map((_, i) => (
+                            <Star key={i} size={18} color="#facc15" />
+                          ))}
+                        </p>
+                        <p style={{ fontStyle: "italic" }}>
+                          {userRating?.reason || "Без комментария"}
+                        </p>
+                      </div>
+                    ) : (
+                      !showRatingForm && (
+                        <button
+                          className={s.contactButton}
+                          onClick={handleShowRatingForm}
+                        >
+                          Оставить рейтинг
+                        </button>
+                      )
+                    ))}
 
                   {/* Форма рейтинга */}
                   {showRatingForm && (
