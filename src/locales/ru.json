@@ -22,6 +22,18 @@
   "languageSelector":{
     "chooseLanguage": "Выберите язык"
   },
+  "roleselect":{
+    
+      "customer": "Заказчик",
+      "carrier": "Перевозчик",
+      "dispatcher": "Диспетчер",
+      "forwarder": "Экспедитор",
+      "fetchError": "Ошибка при получении пользователя:",
+      "updateError": "Ошибка при обновлении роли:",
+      "updateSuccess": "Роль обновлена на сервере:",
+      "arrowDown": "стрелка вниз"
+    
+  },
   "calculator": {
     "title": "Калькулятор стоимости доставки",
     "cityFrom": "Город отправления",
