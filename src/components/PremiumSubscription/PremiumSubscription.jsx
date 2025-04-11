@@ -3,52 +3,57 @@ import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import styles from "./PremiumSubscription.module.scss";
 import { ChevronLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const PremiumSubscription = () => {
   const [selectedTariff, setSelectedTariff] = useState(null);
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
+  const { t } = useTranslation();
 
   const isDark = theme === "dark";
 
   const tariffs = [
     {
       id: "weekly",
-      name: "РАЗОВЫЙ",
-      duration: "1 неделя",
+      name: t("premium.tariffs.weekly.name"),
+      duration: t("premium.tariffs.weekly.duration"),
       price: 1000,
       features: [
-        "Открытие 30 заявок в день",
-        "Просмотр 10 резюме без размещения вакансии",
+        t("premium.tariffs.weekly.feature1"),
+        t("premium.tariffs.weekly.feature2"),
       ],
     },
     {
       id: "monthly",
-      name: "МИНИМАЛЬНЫЙ",
-      duration: "1 месяц",
+      name: t("premium.tariffs.monthly.name"),
+      duration: t("premium.tariffs.monthly.duration"),
       price: 3990,
-      features: ["Полный доступ", "Неограниченное количество заявок"],
+      features: [
+        t("premium.tariffs.monthly.feature1"),
+        t("premium.tariffs.monthly.feature2"),
+      ],
     },
     {
       id: "half-year",
-      name: "СТАНДАРТ",
-      duration: "6 месяцев",
+      name: t("premium.tariffs.halfYear.name"),
+      duration: t("premium.tariffs.halfYear.duration"),
       price: 7990,
       features: [
-        "Полный доступ",
-        "Неограниченное количество заявок",
-        "Скидка 33%",
+        t("premium.tariffs.halfYear.feature1"),
+        t("premium.tariffs.halfYear.feature2"),
+        t("premium.tariffs.halfYear.feature3"),
       ],
     },
     {
       id: "yearly",
-      name: "МАКСИМАЛЬНЫЙ",
-      duration: "12 месяцев",
+      name: t("premium.tariffs.yearly.name"),
+      duration: t("premium.tariffs.yearly.duration"),
       price: 10990,
       features: [
-        "Полный доступ",
-        "Неограниченное количество заявок",
-        "Скидка 50%",
+        t("premium.tariffs.yearly.feature1"),
+        t("premium.tariffs.yearly.feature2"),
+        t("premium.tariffs.yearly.feature3"),
       ],
     },
   ];
@@ -56,24 +61,24 @@ const PremiumSubscription = () => {
   const additionalOptions = [
     {
       id: "contacts",
-      name: "Дополнительный контакт",
+      name: t("premium.options.contacts.name"),
       price: 590,
-      duration: "25 дней",
-      description: "10 открытий заявок",
+      duration: t("premium.options.contacts.duration"),
+      description: t("premium.options.contacts.description"),
     },
     {
       id: "all-cars",
-      name: "Все машины",
+      name: t("premium.options.allCars.name"),
       price: 490,
-      duration: "25 дней",
-      description: "Доступ к контактной информации всех перевозчиков",
+      duration: t("premium.options.allCars.duration"),
+      description: t("premium.options.allCars.description"),
     },
     {
       id: "ratings",
-      name: "Просмотр рейтингов",
+      name: t("premium.options.ratings.name"),
       price: 1990,
-      duration: "25 дней",
-      description: "Просмотр рейтинга перевозчиков и грузоотправителей",
+      duration: t("premium.options.ratings.duration"),
+      description: t("premium.options.ratings.description"),
     },
   ];
 
@@ -117,11 +122,11 @@ const PremiumSubscription = () => {
             color: isDark ? "#fff" : "#000",
           }}
         />
-        <h1>Премиум подписка</h1>
+        <h1>{t("premium.title")}</h1>
       </div>
 
       <div className={styles.tariffs}>
-        <h2>Тарифы для перевозчиков</h2>
+        <h2>{t("premium.tariffsTitle")}</h2>
         <div className={styles.tariffGrid}>
           {tariffs.map((tariff) => (
             <div
@@ -146,7 +151,7 @@ const PremiumSubscription = () => {
       </div>
 
       <div className={styles.additionalOptions}>
-        <h2>Дополнительные опции</h2>
+        <h2>{t("premium.optionsTitle")}</h2>
         <div className={styles.optionsGrid}>
           {additionalOptions.map((option) => (
             <div
@@ -158,7 +163,7 @@ const PremiumSubscription = () => {
               <p className={styles.price}>{option.price} ₽</p>
               <p className={styles.duration}>{option.duration}</p>
               <p className={styles.description}>{option.description}</p>
-              <button style={buttonStyle}>Купить</button>
+              <button style={buttonStyle}>{t("premium.buy")}</button>
             </div>
           ))}
         </div>
@@ -167,7 +172,7 @@ const PremiumSubscription = () => {
       {selectedTariff && (
         <div className={styles.purchaseSection}>
           <button style={buttonStyle} onClick={handlePurchase}>
-            Купить выбранный тариф
+            {t("premium.buySelected")}
           </button>
         </div>
       )}

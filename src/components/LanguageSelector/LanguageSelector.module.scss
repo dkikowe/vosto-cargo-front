@@ -1,0 +1,53 @@
+.container {
+  padding: 100px 20px 20px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  height: 95vh;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #333;
+  text-align: center;
+}
+
+.languagesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 5px;
+}
+
+.languageCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+  }
+}
+
+.languageInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.languageName {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.nativeName {
+  font-size: 14px;
+  color: #666;
+} 

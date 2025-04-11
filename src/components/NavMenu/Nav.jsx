@@ -1,23 +1,29 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useContext } from "react";
 import { useLocation, NavLink } from "react-router-dom";
-import { Menu, PackagePlus, Search, Bell, House } from "lucide-react";
+import { Menu, PackagePlus, House } from "lucide-react";
 import s from "./Nav.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export default function Nav() {
   const location = useLocation();
   const isStartPage = location.pathname === "/start";
   const { theme } = useContext(ThemeContext);
+  const { t } = useTranslation();
 
   const navItems = [
-    { path: "/home", icon: <House className={s.icon} />, label: "Заявки" },
+    {
+      path: "/home",
+      icon: <House className={s.icon} />,
+      label: t("nav.requests"),
+    },
     {
       path: "/create",
       icon: <PackagePlus className={s.icon} />,
-      label: "Создать",
+      label: t("nav.create"),
     },
     { path: "/start", img: "/images/log.png" },
-    { path: "/menu", icon: <Menu className={s.icon} />, label: "Меню" },
+    { path: "/menu", icon: <Menu className={s.icon} />, label: t("nav.menu") },
   ];
 
   return (

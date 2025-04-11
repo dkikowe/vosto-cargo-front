@@ -6,11 +6,13 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 dayjs.extend(relativeTime);
 
 const Notifications = () => {
   const { theme } = useContext(ThemeContext);
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
   const isDarkMode = theme === "dark";
@@ -26,9 +28,9 @@ const Notifications = () => {
 
         const generated = user.ratingHistory.map((entry, index) => ({
           id: entry._id || index,
-          title: "Вам поставили рейтинг",
-          message: `${entry.value} звёзд — ${
-            entry.reason || "без комментария"
+          title: t("notifications.ratingTitle"),
+          message: `${entry.value} ★ — ${
+            entry.reason || t("notifications.noComment")
           }`,
           time: dayjs(entry.createdAt).fromNow(),
           type: "rating",
@@ -41,7 +43,7 @@ const Notifications = () => {
     };
 
     fetchUserAndBuildNotifications();
-  }, []);
+  }, [t]);
 
   const background = isDarkMode ? "#121212" : "#fff";
   const textColor = isDarkMode ? "#fff" : "#222";
@@ -62,12 +64,13 @@ const Notifications = () => {
             color: textColor,
           }}
         />
-        <h1>Уведомления</h1>
+        <h1>{t("notifications.title")}</h1>
       </div>
+
       <div className={styles.notificationsList}>
         {notifications.length === 0 && (
           <p className={styles.empty} style={{ color: timeColor }}>
-            Нет новых уведомлений
+            {t("notifications.empty")}
           </p>
         )}
         {notifications.map((notification) => (

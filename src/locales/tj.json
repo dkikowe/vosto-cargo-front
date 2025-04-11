@@ -1,0 +1,13 @@
+{
+  "cabinet": {
+    "title": "Кабинет",
+    "enterNewName": "Номи навро ворид кунед",
+    "save": "Захира кунед",
+    "changeLanguage": "Ивзои забон",
+    "currentLanguage": "Забони ҷорӣ",
+    "changeAvatar": "Тасвирро иваз кунед",
+    "uploading": "Боргузорӣ...",
+    "chooseFile": "Файл интихоб кунед",
+    "removePhoto": "Тасвирро ҳазф кунед"
+  }
+}

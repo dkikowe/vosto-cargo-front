@@ -1,0 +1,331 @@
+{
+  "cabinet": {
+    "calculator": "Calculator",
+    "subscription": "Subscription",
+    "support": "Support",
+    "darkTheme": "Dark Theme",
+    "lightTheme": "Light Theme",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "addCompany": "Add company",
+    "telegramId": "Your ID",
+    "nameChangeSuccess": "Name successfully changed",
+    "nameChangeFail": "Failed to change name",
+    "tgIdFail": "Failed to get Telegram ID",
+    "sendError": "An error occurred",
+    "saveAvatar": "Save",
+    "enterNewName": "Enter your name",
+    "changeAvatar": "Change photo",
+    "defaultName": "Your name",
+    "changeLang":"Language"
+  },
+  "languageSelector":{
+    "chooseLanguage": "Choose Language"
+  },
+  "roleselect":{
+    
+      "customer": "Customer",
+      "carrier": "Carrier",
+      "dispatcher": "Dispatcher",
+      "forwarder": "Forwarder",
+      "fetchError": "Error fetching user:",
+      "updateError": "Error updating role:",
+      "updateSuccess": "Role updated on server:",
+      "arrowDown": "arrow down"
+    
+    
+  },
+  "calculator": {
+    "title": "Delivery cost calculator",
+    "cityFrom": "City of departure",
+    "cityTo": "Destination city",
+    "placeholderFrom": "For example, Moscow",
+    "placeholderTo": "For example, Saint Petersburg",
+    "carType": "Vehicle type",
+    "cargoType": "Shipping type",
+    "tent": "Tent truck",
+    "refrigerator": "Refrigerator truck",
+    "fullTruck": "Full truckload",
+    "groupage": "Groupage cargo",
+    "volume": "Volume (m³)",
+    "placeholderVolume": "For example, 3.5",
+    "weight": "Weight (kg)",
+    "placeholderWeight": "For example, 1000",
+    "calculate": "Calculate",
+    "loading": "Calculating...",
+    "error": "Please specify weight and volume for groupage cargo.",
+    "serverError": "Server error occurred.",
+    "distance": "Distance",
+    "tariff": "Rate",
+    "total": "Total cost",
+    "disclaimer": "Prices are approximate. For exact quotes, contact your manager."
+  },
+  
+    "company": {
+      "title": "Company Information",
+      "name": "Company Name",
+      "inn": "INN",
+      "ogrn": "OGRN",
+      "profile": "Profile",
+      "country": "Country",
+      "city": "City",
+      "email": "Email",
+      "website": "Website",
+      "manager": "Manager",
+      "phone": "Phone",
+      "jobTitle": "Job Title",
+      "department": "Department",
+      "save": "Save",
+      "placeholders": {
+        "name": "Enter company name",
+        "inn": "Enter INN",
+        "ogrn": "Enter OGRN",
+        "profile": "e.g. freight forwarder",
+        "country": "Country",
+        "city": "City",
+        "email": "example@mail.com",
+        "website": "https://example.com",
+        "manager": "John Doe",
+        "phone": "+1 (___) ___-____",
+        "jobTitle": "Manager's job title",
+        "department": "e.g. Headquarters"
+      },
+      "success": {
+        "save": "Company information saved successfully"
+      },
+      "errors": {
+        "saveFailed": "Error saving company information",
+        "noUser": "User not found (no ID in localStorage)"
+      }
+    },
+    
+      "premium": {
+        "title": "Premium Subscription",
+        "tariffsTitle": "Tariffs for Carriers",
+        "optionsTitle": "Additional Options",
+        "buy": "Buy",
+        "buySelected": "Buy Selected Tariff",
+        "tariffs": {
+          "weekly": {
+            "name": "ONE-TIME",
+            "duration": "1 week",
+            "feature1": "Open 30 requests per day",
+            "feature2": "View 10 resumes without posting a vacancy"
+          },
+          "monthly": {
+            "name": "MINIMAL",
+            "duration": "1 month",
+            "feature1": "Full access",
+            "feature2": "Unlimited requests"
+          },
+          "halfYear": {
+            "name": "STANDARD",
+            "duration": "6 months",
+            "feature1": "Full access",
+            "feature2": "Unlimited requests",
+            "feature3": "33% discount"
+          },
+          "yearly": {
+            "name": "MAXIMUM",
+            "duration": "12 months",
+            "feature1": "Full access",
+            "feature2": "Unlimited requests",
+            "feature3": "50% discount"
+          }
+        },
+        "options": {
+          "contacts": {
+            "name": "Additional Contact",
+            "duration": "25 days",
+            "description": "10 request openings"
+          },
+          "allCars": {
+            "name": "All Vehicles",
+            "duration": "25 days",
+            "description": "Access to contact info of all carriers"
+          },
+          "ratings": {
+            "name": "View Ratings",
+            "duration": "25 days",
+            "description": "See carrier and shipper ratings"
+          }
+        }
+      },
+      
+        "support": {
+          "title": "Technical Support",
+          "subject": "Subject",
+          "subjectPlaceholder": "Enter the subject of your request",
+          "description": "Problem Description",
+          "descriptionPlaceholder": "Please describe your issue in detail",
+          "submit": "Submit",
+          "success": "Your request has been sent",
+          "errorSend": "Failed to send the request",
+          "errorUnknown": "An error occurred. Please try again later."
+        },
+        
+          "notifications": {
+            "title": "Notifications",
+            "ratingTitle": "You received a rating",
+            "noComment": "no comment",
+            "empty": "No new notifications"
+          },
+
+            "conf": {
+              "title": "Privacy Policy",
+                  "text": "Privacy Policy for Personal Data\nTelegram Mini App “Vostok Kargo”\n\nThis Privacy Policy (hereinafter – the Policy) applies to all information that the Telegram mini app “Vostok Kargo” (hereinafter – the Application) may obtain about the user during the use of this Application.\n\nBy using the Application, the user unconditionally agrees to the terms of this Policy and the conditions for processing personal data specified herein. If the user disagrees with the terms of the Policy, they should refrain from using the Application.\n\n1. Personal Information of Users\n1.1. “Personal information” means:\n1.1.1. Information provided by the user during authorization via Telegram, including first name, last name, username (nickname), and Telegram user ID;\n1.1.2. Information transmitted during the use of the Application, including data about cargo and vehicles entered by the user;\n1.1.3. Automatically collected technical data, including IP address, browser information, device type, and access time.\n1.2. The Application does not verify the accuracy of the provided information and assumes it is current and correct.\n\n2. Purposes of Processing Personal Information\n2.1. The user’s personal information is processed for the following purposes:\n2.1.1. Ensuring the functioning of the Application and providing users with its features;\n2.1.2. Providing personalized services and features;\n2.1.3. Communicating with the user, handling their requests, and notifying them of changes to the Application;\n2.1.4. Improving the quality and usability of the Application;\n2.1.5. Conducting analytical research using anonymized data.\n\n3. Confidentiality of Personal Information\n3.1. Users’ personal information is kept confidential, except in cases where the user voluntarily provides it for public access.\n3.2. The Application may transfer users’ personal data to third parties only with the user's consent or in cases provided for by the legislation of the Russian Federation.\n\n4. Changing and Deleting Personal Information\n4.1. The user may edit the information they have provided in the Application settings or request its deletion by contacting the Application administration.\n4.2. The Application administration is obliged to retain modified or deleted data in cases stipulated by law.\n\n5. Protection of Personal Information\n5.1. The Application takes the necessary organizational and technical measures to protect user data from unauthorized access, distribution, or destruction.\n\n6. Changes to the Privacy Policy\n6.1. The Application administration reserves the right to modify the terms of this Policy. The updated Policy takes effect from the moment it is published.\n\n7. Applicable Law\n7.1. This Policy and the relationship between the user and the Application administration are governed by the laws of the Russian Federation.\n\nLast updated: April 10, 2025."
+
+            },
+            
+              "nav": {
+                "requests": "Requests",
+                "create": "Create",
+                "menu": "Menu"
+              },
+              
+                "order": {
+                  "addCargo": "Add cargo",
+                  "addMachine": "Add machine",
+                  "description": "Description",
+                  "descriptionPlaceholder": "Order description",
+                  "loadingPlace": "Loading place",
+                  "unloadingPlace": "Unloading place",
+                  "cargoName": "Cargo name",
+                  "cargoPlaceholder": "e.g. furniture",
+                  "volume": "Volume (m³)",
+                  "weight": "Weight (kg)",
+                  "brand": "Brand",
+                  "brandPlaceholder": "e.g. Mercedes",
+                  "model": "Model",
+                  "modelPlaceholder": "e.g. Actros",
+                  "bodyType": "Body type",
+                  "bodyTypePlaceholder": "e.g. tarp",
+                  "loadingType": "Loading type",
+                  "loadingTypePlaceholder": "e.g. rear",
+                  "capacityTons": "Capacity (tons)",
+                  "volumeCubic": "Volume (m³)",
+                  "readyDate": "Ready date",
+                  "from": "From",
+                  "fromPlaceholder": "e.g. Moscow",
+                  "to": "To",
+                  "toPlaceholder": "e.g. Kazan",
+                  "contactName": "Contact person",
+                  "contactNamePlaceholder": "Name",
+                  "firm": "Position",
+                  "firmPlaceholder": "Company name",
+                  "phone": "Phone",
+                  "city": "City",
+                  "cityPlaceholder": "City",
+                  "email": "Email",
+                  "company": "Company",
+                  "companyPlaceholder": "Company name",
+                  "paymentMethod": "Payment method",
+                  "paymentSelect": "Select payment method",
+                  "cash": "Cash",
+                  "card": "Card",
+                  "submit": "Submit"
+                }
+
+          ,
+          
+            "orders": {
+              "cargo": "Cargo",
+              "machine": "Machine",
+              "addCargo": "Add cargo",
+              "addMachine": "Add machine",
+              "published": "Published",
+              "archive": "Archive",
+              "noCargo": "Your cargo orders will appear here. Add them or restore from archive.",
+              "noMachine": "Your machine orders will appear here. Add them or restore from archive.",
+              "loadingPlace": "Loading location",
+              "unloadingPlace": "Unloading location",
+              "cargoName": "Cargo",
+              "brandAndType": "Brand and type",
+              "from": "From",
+              "to": "To",
+              "edit": "Edit",
+              "delete": "Delete",
+              "toArchive": "Archive",
+              "restore": "Restore",
+              "toggleFormClose": "Close form",
+              "toggleFormAddCargo": "Add cargo",
+              "toggleFormAddMachine": "Add machine",
+              "empty": "Here will be your {{type}}. Add them or restore from archive"
+            },
+            "card":
+              {
+                "orderNumber": "Cargo number",
+                "from": "From",
+                "to": "To",
+                "showRoute": "Show route on map",
+                "weight": "Weight",
+                "volume": "Volume",
+                "rate": "Rate",
+                "vehicle": "Vehicle type",
+                "contactCustomer": "Contact customer",
+                "contactCarrier": "Contact carrier",
+                "contact": "Contact",
+                "yourReview": "Your review",
+                "noComment": "No comment",
+                "leaveRating": "Leave a rating",
+                "rating": "Rating",
+                "reason": "Reason/Comment",
+                "save": "Save",
+                "bodyType": "Body type",
+                "loadingType": "Loading type",
+                "tonnage": "Tonnage",
+                "capacity": "Capacity",
+                "errorFetchingRoute": "Error fetching route",
+                "ratingSuccess": "Rating submitted successfully!",
+                "ratingError": "Failed to submit rating. Please try again."
+              },
+              "parserSwitcher":{
+                "loading": "Loading...",
+                "noData": "No data",
+                "errorLoading": "Error loading:",
+                "cargo": "Cargo",
+                "machine": "Machine",
+                "feed": "Feed",
+                "search": "Search",
+                "pullToRefresh": "Pull down",
+                "refreshing": "Refreshing...",
+                "noOrdersByType": "No orders for the selected type",
+                "dateFrom": "Date (from):",
+                "dateTo": "Date (to):",
+                "cargoType": "Cargo type:",
+                "fromLocation": "From:",
+                "toLocation": "To:",
+                "readyDate": "Ready date:",
+                "tonnage": "Tonnage:",
+                "bodyType": "Body type:",
+                "exampleCargoType": "e.g.: sand, furniture...",
+                "departureCity": "Departure city",
+                "arrivalCity": "Arrival city",
+                "exampleTonnage": "e.g.: 5t, 20t...",
+                "departureLocation": "Departure location",
+                "destinationLocation": "Destination location",
+                "exampleBodyType": "e.g.: tarp, refrigerated...",
+                "find": "Find",
+                "reset": "Reset",
+                "noOrdersByFilters": "No orders matching the filters"
+              }
+              
+              
+            
+          
+          
+              
+              
+            
+            
+
+          
+        
+        
+      
+      
+    
+    
+  
+  
+}

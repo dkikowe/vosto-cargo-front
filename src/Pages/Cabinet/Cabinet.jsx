@@ -12,17 +12,19 @@ import {
   LockKeyhole,
   Bell,
   Calculator,
+  Languages,
 } from "lucide-react";
 import s from "./Cabinet.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
 import RoleSelect from "../../components/RoleSelect/RoleSelect";
+import { useTranslation } from "react-i18next";
+
+// ...импорты остаются без изменений...
 
 export default function Cabinet() {
-  // Если используете Telegram WebApp, раскомментируйте это и закомментируйте initData ниже
   const initData = window.Telegram.WebApp.initData;
   // const initData =
   // "user=%7B%22id%22%3A5056024242%2C%22first_name%22%3A%22%3C%5C%2Fabeke%3E%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22abylaikak%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FAj3hfrbNq8PfLLKvsSp3-WizcXTc3HO8Vynsw3R1a1A5spK3fDmZERABNoOGLEQN.svg%22%7D&chat_instance=-4908992446394523843&chat_type=private&auth_date=1735556539&signature=pgNJfzcxYGAcJCJ_jnsYEsmiTJJxOP2tNKb941-fT7QcsUQ2chSkFcItG8KvjR_r3nH0vem4bxtlltuyX-IwBQ&hash=c0b510163f5b1dea53172644df35e63458216a9d5d9a10413af4f5b0204bb493";
-
   const navigate = useNavigate();
   const id = localStorage.getItem("id");
 
@@ -38,13 +40,11 @@ export default function Cabinet() {
   const [role, setRole] = useState("");
   const [rating, setRating] = useState("");
 
-  // Управление видимостью попапа «Калькулятор»
   const [showCalculator, setShowCalculator] = useState(false);
 
-  // Тема из контекста
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { t, i18n } = useTranslation();
 
-  // Инициализация данных из Telegram
   useEffect(() => {
     try {
       if (initData) {
@@ -53,9 +53,8 @@ export default function Cabinet() {
 
         if (userData) {
           const userObj = JSON.parse(decodeURIComponent(userData));
-          console.log(userObj);
           if (!userObj.id) {
-            alert("Не удалось получить Telegram ID");
+            alert(t("cabinet.tgIdFail"));
             return;
           }
 
@@ -70,9 +69,8 @@ export default function Cabinet() {
                 localStorage.setItem("id", response.data.user._id);
               }
             })
-            .catch((error) => {
-              console.error("Ошибка при отправке данных:", error);
-              alert("Произошла ошибка");
+            .catch(() => {
+              alert(t("cabinet.sendError"));
             });
         }
       }
@@ -81,27 +79,25 @@ export default function Cabinet() {
     }
   }, [initData]);
 
-  // Загрузка данных пользователя
   useEffect(() => {
     if (id) {
       axios.get(`/getUserById/${id}`).then((res) => {
         if (res.data) {
+          console.log(res.data);
           setUser(res.data);
-          setName(res.data.name || "Ваше имя");
+          setName(res.data.name || t("cabinet.defaultName"));
           setRole(res.data.role);
           setIdTelega(res.data.telegramId);
           setCompany(res.data.company);
           setRating(res.data.rating);
-          if (res.data.theme) {
-            localStorage.setItem("theme", res.data.theme);
-          }
+          if (res.data.theme) localStorage.setItem("theme", res.data.theme);
+          if (res.data.language) i18n.changeLanguage(res.data.language);
           setIsLoading(false);
         }
       });
     }
   }, [id]);
 
-  // Загрузка информации о компании
   useEffect(() => {
     if (id) {
       axios
@@ -111,29 +107,20 @@ export default function Cabinet() {
             console.log(res.data.company);
           }
         })
-        .catch((error) => {
-          console.error("Ошибка при получении данных компании:", error);
-        });
+        .catch(console.error);
     }
   }, [id]);
 
-  function handleNavigate(path) {
-    navigate(`/${path}`);
-  }
+  const handleNavigate = (path) => navigate(`/${path}`);
 
   const saveName = () => {
     axios
       .post("/saveName", { userId: id, name })
       .then((res) => res.data)
       .then((data) => {
-        if (data) {
-          alert("Успешно изменено имя");
-        }
+        if (data) alert(t("cabinet.nameChangeSuccess"));
       })
-      .catch((err) => {
-        console.log(err.message);
-        alert("Не удалось изменить имя");
-      });
+      .catch(() => alert(t("cabinet.nameChangeFail")));
   };
 
   const handleFileSelection = (e) => {
@@ -153,7 +140,6 @@ export default function Cabinet() {
         const response = await axios.post(`/uploadPhoto/${id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        console.log("Upload successful:", response.data);
         setUser((prev) => ({ ...prev, avatar: URL.createObjectURL(blob) }));
       } catch (error) {
         console.error("Error uploading photo:", error);
@@ -163,8 +149,6 @@ export default function Cabinet() {
       }
     });
   };
-
-  // ======================= Калькулятор через БЭКЕНД =======================
 
   function CalculatorPopup({ onClose }) {
     const [cityA, setCityA] = useState("");
@@ -184,31 +168,22 @@ export default function Cabinet() {
       if (!cityA || !cityB || !carType) return;
 
       if (cargoType === "groupage" && (!volume || !weight)) {
-        setError("Для сборного груза укажите вес и объем.");
+        setError(t("calculator.error"));
         return;
       }
 
       try {
         setLoading(true);
-
-        const params = {
-          cityA,
-          cityB,
-          carType,
-          cargoType,
-        };
-
+        const params = { cityA, cityB, carType, cargoType };
         if (cargoType === "groupage") {
           params.volume = volume;
           params.weight = weight;
         }
-
         const res = await axios.get("/getShippingCalculation", { params });
         setResult(res.data);
-        console.log(res.data);
       } catch (err) {
         console.error("Ошибка при расчете:", err);
-        setError("Ошибка при запросе к серверу.");
+        setError(t("calculator.serverError"));
       } finally {
         setLoading(false);
       }
@@ -220,50 +195,52 @@ export default function Cabinet() {
           <button className={s.closeBtn} onClick={onClose}>
             ×
           </button>
-          <h2 className={s.title}>Калькулятор стоимости доставки</h2>
+          <h2 className={s.title}>{t("calculator.title")}</h2>
 
           <div className={s.field}>
-            <label>Город отправления</label>
+            <label>{t("calculator.cityFrom")}</label>
             <input
               type="text"
               value={cityA}
               onChange={(e) => setCityA(e.target.value)}
-              placeholder="Например, Москва"
+              placeholder={t("calculator.placeholderFrom")}
             />
           </div>
 
           <div className={s.field}>
-            <label>Город назначения</label>
+            <label>{t("calculator.cityTo")}</label>
             <input
               type="text"
               value={cityB}
               onChange={(e) => setCityB(e.target.value)}
-              placeholder="Например, Санкт-Петербург"
+              placeholder={t("calculator.placeholderTo")}
             />
           </div>
 
           <div className={s.selects}>
             <div className={s.field}>
-              <label>Тип машины</label>
+              <label>{t("calculator.carType")}</label>
               <select
                 value={carType}
                 onChange={(e) => setCarType(e.target.value)}
                 className={s.select}
               >
-                <option value="тент">Тентованная</option>
-                <option value="рефрижератор">Рефрижератор</option>
+                <option value="тент">{t("calculator.tent")}</option>
+                <option value="рефрижератор">
+                  {t("calculator.refrigerator")}
+                </option>
               </select>
             </div>
 
             <div className={s.field}>
-              <label>Тип перевозки</label>
+              <label>{t("calculator.cargoType")}</label>
               <select
                 value={cargoType}
                 onChange={(e) => setCargoType(e.target.value)}
                 className={s.select}
               >
-                <option value="full">Отдельная машина</option>
-                <option value="groupage">Сборный груз</option>
+                <option value="full">{t("calculator.fullTruck")}</option>
+                <option value="groupage">{t("calculator.groupage")}</option>
               </select>
             </div>
           </div>
@@ -271,25 +248,25 @@ export default function Cabinet() {
           {cargoType === "groupage" && (
             <>
               <div className={s.field}>
-                <label>Объем (м³)</label>
+                <label>{t("calculator.volume")}</label>
                 <input
                   type="number"
                   min="0.01"
                   step="0.01"
                   value={volume}
                   onChange={(e) => setVolume(e.target.value)}
-                  placeholder="Например, 3.5"
+                  placeholder={t("calculator.placeholderVolume")}
                 />
               </div>
               <div className={s.field}>
-                <label>Вес (кг)</label>
+                <label>{t("calculator.weight")}</label>
                 <input
                   type="number"
                   min="0.1"
                   step="0.1"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
-                  placeholder="Например, 1000"
+                  placeholder={t("calculator.placeholderWeight")}
                 />
               </div>
             </>
@@ -297,11 +274,11 @@ export default function Cabinet() {
 
           {loading ? (
             <button className={s.calculateBtn} disabled>
-              Рассчитываем...
+              {t("calculator.loading")}
             </button>
           ) : (
             <button className={s.calculateBtn} onClick={handleCalculate}>
-              Рассчитать
+              {t("calculator.calculate")}
             </button>
           )}
 
@@ -309,27 +286,26 @@ export default function Cabinet() {
 
           {result && !loading && (
             <div className={s.result}>
-              <p>Расстояние: {result.distance} км</p>
-              <p>Тариф: {result.tariff} ₽/км</p>
+              <p>
+                {t("calculator.distance")}: {result.distance} км
+              </p>
+              <p>
+                {t("calculator.tariff")}: {result.tariff} ₽/км
+              </p>
               <p className={s.total}>
-                Итоговая стоимость: {parseFloat(result.price).toFixed(2)} ₽
+                {t("calculator.total")}: {parseFloat(result.price).toFixed(2)} ₽
               </p>
             </div>
           )}
 
-          <p className={s.warn}>
-            Цены являются примерными, за точными ценами обращайтесь к менеджеру
-          </p>
+          <p className={s.warn}>{t("calculator.disclaimer")}</p>
         </div>
       </div>
     );
   }
 
-  // =======================================================================
-
   return (
     <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
-      {/* Верхняя часть профиля */}
       <div className={s.profileContainer}>
         <div className={s.profile}>
           <label htmlFor="image" className="w-[97px] relative">
@@ -355,7 +331,7 @@ export default function Cabinet() {
                     onChange={(e) => setScale(parseFloat(e.target.value))}
                   />
                   <button onClick={handleSaveAvatar} className={s.saveButton}>
-                    Сохранить
+                    {t("cabinet.saveAvatar")}
                   </button>
                 </div>
               </div>
@@ -396,7 +372,9 @@ export default function Cabinet() {
               <p className={s.ratingNum}>{rating === 5 ? "5.0" : rating}</p>
             </div>
             <RoleSelect userId={id} />
-            <p className={s.idTelega}>Ваш ID: {idTelega}</p>
+            <p className={s.idTelega}>
+              {t("cabinet.telegramId")}: {idTelega}
+            </p>
           </div>
         </div>
         <hr />
@@ -404,7 +382,7 @@ export default function Cabinet() {
           <div className={s.icon}>
             <Building2 />
             <p className={s.companyText}>
-              {company && company.name ? company.name : "Добавить компанию"}
+              {company && company.name ? company.name : t("cabinet.addCompany")}
             </p>
           </div>
           <div className={s.str}>
@@ -417,7 +395,7 @@ export default function Cabinet() {
         <div className={s.support} onClick={() => setShowCalculator(true)}>
           <div className={s.iconText}>
             <Calculator />
-            <p>Калькулятор </p>
+            <p>{t("cabinet.calculator")}</p>
           </div>
           <div className={s.str}>
             <ChevronRight />
@@ -425,12 +403,11 @@ export default function Cabinet() {
         </div>
       </div>
 
-      {/* Блок с подпиской и поддержкой */}
       <div className={s.paymentContainer}>
         <div className={s.premium} onClick={() => handleNavigate("prem")}>
           <div className={s.iconText}>
             <Star />
-            <p>Подписка</p>
+            <p>{t("cabinet.subscription")}</p>
           </div>
           <div className={s.str}>
             <ChevronRight />
@@ -440,7 +417,7 @@ export default function Cabinet() {
         <div className={s.support} onClick={() => handleNavigate("support")}>
           <div className={s.iconText}>
             <Headset />
-            <p>Поддержка </p>
+            <p>{t("cabinet.support")}</p>
           </div>
           <div className={s.str}>
             <ChevronRight />
@@ -448,12 +425,15 @@ export default function Cabinet() {
         </div>
       </div>
 
-      {/* Переключатель темы */}
       <div className={s.themeChanger}>
         <div className={s.change}>
           <div className={s.iconText}>
             <SunMoon />
-            <p>{theme === "dark" ? "Тёмная тема" : "Светлая тема"}</p>
+            <p>
+              {theme === "dark"
+                ? t("cabinet.darkTheme")
+                : t("cabinet.lightTheme")}
+            </p>
           </div>
           <div className={s.themeToggle}>
             <label className={s.switch}>
@@ -468,7 +448,6 @@ export default function Cabinet() {
         </div>
       </div>
 
-      {/* Уведомления, конфиденциальность, настройки */}
       <div className={s.paymentContainer}>
         <div
           className={s.support}
@@ -476,7 +455,7 @@ export default function Cabinet() {
         >
           <div className={s.iconText}>
             <Bell />
-            <p>Уведомления</p>
+            <p>{t("cabinet.notifications")}</p>
           </div>
           <div className={s.str}>
             <ChevronRight />
@@ -486,7 +465,18 @@ export default function Cabinet() {
         <div className={s.support} onClick={() => handleNavigate("conf")}>
           <div className={s.iconText}>
             <LockKeyhole />
-            <p>Конфеденциальность</p>
+            <p>{t("cabinet.privacy")}</p>
+          </div>
+          <div className={s.str}>
+            <ChevronRight />
+          </div>
+        </div>
+      </div>
+      <div className={s.paymentContainer}>
+        <div className={s.premium} onClick={() => handleNavigate("lang")}>
+          <div className={s.iconText}>
+            <Languages />
+            <p>{t("cabinet.changeLang")}</p>
           </div>
           <div className={s.str}>
             <ChevronRight />
@@ -494,9 +484,6 @@ export default function Cabinet() {
         </div>
       </div>
 
-      {/* Кнопка, открывающая калькулятор (через бэкенд) */}
-
-      {/* Popup для калькулятора */}
       {showCalculator && (
         <CalculatorPopup onClose={() => setShowCalculator(false)} />
       )}

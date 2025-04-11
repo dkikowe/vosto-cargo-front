@@ -18,6 +18,7 @@ import Support from "./components/Support";
 import Conf from "./components/Conf/Conf";
 import PremiumSubscription from "./components/PremiumSubscription/PremiumSubscription";
 import Notifications from "./components/Notifications/Notifications";
+import LanguageSelector from "./components/LanguageSelector/LanguageSelector";
 
 function App() {
   useEffect(() => {
@@ -45,6 +46,7 @@ function App() {
         <Route path="/conf" element={<Conf />} />
         <Route path="/prem" element={<PremiumSubscription />} />
         <Route path="/notification" element={<Notifications />} />
+        <Route path="/lang" element={<LanguageSelector />} />
       </Routes>
     </Router>
   );

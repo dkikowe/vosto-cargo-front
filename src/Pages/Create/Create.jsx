@@ -4,8 +4,10 @@ import s from "./Create.module.sass";
 import { AddOrderModal } from "./AddOrderModal.jsx";
 import { ThemeContext } from "../../context/ThemeContext";
 import { Edit, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function CreateOrders() {
+  const { t } = useTranslation();
   const { theme } = useContext(ThemeContext);
   const userId = localStorage.getItem("id");
 
@@ -14,17 +16,12 @@ export default function CreateOrders() {
   const [orders, setOrders] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
-  // Состояние редактируемой заявки (если null — создание новой)
   const [editingOrder, setEditingOrder] = useState(null);
 
-  // Форма для создания/редактирования заявки
   const [formData, setFormData] = useState({
     description: "",
     paymentMethod: "",
     isArchived: false,
-
-    // CargoOrder
     from: "",
     to: "",
     cargo: "",
@@ -33,8 +30,6 @@ export default function CreateOrders() {
     rate: "",
     ready: "",
     vehicle: "",
-
-    // MachineOrder
     url: "",
     marka: "",
     tip: "",
@@ -53,7 +48,6 @@ export default function CreateOrders() {
     company: "",
   });
 
-  // Загружаем заказы
   const fetchUserOrders = async () => {
     try {
       if (!userId) return;
@@ -68,7 +62,6 @@ export default function CreateOrders() {
     fetchUserOrders();
   }, [userId]);
 
-  // Обработчик изменения полей формы
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -77,13 +70,11 @@ export default function CreateOrders() {
     }));
   };
 
-  // Сброс формы и состояния редактирования
   const resetForm = () => {
     setFormData({
       description: "",
       paymentMethod: "",
       isArchived: false,
-
       from: "",
       to: "",
       cargo: "",
@@ -92,7 +83,6 @@ export default function CreateOrders() {
       rate: "",
       ready: "",
       vehicle: "",
-
       url: "",
       marka: "",
       tip: "",
@@ -113,14 +103,12 @@ export default function CreateOrders() {
     setEditingOrder(null);
   };
 
-  // Функция для создания нового заказа
   const handleCreateOrder = async (e) => {
     e.preventDefault();
     if (!userId) return;
 
     let payload = {};
     if (currentType === "CargoOrder") {
-      // Формируем payload для заявки на груз (CargoOrder)
       payload = {
         userId,
         orderType: currentType,
@@ -130,7 +118,6 @@ export default function CreateOrders() {
         cargo: formData.cargoName,
         volume: formData.volume ? formData.volume.toString() : "",
         weight: formData.weight ? formData.weight.toString() : "",
-        // Для этих полей можно оставить пустые строки, если их не вводят
         rate: "",
         ready: "",
         vehicle: "",
@@ -138,9 +125,6 @@ export default function CreateOrders() {
         isArchived: false,
       };
     } else if (currentType === "MachineOrder") {
-      // Разбиваем brandAndModel на marka и tip
-
-      // Формируем payload для заявки на машину (MachineOrder)
       payload = {
         userId,
         orderType: currentType,
@@ -149,10 +133,8 @@ export default function CreateOrders() {
         tip: formData.tip,
         kuzov: formData.kuzov,
         tip_zagruzki: formData.tip_zagruzki,
-        gruzopodyomnost: formData.gruzopodyomnost
-          ? formData.gruzopodyomnost.toString()
-          : "",
-        vmestimost: formData.vmestimost ? formData.vmestimost.toString() : "",
+        gruzopodyomnost: formData.gruzopodyomnost?.toString() || "",
+        vmestimost: formData.vmestimost?.toString() || "",
         data_gotovnosti: formData.data_gotovnosti,
         otkuda: formData.otkuda,
         kuda: formData.kuda,
@@ -178,7 +160,6 @@ export default function CreateOrders() {
     }
   };
 
-  // Функция для обновления существующего заказа
   const handleUpdateOrder = async (e) => {
     e.preventDefault();
     if (!userId || !editingOrder) return;
@@ -192,8 +173,8 @@ export default function CreateOrders() {
         from: formData.loadingPlace,
         to: formData.unloadingPlace,
         cargo: formData.cargoName,
-        volume: formData.volume ? formData.volume.toString() : "",
-        weight: formData.weight ? formData.weight.toString() : "",
+        volume: formData.volume?.toString() || "",
+        weight: formData.weight?.toString() || "",
         rate: "",
         ready: "",
         vehicle: "",
@@ -202,18 +183,15 @@ export default function CreateOrders() {
       };
     } else if (currentType === "MachineOrder") {
       payload = {
-        marka: formData.marka,
-        tip: formData.tip,
         userId,
         orderType: currentType,
         description: formData.description,
-
+        marka: formData.marka,
+        tip: formData.tip,
         kuzov: formData.kuzov,
         tip_zagruzki: formData.tip_zagruzki,
-        gruzopodyomnost: formData.gruzopodyomnost
-          ? formData.gruzopodyomnost.toString()
-          : "",
-        vmestimost: formData.vmestimost ? formData.vmestimost.toString() : "",
+        gruzopodyomnost: formData.gruzopodyomnost?.toString() || "",
+        vmestimost: formData.vmestimost?.toString() || "",
         data_gotovnosti: formData.data_gotovnosti,
         otkuda: formData.otkuda,
         kuda: formData.kuda,
@@ -242,45 +220,32 @@ export default function CreateOrders() {
     }
   };
 
-  // Общий onSubmit, который решает, создавать или обновлять
   const handleSubmitOrder = (e) => {
-    if (editingOrder) {
-      handleUpdateOrder(e);
-    } else {
-      handleCreateOrder(e);
-    }
+    editingOrder ? handleUpdateOrder(e) : handleCreateOrder(e);
   };
 
-  // Архивирование / восстановление заказа
   const handleToggleArchive = async (orderId, currentIsArchived) => {
     try {
-      let updatedOrder;
-      if (!currentIsArchived) {
-        const response = await axios.post("/orders/archive", {
-          orderId,
-          userId,
-        });
-        updatedOrder = response.data;
-        console.log("Заказ архивирован:", updatedOrder);
-      } else {
-        const response = await axios.post("/orders/restore", {
-          orderId,
-          userId,
-        });
-        updatedOrder = response.data;
-        console.log("Заказ восстановлен:", updatedOrder);
-      }
+      const endpoint = currentIsArchived
+        ? "/orders/restore"
+        : "/orders/archive";
+      const { data: updatedOrder } = await axios.post(endpoint, {
+        orderId,
+        userId,
+      });
+      console.log(
+        currentIsArchived ? "Заявка восстановлена" : "Заявка архивирована",
+        updatedOrder
+      );
       fetchUserOrders();
     } catch (error) {
       console.error("Ошибка обновления заявки:", error);
     }
   };
 
-  // Заполнение формы при нажатии «Редактировать»
   const handleEditOrder = (order) => {
     setEditingOrder(order);
     setCurrentType(order.orderType);
-
     setFormData({
       description: order.description || "",
       loadingPlace: order.from || "",
@@ -288,11 +253,8 @@ export default function CreateOrders() {
       cargoName: order.cargo || "",
       volume: order.volume || "",
       weight: order.weight || "",
-      // Для заявки на груз больше никаких полей нет
-
-      // Для машины:
       licensePlate: order.licensePlate || "",
-      brandAndModel: order.brandAndModel || "", // на бэкенде разделится на marka и tip
+      brandAndModel: order.brandAndModel || "",
       kuzov: order.kuzov || "",
       tip_zagruzki: order.tip_zagruzki || "",
       gruzopodyomnost: order.gruzopodyomnost || "",
@@ -306,20 +268,15 @@ export default function CreateOrders() {
       contactCity: order.gorod || "",
       contactEmail: order.pochta || "",
       company: order.company || "",
-
       paymentMethod: order.paymentMethod || "",
       isArchived: order.isArchived || false,
     });
-
     setShowForm(true);
   };
 
-  // Удаление заказа
   const handleDeleteOrder = async (orderId) => {
     try {
-      await axios.delete("/orders", {
-        data: { userId, orderId },
-      });
+      await axios.delete("/orders", { data: { userId, orderId } });
       console.log("Заявка удалена");
       fetchUserOrders();
     } catch (error) {
@@ -327,22 +284,12 @@ export default function CreateOrders() {
     }
   };
 
-  // Фильтрация заявок
-  const filteredOrders = orders.filter((order) => {
-    const isRightType = order.orderType === currentType;
-    const isRightArchive =
-      currentTab === "archive" ? order.isArchived : !order.isArchived;
-    return isRightType && isRightArchive;
-  });
+  const filteredOrders = orders.filter(
+    (order) =>
+      order.orderType === currentType &&
+      (currentTab === "archive" ? order.isArchived : !order.isArchived)
+  );
 
-  const typeIndicatorLeft = currentType === "CargoOrder" ? "0%" : "50%";
-
-  // Логика кнопки "+"
-  const handlePlusClick = () => {
-    setShowMenu((prev) => !prev);
-  };
-
-  // Добавить груз
   const handleAddCargo = () => {
     setEditingOrder(null);
     setCurrentType("CargoOrder");
@@ -351,7 +298,6 @@ export default function CreateOrders() {
     setShowMenu(false);
   };
 
-  // Добавить машину
   const handleAddMachine = () => {
     setEditingOrder(null);
     setCurrentType("MachineOrder");
@@ -370,7 +316,7 @@ export default function CreateOrders() {
           <div className={s.typeSwitcher}>
             <div
               className={s.switchIndicator}
-              style={{ left: typeIndicatorLeft }}
+              style={{ left: currentType === "CargoOrder" ? "0%" : "50%" }}
             />
             <button
               className={
@@ -378,7 +324,7 @@ export default function CreateOrders() {
               }
               onClick={() => setCurrentType("CargoOrder")}
             >
-              Грузы
+              {t("orders.cargo")}
             </button>
             <button
               className={
@@ -386,20 +332,20 @@ export default function CreateOrders() {
               }
               onClick={() => setCurrentType("MachineOrder")}
             >
-              Машины
+              {t("orders.machine")}
             </button>
           </div>
           <div className={s.plusWrapper}>
-            <p className={s.plus} onClick={handlePlusClick}>
+            <p className={s.plus} onClick={() => setShowMenu((prev) => !prev)}>
               +
             </p>
             {showMenu && (
               <div className={s.plusMenu}>
                 <button className={s.plusButton} onClick={handleAddCargo}>
-                  Добавить груз
+                  {t("orders.addCargo")}
                 </button>
                 <button className={s.plusButton} onClick={handleAddMachine}>
-                  Добавить машину
+                  {t("orders.addMachine")}
                 </button>
               </div>
             )}
@@ -410,7 +356,7 @@ export default function CreateOrders() {
             className={currentTab === "active" ? s.statusActive : s.statusItem}
             onClick={() => setCurrentTab("active")}
           >
-            Опубликовано
+            {t("orders.published")}
           </button>
           <button
             className={
@@ -418,15 +364,20 @@ export default function CreateOrders() {
             }
             onClick={() => setCurrentTab("archive")}
           >
-            Архив
+            {t("orders.archive")}
           </button>
         </div>
       </div>
       <div className={s.ordersList}>
         {filteredOrders.length === 0 ? (
           <p>
-            Здесь будут ваши {currentType === "CargoOrder" ? "грузы" : "машины"}
-            . Добавьте их или восстановите из архива
+            {t("orders.empty", {
+              type: t(
+                currentType === "CargoOrder"
+                  ? "orders.cargoPlural"
+                  : "orders.machinePlural"
+              ),
+            })}
           </p>
         ) : (
           filteredOrders.map((order) => (
@@ -440,38 +391,42 @@ export default function CreateOrders() {
               {order.orderType === "CargoOrder" ? (
                 <>
                   <p>
-                    <strong>Груз:</strong> {order.cargoName || "—"}
+                    <strong>{t("orders.cargo")}:</strong>{" "}
+                    {order.cargoName || "—"}
                   </p>
                   <p>
-                    <strong>Загрузка:</strong> {order.loadingPlace || "—"}
+                    <strong>{t("orders.from")}:</strong>{" "}
+                    {order.loadingPlace || "—"}
                   </p>
                   <p>
-                    <strong>Выгрузка:</strong> {order.unloadingPlace || "—"}
+                    <strong>{t("orders.to")}:</strong>{" "}
+                    {order.unloadingPlace || "—"}
                   </p>
                 </>
               ) : (
                 <>
                   <p>
-                    <strong>Марка и тип:</strong> {order.marka} {order.tip}
+                    <strong>{t("orders.brandAndType")}:</strong> {order.marka}{" "}
+                    {order.tip}
                   </p>
                   <p>
-                    <strong>Откуда:</strong> {order.otkuda || "—"}
+                    <strong>{t("orders.from")}:</strong> {order.otkuda || "—"}
                   </p>
                   <p>
-                    <strong>Куда:</strong> {order.kuda || "—"}
+                    <strong>{t("orders.to")}:</strong> {order.kuda || "—"}
                   </p>
                 </>
               )}
               <div className={s.actions}>
                 <button
                   onClick={() => handleEditOrder(order)}
-                  title="Редактировать"
+                  title={t("orders.edit")}
                 >
                   <Edit size={16} />
                 </button>
                 <button
                   onClick={() => handleDeleteOrder(order._id)}
-                  title="Удалить"
+                  title={t("orders.delete")}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -482,7 +437,7 @@ export default function CreateOrders() {
                     handleToggleArchive(order._id, order.isArchived)
                   }
                 >
-                  {order.isArchived ? "Восстановить" : "В архив"}
+                  {order.isArchived ? t("orders.restore") : t("orders.archive")}
                 </button>
               </div>
             </div>
@@ -492,10 +447,10 @@ export default function CreateOrders() {
       <div className={s.addButtonWrapper}>
         <button onClick={() => setShowForm(!showForm)}>
           {showForm
-            ? "Закрыть форму"
+            ? t("orders.closeForm")
             : currentType === "CargoOrder"
-            ? "Добавить груз"
-            : "Добавить машину"}
+            ? t("orders.addCargo")
+            : t("orders.addMachine")}
         </button>
       </div>
       <AddOrderModal

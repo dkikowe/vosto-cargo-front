@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import s from "./Create.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
 import { CityAutocomplete } from "./CityAutoComplete";
+import { useTranslation } from "react-i18next";
 
 export function AddOrderModal({
   visible,
@@ -12,6 +13,8 @@ export function AddOrderModal({
   onSubmit,
 }) {
   const { theme } = useContext(ThemeContext);
+  const { t } = useTranslation();
+
   if (!visible) return null;
 
   return (
@@ -31,7 +34,9 @@ export function AddOrderModal({
           ×
         </button>
         <h3>
-          {currentType === "CargoOrder" ? "Добавить груз" : "Добавить машину"}
+          {currentType === "CargoOrder"
+            ? t("order.addCargo")
+            : t("order.addMachine")}
         </h3>
         <form
           onSubmit={onSubmit}
@@ -41,19 +46,19 @@ export function AddOrderModal({
           }}
         >
           <div className={s.formGroup}>
-            <label>Описание</label>
+            <label>{t("order.description")}</label>
             <textarea
               name="description"
               value={formData.description || ""}
               onChange={onChange}
-              placeholder="Описание заявки"
+              placeholder={t("order.descriptionPlaceholder")}
             />
           </div>
 
           {currentType === "CargoOrder" ? (
             <>
               <div className={s.formGroup}>
-                <label>Место загрузки</label>
+                <label>{t("order.loadingPlace")}</label>
                 <CityAutocomplete
                   onCitySelect={(selectedCity) => {
                     onChange({
@@ -63,7 +68,7 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Место выгрузки</label>
+                <label>{t("order.unloadingPlace")}</label>
                 <CityAutocomplete
                   onCitySelect={(selectedCity) => {
                     onChange({
@@ -73,16 +78,16 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Наименование груза</label>
+                <label>{t("order.cargoName")}</label>
                 <input
                   name="cargo"
                   value={formData.cargo || ""}
                   onChange={onChange}
-                  placeholder="Например, мебель"
+                  placeholder={t("order.cargoPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Объём (м³)</label>
+                <label>{t("order.volume")}</label>
                 <input
                   type="number"
                   name="volume"
@@ -92,7 +97,7 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Вес (кг)</label>
+                <label>{t("order.weight")}</label>
                 <input
                   type="number"
                   name="weight"
@@ -105,43 +110,43 @@ export function AddOrderModal({
           ) : (
             <>
               <div className={s.formGroup}>
-                <label>Марка</label>
+                <label>{t("order.brand")}</label>
                 <input
                   name="marka"
                   value={formData.marka || ""}
                   onChange={onChange}
-                  placeholder="Например, Mercedes"
+                  placeholder={t("order.brandPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Тип</label>
+                <label>{t("order.model")}</label>
                 <input
                   name="tip"
                   value={formData.tip || ""}
                   onChange={onChange}
-                  placeholder="Например, Actros"
+                  placeholder={t("order.modelPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Кузов</label>
+                <label>{t("order.bodyType")}</label>
                 <input
                   name="kuzov"
                   value={formData.kuzov || ""}
                   onChange={onChange}
-                  placeholder="Например, тент"
+                  placeholder={t("order.bodyTypePlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Тип загрузки</label>
+                <label>{t("order.loadingType")}</label>
                 <input
                   name="tip_zagruzki"
                   value={formData.tip_zagruzki || ""}
                   onChange={onChange}
-                  placeholder="Например, задняя"
+                  placeholder={t("order.loadingTypePlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Грузоподъемность (т)</label>
+                <label>{t("order.capacityTons")}</label>
                 <input
                   type="number"
                   name="gruzopodyomnost"
@@ -151,7 +156,7 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Вместимость (м³)</label>
+                <label>{t("order.volumeCubic")}</label>
                 <input
                   type="number"
                   name="vmestimost"
@@ -161,7 +166,7 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Дата готовности</label>
+                <label>{t("order.readyDate")}</label>
                 <input
                   type="date"
                   name="data_gotovnosti"
@@ -170,43 +175,43 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Откуда</label>
+                <label>{t("order.from")}</label>
                 <input
                   name="otkuda"
                   value={formData.otkuda || ""}
                   onChange={onChange}
-                  placeholder="Например, Москва"
+                  placeholder={t("order.fromPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Куда</label>
+                <label>{t("order.to")}</label>
                 <input
                   name="kuda"
                   value={formData.kuda || ""}
                   onChange={onChange}
-                  placeholder="Например, Казань"
+                  placeholder={t("order.toPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Контактное лицо</label>
+                <label>{t("order.contactName")}</label>
                 <input
                   name="imya"
                   value={formData.imya || ""}
                   onChange={onChange}
-                  placeholder="Имя"
+                  placeholder={t("order.contactNamePlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Должность</label>
+                <label>{t("order.firm")}</label>
                 <input
                   name="firma"
                   value={formData.firma || ""}
                   onChange={onChange}
-                  placeholder="Название фирмы"
+                  placeholder={t("order.firmPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Телефон</label>
+                <label>{t("order.phone")}</label>
                 <input
                   name="telefon"
                   value={formData.telefon || ""}
@@ -215,16 +220,16 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Город</label>
+                <label>{t("order.city")}</label>
                 <input
                   name="gorod"
                   value={formData.gorod || ""}
                   onChange={onChange}
-                  placeholder="Город"
+                  placeholder={t("order.cityPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Почта</label>
+                <label>{t("order.email")}</label>
                 <input
                   name="pochta"
                   value={formData.pochta || ""}
@@ -233,32 +238,32 @@ export function AddOrderModal({
                 />
               </div>
               <div className={s.formGroup}>
-                <label>Компания</label>
+                <label>{t("order.company")}</label>
                 <input
                   name="company"
                   value={formData.company || ""}
                   onChange={onChange}
-                  placeholder="Название компании"
+                  placeholder={t("order.companyPlaceholder")}
                 />
               </div>
             </>
           )}
 
           <div className={s.formGroup}>
-            <label>Способ оплаты</label>
+            <label>{t("order.paymentMethod")}</label>
             <select
               name="paymentMethod"
               value={formData.paymentMethod || ""}
               onChange={onChange}
             >
-              <option value="">Выберите способ оплаты</option>
-              <option value="Кэш">Наличные</option>
-              <option value="Карта">Карта</option>
+              <option value="">{t("order.paymentSelect")}</option>
+              <option value="Кэш">{t("order.cash")}</option>
+              <option value="Карта">{t("order.card")}</option>
             </select>
           </div>
 
           <button type="submit" className={s.submitBtn}>
-            Создать
+            {t("order.submit")}
           </button>
         </form>
       </div>

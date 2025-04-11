@@ -5,6 +5,7 @@ import ReactPullToRefresh from "react-simple-pull-to-refresh";
 // Импортируем наш контекст темы
 import { ThemeContext } from "../../../context/ThemeContext";
 import { Star, StarOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // ---------- Парсинг дат (не меняем) ----------
 function tryParseDate(ddmm, yearArg) {
@@ -51,13 +52,14 @@ function parseRange(readyStr, yearArg) {
 // ---------- Компонент карточки (не меняем) ----------
 
 // ---------- Компонент карточки (с добавлением рейтинга) ----------
+
 export const Card = ({ data }) => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
+  const { t } = useTranslation();
   const [mapLink, setMapLink] = useState(null);
   const [showContact, setShowContact] = useState(false);
 
-  // Новые стейты для рейтинга
   const [showRatingForm, setShowRatingForm] = useState(false);
   const [ratingValue, setRatingValue] = useState("");
   const [ratingReason, setRatingReason] = useState("");
@@ -66,6 +68,11 @@ export const Card = ({ data }) => {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [hasRated, setHasRated] = useState(false);
   const [userRating, setUserRating] = useState(null);
+
+  const cardStyle = {
+    backgroundColor: isDark ? "#111" : "#fff",
+    color: isDark ? "#fff" : "#000",
+  };
 
   useEffect(() => {
     const localId = localStorage.getItem("id");
@@ -83,6 +90,22 @@ export const Card = ({ data }) => {
       });
     }
   }, [data.createdBy]);
+
+  useEffect(() => {
+    const fetchMapLink = async () => {
+      if (data.from && data.to) {
+        try {
+          const response = await axios.get("/api/distance", {
+            params: { cityA: data.from, cityB: data.to },
+          });
+          setMapLink(response.data.routeUrl);
+        } catch (error) {
+          console.error(t("card.errorFetchingRoute"), error);
+        }
+      }
+    };
+    if (isCargo) fetchMapLink();
+  }, [data.from, data.to]);
 
   const renderStars = () => {
     const stars = [];
@@ -112,42 +135,9 @@ export const Card = ({ data }) => {
     return stars;
   };
 
-  const cardStyle = {
-    backgroundColor: isDark ? "#111" : "#fff",
-    color: isDark ? "#fff" : "#000",
-  };
-
-  useEffect(() => {
-    const fetchMapLink = async () => {
-      if (data.from && data.to) {
-        try {
-          const response = await axios.get("/api/distance", {
-            params: {
-              cityA: data.from,
-              cityB: data.to,
-            },
-          });
-          setMapLink(response.data.routeUrl);
-        } catch (error) {
-          console.error("Ошибка при получении маршрута:", error);
-        }
-      }
-    };
-
-    if (isCargo) {
-      fetchMapLink();
-    }
-  }, [data.from, data.to]);
-
-  // Показать контакт
   const handleShowContact = () => setShowContact(true);
+  const handleShowRatingForm = () => setShowRatingForm(true);
 
-  // Показать форму рейтинга
-  const handleShowRatingForm = () => {
-    setShowRatingForm(true);
-  };
-
-  // Отправка рейтинга
   const handleSubmitRating = async () => {
     try {
       await axios.post(`/api/rating/rate/${data.createdBy}`, {
@@ -155,33 +145,80 @@ export const Card = ({ data }) => {
         reason: ratingReason,
         fromUserId: currentUserId,
       });
-
-      alert("Рейтинг успешно установлен!");
+      alert(t("card.ratingSuccess"));
       setShowRatingForm(false);
-      // при необходимости сбросить поля формы:
-      // setRatingValue("");
-      // setRatingReason("");
     } catch (error) {
-      console.error("Ошибка при выставлении рейтинга:", error);
-      alert("Не удалось отправить рейтинг. Попробуйте снова.");
+      console.error(t("card.ratingError"), error);
+      alert(t("card.ratingError"));
     }
   };
 
-  // Вёрстка для грузов
+  const renderRatingSection = () => (
+    <>
+      {data.createdBy &&
+        (hasRated ? (
+          <div className={s.rated} style={{ marginTop: "0.5rem" }}>
+            <p style={{ fontWeight: "bold" }}>{t("card.yourReview")}</p>
+            <p className={s.ratedStars}>
+              {[...Array(userRating?.value)].map((_, i) => (
+                <Star key={i} size={18} color="#facc15" />
+              ))}
+            </p>
+            <p style={{ fontStyle: "italic" }}>
+              {userRating?.reason || t("card.noComment")}
+            </p>
+          </div>
+        ) : (
+          !showRatingForm && (
+            <button className={s.contactButton} onClick={handleShowRatingForm}>
+              {t("card.leaveRating")}
+            </button>
+          )
+        ))}
+      {showRatingForm && (
+        <div className={s.ratingForm}>
+          <label style={cardStyle}>
+            {t("card.rating")}
+            <div
+              style={{ display: "flex", gap: "0.4rem", marginTop: "0.3rem" }}
+            >
+              {renderStars()}
+            </div>
+          </label>
+          <label style={cardStyle}>
+            {t("card.reason")}
+            <textarea
+              rows={3}
+              value={ratingReason}
+              onChange={(e) => setRatingReason(e.target.value)}
+            />
+          </label>
+          <button onClick={handleSubmitRating}>{t("card.save")}</button>
+        </div>
+      )}
+    </>
+  );
+
+  // -------------------- CARGO --------------------
   if (isCargo) {
     return (
       <div className={s.card} style={cardStyle}>
         <div className={s.cardHeader}>
-          {data.orderNumber && <h3>Груз номер: Nº{data.orderNumber}</h3>}
+          {data.orderNumber && (
+            <h3>
+              {t("card.orderNumber")}: Nº{data.orderNumber}
+            </h3>
+          )}
           {data.cargo && <h3>{data.cargo}</h3>}
           {data.ready && <p>{data.ready}</p>}
         </div>
+
         {(data.from || data.to) && (
           <div className={s.cardRoute}>
             {data.from && (
               <div>
                 <span className={s.label} style={cardStyle}>
-                  Откуда:
+                  {t("card.from")}
                 </span>
                 <p>{data.from}</p>
               </div>
@@ -189,7 +226,7 @@ export const Card = ({ data }) => {
             {data.to && (
               <div>
                 <span className={s.label} style={cardStyle}>
-                  Куда:
+                  {t("card.to")}
                 </span>
                 <p>{data.to}</p>
               </div>
@@ -201,16 +238,17 @@ export const Card = ({ data }) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Показать маршрут на карте
+                {t("card.showRoute")}
               </a>
             )}
           </div>
         )}
+
         <div className={s.cardBody}>
           {data.weight && (
             <div className={s.cardRow}>
               <span className={s.label} style={cardStyle}>
-                Вес:
+                {t("card.weight")}
               </span>
               <span>{data.weight}</span>
             </div>
@@ -218,7 +256,7 @@ export const Card = ({ data }) => {
           {data.volume && (
             <div className={s.cardRow}>
               <span className={s.label} style={cardStyle}>
-                Объём:
+                {t("card.volume")}
               </span>
               <span>{data.volume}</span>
             </div>
@@ -226,7 +264,7 @@ export const Card = ({ data }) => {
           {data.rate && (
             <div className={s.cardRow}>
               <span className={s.label} style={cardStyle}>
-                Ставка:
+                {t("card.rate")}
               </span>
               <span>{data.rate}</span>
             </div>
@@ -234,77 +272,24 @@ export const Card = ({ data }) => {
           {data.vehicle && (
             <div className={s.cardRow}>
               <span className={s.label} style={cardStyle}>
-                Тип ТС:
+                {t("card.vehicle")}
               </span>
               <span>{data.vehicle}</span>
             </div>
           )}
-
           {data.telefon && (
             <div className={s.cardContact}>
               {!showContact ? (
                 <button className={s.contactButton} onClick={handleShowContact}>
-                  Связаться с заказчиком
+                  {t("card.contactCustomer")}
                 </button>
               ) : (
                 <div>
                   <span className={s.label} style={cardStyle}>
-                    Контакт:
+                    {t("card.contact")}
                   </span>
                   <p>Тел: {data.telefon}</p>
-
-                  {/* Если у заявки есть createdBy, показываем кнопку рейтинга */}
-                  {data.createdBy &&
-                    (hasRated ? (
-                      <div className={s.rated} style={{ marginTop: "0.5rem" }}>
-                        <p style={{ fontWeight: "bold" }}>Ваш отзыв:</p>
-                        <p className={s.ratedStars}>
-                          {[...Array(userRating?.value)].map((_, i) => (
-                            <Star key={i} size={18} color="#facc15" />
-                          ))}
-                        </p>
-                        <p style={{ fontStyle: "italic" }}>
-                          {userRating?.reason || "Без комментария"}
-                        </p>
-                      </div>
-                    ) : (
-                      !showRatingForm && (
-                        <button
-                          className={s.contactButton}
-                          onClick={handleShowRatingForm}
-                        >
-                          Оставить рейтинг
-                        </button>
-                      )
-                    ))}
-
-                  {/* Форма рейтинга */}
-                  {showRatingForm && (
-                    <div className={s.ratingForm}>
-                      <label style={cardStyle}>
-                        Рейтинг:
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "0.4rem",
-                            marginTop: "0.3rem",
-                          }}
-                        >
-                          {renderStars()}
-                        </div>
-                      </label>
-
-                      <label style={cardStyle}>
-                        Причина/Комментарий:
-                        <textarea
-                          rows={3}
-                          value={ratingReason}
-                          onChange={(e) => setRatingReason(e.target.value)}
-                        />
-                      </label>
-                      <button onClick={handleSubmitRating}>Сохранить</button>
-                    </div>
-                  )}
+                  {renderRatingSection()}
                 </div>
               )}
             </div>
@@ -314,163 +299,111 @@ export const Card = ({ data }) => {
     );
   }
 
-  // Вёрстка для машин
-  else {
-    return (
-      <div className={s.card} style={cardStyle}>
-        <div className={s.cardHeader}>
-          {data.orderNumber && <h3>Груз номер: Nº{data.orderNumber}</h3>}
-          {(data.marka || data.tip) && (
-            <h3>
-              {data.marka} {data.tip}
-            </h3>
-          )}
-          {data.data_gotovnosti && (
-            <span className={s.date}>{data.data_gotovnosti}</span>
-          )}
-        </div>
-        <div className={s.cardBody}>
-          {data.kuzov && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                Кузов:
-              </span>
-              <span>{data.kuzov}</span>
-            </div>
-          )}
-          {data.tip_zagruzki && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                Тип загрузки:
-              </span>
-              <span>{data.tip_zagruzki}</span>
-            </div>
-          )}
-          {data.gruzopodyomnost && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                Грузоподъемность:
-              </span>
-              <span>{data.gruzopodyomnost}</span>
-            </div>
-          )}
-          {data.vmestimost && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                Вместимость:
-              </span>
-              <span>{data.vmestimost}</span>
-            </div>
-          )}
-          {(data.otkuda || data.kuda) && (
-            <div className={s.cardRoute}>
-              {data.otkuda && (
-                <div>
-                  <span className={s.label} style={cardStyle}>
-                    Откуда:
-                  </span>
-                  <p>{data.otkuda}</p>
-                </div>
-              )}
-              {data.kuda && (
-                <div>
-                  <span className={s.label} style={cardStyle}>
-                    Куда:
-                  </span>
-                  <p>{data.kuda}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {(data.imya || data.firma || data.telefon) && (
-            <div className={s.cardContact}>
-              {!showContact ? (
-                <button className={s.contactButton} onClick={handleShowContact}>
-                  Связаться с перевозчиком
-                </button>
-              ) : (
-                <div>
-                  <span className={s.label} style={cardStyle}>
-                    Контакт:
-                  </span>
-                  {data.imya && <p>{data.imya}</p>}
-                  {data.firma && <p>({data.firma})</p>}
-                  {data.telefon && <p>Тел: {data.telefon}</p>}
-
-                  {/* Если у заявки есть createdBy, показываем кнопку рейтинга */}
-                  {data.createdBy &&
-                    (hasRated ? (
-                      <div className={s.rated} style={{ marginTop: "0.5rem" }}>
-                        <p style={{ fontWeight: "bold" }}>Ваш отзыв:</p>
-                        <p className={s.ratedStars}>
-                          {[...Array(userRating?.value)].map((_, i) => (
-                            <Star key={i} size={18} color="#facc15" />
-                          ))}
-                        </p>
-                        <p style={{ fontStyle: "italic" }}>
-                          {userRating?.reason || "Без комментария"}
-                        </p>
-                      </div>
-                    ) : (
-                      !showRatingForm && (
-                        <button
-                          className={s.contactButton}
-                          onClick={handleShowRatingForm}
-                        >
-                          Оставить рейтинг
-                        </button>
-                      )
-                    ))}
-
-                  {/* Форма рейтинга */}
-                  {showRatingForm && (
-                    <div className={s.ratingForm}>
-                      <label style={cardStyle}>
-                        Рейтинг:
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "0.4rem",
-                            marginTop: "0.3rem",
-                          }}
-                        >
-                          {renderStars()}
-                        </div>
-                      </label>
-
-                      <label style={cardStyle}>
-                        Причина/Комментарий:
-                        <textarea
-                          rows={3}
-                          value={ratingReason}
-                          onChange={(e) => setRatingReason(e.target.value)}
-                        />
-                      </label>
-                      <button onClick={handleSubmitRating}>Сохранить</button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+  // -------------------- MACHINE --------------------
+  return (
+    <div className={s.card} style={cardStyle}>
+      <div className={s.cardHeader}>
+        {data.orderNumber && (
+          <h3>
+            {t("card.orderNumber")}: Nº{data.orderNumber}
+          </h3>
+        )}
+        {(data.marka || data.tip) && (
+          <h3>
+            {data.marka} {data.tip}
+          </h3>
+        )}
+        {data.data_gotovnosti && (
+          <span className={s.date}>{data.data_gotovnosti}</span>
+        )}
       </div>
-    );
-  }
+      <div className={s.cardBody}>
+        {data.kuzov && (
+          <div className={s.cardRow}>
+            <span className={s.label} style={cardStyle}>
+              {t("card.bodyType")}
+            </span>
+            <span>{data.kuzov}</span>
+          </div>
+        )}
+        {data.tip_zagruzki && (
+          <div className={s.cardRow}>
+            <span className={s.label} style={cardStyle}>
+              {t("card.loadingType")}
+            </span>
+            <span>{data.tip_zagruzki}</span>
+          </div>
+        )}
+        {data.gruzopodyomnost && (
+          <div className={s.cardRow}>
+            <span className={s.label} style={cardStyle}>
+              {t("card.tonnage")}
+            </span>
+            <span>{data.gruzopodyomnost}</span>
+          </div>
+        )}
+        {data.vmestimost && (
+          <div className={s.cardRow}>
+            <span className={s.label} style={cardStyle}>
+              {t("card.capacity")}
+            </span>
+            <span>{data.vmestimost}</span>
+          </div>
+        )}
+        {(data.otkuda || data.kuda) && (
+          <div className={s.cardRoute}>
+            {data.otkuda && (
+              <div>
+                <span className={s.label} style={cardStyle}>
+                  {t("card.from")}
+                </span>
+                <p>{data.otkuda}</p>
+              </div>
+            )}
+            {data.kuda && (
+              <div>
+                <span className={s.label} style={cardStyle}>
+                  {t("card.to")}
+                </span>
+                <p>{data.kuda}</p>
+              </div>
+            )}
+          </div>
+        )}
+        {(data.imya || data.firma || data.telefon) && (
+          <div className={s.cardContact}>
+            {!showContact ? (
+              <button className={s.contactButton} onClick={handleShowContact}>
+                {t("card.contactCarrier")}
+              </button>
+            ) : (
+              <div>
+                <span className={s.label} style={cardStyle}>
+                  {t("card.contact")}
+                </span>
+                {data.imya && <p>{data.imya}</p>}
+                {data.firma && <p>({data.firma})</p>}
+                {data.telefon && <p>Тел: {data.telefon}</p>}
+                {renderRatingSection()}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 // ---------- Основной компонент ----------
 export const ParserSwitcher = () => {
-  // Забираем тему из контекста
   const { theme } = useContext(ThemeContext);
+  const { t } = useTranslation();
 
   const [currentType, setCurrentType] = useState("CargoOrder");
   const [currentTab, setCurrentTab] = useState("feed");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  // Поля поиска
   const [cargoSearch, setCargoSearch] = useState({
     fromDate: "",
     toDate: "",
@@ -498,7 +431,7 @@ export const ParserSwitcher = () => {
       const { data } = await axios.get("/allOrders");
       setResult(data);
     } catch (error) {
-      console.error("Ошибка загрузки:", error);
+      console.error(t("parserSwitcher.errorLoading"), error);
     } finally {
       setIsLoading(false);
     }
@@ -657,14 +590,12 @@ export const ParserSwitcher = () => {
     setSearchResults([]);
   };
 
-  // Формируем список для «Ленты»
   const feedData = result
     ? result
         .filter((item) => item.orderType === currentType && !item.isArchived)
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
     : [];
 
-  // Если идёт загрузка
   if (isLoading) {
     return (
       <div className={s.loading}>
@@ -688,7 +619,7 @@ export const ParserSwitcher = () => {
                 }
                 onClick={() => handleTypeSwitch("CargoOrder")}
               >
-                Грузы
+                {t("parserSwitcher.cargo")}
               </button>
               <button
                 className={
@@ -696,7 +627,7 @@ export const ParserSwitcher = () => {
                 }
                 onClick={() => handleTypeSwitch("MachineOrder")}
               >
-                Машины
+                {t("parserSwitcher.machine")}
               </button>
             </div>
           </div>
@@ -705,7 +636,7 @@ export const ParserSwitcher = () => {
               className={currentTab === "feed" ? s.statusActive : s.statusItem}
               onClick={() => setCurrentTab("feed")}
             >
-              Лента
+              {t("parserSwitcher.feed")}
             </button>
             <button
               className={
@@ -716,28 +647,23 @@ export const ParserSwitcher = () => {
                 setSearchResults([]);
               }}
             >
-              Поиск
+              {t("parserSwitcher.search")}
             </button>
           </div>
         </div>
-        Загрузка...
+        {t("parserSwitcher.loading")}
       </div>
     );
   }
 
-  // Если данных нет
   if (!result) {
-    return <div className={s.placeholder}>Нет данных</div>;
+    return <div className={s.placeholder}>{t("parserSwitcher.noData")}</div>;
   }
 
-  // ---------------------------------------------------------
-  // Тут мы будем применять стили для dark/light:
-  // Можно добавить класс s.darkTheme, s.lightTheme, или inline-стили
-  // ---------------------------------------------------------
   const containerStyle = {
     backgroundColor: theme === "dark" ? "#1A1A1A" : undefined,
     color: theme === "dark" ? "#ddd" : undefined,
-    minHeight: "100vh", // чтобы фон точно покрывал экран
+    minHeight: "100vh",
   };
 
   return (
@@ -762,7 +688,7 @@ export const ParserSwitcher = () => {
               }
               onClick={() => handleTypeSwitch("CargoOrder")}
             >
-              Грузы
+              {t("parserSwitcher.cargo")}
             </button>
             <button
               className={
@@ -770,7 +696,7 @@ export const ParserSwitcher = () => {
               }
               onClick={() => handleTypeSwitch("MachineOrder")}
             >
-              Машины
+              {t("parserSwitcher.machine")}
             </button>
           </div>
         </div>
@@ -779,7 +705,7 @@ export const ParserSwitcher = () => {
             className={currentTab === "feed" ? s.statusActive : s.statusItem}
             onClick={() => setCurrentTab("feed")}
           >
-            Лента
+            {t("parserSwitcher.feed")}
           </button>
           <button
             className={
@@ -790,17 +716,20 @@ export const ParserSwitcher = () => {
               setSearchResults([]);
             }}
           >
-            Поиск
+            {t("parserSwitcher.search")}
           </button>
         </div>
       </div>
 
-      {/* Вкладка ЛЕНТА – Pull to Refresh */}
       {currentTab === "feed" && (
         <ReactPullToRefresh
           onRefresh={fetchData}
-          pullingContent={<div className={s.loading}>Потяните вниз</div>}
-          refreshingContent={<div className={s.loading}>Обновляем...</div>}
+          pullingContent={
+            <div className={s.loading}>{t("parserSwitcher.pullToRefresh")}</div>
+          }
+          refreshingContent={
+            <div className={s.loading}>{t("parserSwitcher.refreshing")}</div>
+          }
           resistance={2.5}
         >
           <div
@@ -814,21 +743,22 @@ export const ParserSwitcher = () => {
               {feedData.length > 0 ? (
                 feedData.map((item, index) => <Card key={index} data={item} />)
               ) : (
-                <p className={s.placeholder}>Нет заявок по выбранному типу</p>
+                <p className={s.placeholder}>
+                  {t("parserSwitcher.noOrdersByType")}
+                </p>
               )}
             </div>
           </div>
         </ReactPullToRefresh>
       )}
 
-      {/* Вкладка ПОИСК */}
       {currentTab === "search" && (
         <div className={s.searchContainer}>
           {currentType === "CargoOrder" ? (
             <div className={s.filterContainer}>
               <div className={s.filterGroup}>
                 <label className={s.filterLabel}>
-                  Дата (с):
+                  {t("parserSwitcher.dateFrom")}
                   <input
                     type="date"
                     value={cargoSearch.fromDate}
@@ -842,7 +772,7 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Дата (по):
+                  {t("parserSwitcher.dateTo")}
                   <input
                     type="date"
                     value={cargoSearch.toDate}
@@ -856,10 +786,10 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Тип груза:
+                  {t("parserSwitcher.cargoType")}
                   <input
                     type="text"
-                    placeholder="Напр.: песок, мебель..."
+                    placeholder={t("parserSwitcher.exampleCargoType")}
                     value={cargoSearch.cargoType}
                     onChange={(e) =>
                       setCargoSearch({
@@ -871,10 +801,10 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Откуда:
+                  {t("parserSwitcher.fromLocation")}
                   <input
                     type="text"
-                    placeholder="Город отправления"
+                    placeholder={t("parserSwitcher.departureCity")}
                     value={cargoSearch.fromLocation}
                     onChange={(e) =>
                       setCargoSearch({
@@ -886,10 +816,10 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Куда:
+                  {t("parserSwitcher.toLocation")}
                   <input
                     type="text"
-                    placeholder="Город доставки"
+                    placeholder={t("parserSwitcher.arrivalCity")}
                     value={cargoSearch.toLocation}
                     onChange={(e) =>
                       setCargoSearch({
@@ -903,10 +833,10 @@ export const ParserSwitcher = () => {
               </div>
               <div className={s.buttonGroup}>
                 <button className={s.searchButton} onClick={handleSearchCargo}>
-                  Найти
+                  {t("parserSwitcher.find")}
                 </button>
                 <button className={s.reset} onClick={handleResetCargo}>
-                  Сброс
+                  {t("parserSwitcher.reset")}
                 </button>
               </div>
             </div>
@@ -914,7 +844,7 @@ export const ParserSwitcher = () => {
             <div className={s.filterContainer}>
               <div className={s.filterGroup}>
                 <label className={s.filterLabel}>
-                  Дата готовности:
+                  {t("parserSwitcher.readyDate")}
                   <input
                     type="date"
                     value={machineSearch.fromDate}
@@ -928,10 +858,10 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Тоннаж:
+                  {t("parserSwitcher.tonnage")}
                   <input
                     type="text"
-                    placeholder="Напр.: 5 т, 20 т..."
+                    placeholder={t("parserSwitcher.exampleTonnage")}
                     value={machineSearch.tonnage}
                     onChange={(e) =>
                       setMachineSearch({
@@ -943,10 +873,10 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Откуда:
+                  {t("parserSwitcher.fromLocation")}
                   <input
                     type="text"
-                    placeholder="Место отправления"
+                    placeholder={t("parserSwitcher.departureLocation")}
                     value={machineSearch.fromLocation}
                     onChange={(e) =>
                       setMachineSearch({
@@ -958,10 +888,10 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Куда:
+                  {t("parserSwitcher.toLocation")}
                   <input
                     type="text"
-                    placeholder="Место назначения"
+                    placeholder={t("parserSwitcher.destinationLocation")}
                     value={machineSearch.toLocation}
                     onChange={(e) =>
                       setMachineSearch({
@@ -973,10 +903,10 @@ export const ParserSwitcher = () => {
                   />
                 </label>
                 <label className={s.filterLabel}>
-                  Тип кузова:
+                  {t("parserSwitcher.bodyType")}
                   <input
                     type="text"
-                    placeholder="Напр.: тент, изотерм..."
+                    placeholder={t("parserSwitcher.exampleBodyType")}
                     value={machineSearch.bodyType}
                     onChange={(e) =>
                       setMachineSearch({
@@ -993,10 +923,10 @@ export const ParserSwitcher = () => {
                   className={s.searchButton}
                   onClick={handleSearchMachine}
                 >
-                  Найти
+                  {t("parserSwitcher.find")}
                 </button>
                 <button className={s.reset} onClick={handleResetMachine}>
-                  Сброс
+                  {t("parserSwitcher.reset")}
                 </button>
               </div>
             </div>
@@ -1009,7 +939,9 @@ export const ParserSwitcher = () => {
             </div>
           ) : (
             searchResults.length === 0 && (
-              <p className={s.placeholder}>Нет заявок по заданным фильтрам</p>
+              <p className={s.placeholder}>
+                {t("parserSwitcher.noOrdersByFilters")}
+              </p>
             )
           )}
         </div>
