@@ -1,9 +1,8 @@
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,
-  useNavigate,
 } from "react-router-dom";
 import { useEffect } from "react";
 import "./App.css";
@@ -21,36 +20,19 @@ import PremiumSubscription from "./components/PremiumSubscription/PremiumSubscri
 import Notifications from "./components/Notifications/Notifications";
 import LanguageSelector from "./components/LanguageSelector/LanguageSelector";
 
-function RedirectByStartParam() {
-  const navigate = useNavigate();
-
+function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
     tg.requestFullscreen();
     tg.disableVerticalSwipes();
     tg.ready();
 
-    const param = tg.initDataUnsafe?.start_param;
-
-    if (param === "calculator")
-      navigate("/home"); // или "/calculator" если есть
-    else if (param === "support") navigate("/support");
-    else if (param === "conf") navigate("/conf");
-    else if (param === "prem") navigate("/prem");
-    else if (param === "notification") navigate("/notification");
-    else if (param === "lang") navigate("/lang");
-    else if (param === "create") navigate("/create");
-    else if (param === "company") navigate("/company");
-    else navigate("/home"); // fallback
-  }, [navigate]);
-
-  return null; // этот компонент не рендерит ничего
-}
-
-function App() {
+    return () => {
+      tg.close(); // Закрытие веб-приложения (при необходимости)
+    };
+  }, []);
   return (
     <Router>
-      <RedirectByStartParam />
       <Header />
       <Nav />
       <Routes>
