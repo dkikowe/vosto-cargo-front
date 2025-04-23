@@ -223,7 +223,12 @@
                   "paymentSelect": "Select payment method",
                   "cash": "Cash",
                   "card": "Card",
-                  "submit": "Submit"
+                  "submit": "Submit",
+                  "readyFrom": "Ready from",
+    "readyTo": "Ready to",
+    "rate": "Rate (₽)",
+    "vehicle": "Vehicle Type",
+    "vehiclePlaceholder": "e.g., tilt, reefer, board"
                 }
 
           ,

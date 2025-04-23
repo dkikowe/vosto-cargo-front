@@ -185,8 +185,8 @@
           "order": {
     "addCargo": "Добавить груз",
     "addMachine": "Добавить машину",
-    "description": "Описание",
-    "descriptionPlaceholder": "Описание заявки",
+    "description": "Требование",
+    "descriptionPlaceholder": "Требование к заявке",
     "loadingPlace": "Место загрузки",
     "unloadingPlace": "Место выгрузки",
     "cargoName": "Наименование груза",
@@ -222,7 +222,12 @@
     "paymentSelect": "Выберите способ оплаты",
     "cash": "Наличные",
     "card": "Карта",
-    "submit": "Создать"
+    "submit": "Создать",
+    "readyFrom": "Готов с",
+    "readyTo": "Готов по",
+    "rate": "Ставка (₽)",
+    "vehicle": "Тип ТС",
+    "vehiclePlaceholder": "например: тент, реф, борт"
   },
   
     "orders": {

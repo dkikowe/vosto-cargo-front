@@ -59,22 +59,29 @@ export function AddOrderModal({
             <>
               <div className={s.formGroup}>
                 <label>{t("order.loadingPlace")}</label>
-                <CityAutocomplete
-                  onCitySelect={(selectedCity) => {
-                    onChange({
-                      target: { name: "from", value: selectedCity },
-                    });
-                  }}
+                <input
+                  name="from"
+                  value={formData.from || ""}
+                  onChange={onChange}
+                  placeholder={t("order.fromPlaceholder")}
                 />
               </div>
               <div className={s.formGroup}>
                 <label>{t("order.unloadingPlace")}</label>
-                <CityAutocomplete
-                  onCitySelect={(selectedCity) => {
-                    onChange({
-                      target: { name: "to", value: selectedCity },
-                    });
-                  }}
+                <input
+                  name="to"
+                  value={formData.to || ""}
+                  onChange={onChange}
+                  placeholder={t("order.toPlaceholder")}
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>{t("order.phone")}</label>
+                <input
+                  name="telefon"
+                  value={formData.telefon || ""}
+                  onChange={onChange}
+                  placeholder="+7 912 345-67-89"
                 />
               </div>
               <div className={s.formGroup}>
@@ -104,6 +111,43 @@ export function AddOrderModal({
                   value={formData.weight || ""}
                   onChange={onChange}
                   placeholder="1000"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>{t("order.readyFrom")}</label>
+                <input
+                  type="date"
+                  name="readyFrom"
+                  value={formData.readyFrom || ""}
+                  onChange={onChange}
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>{t("order.readyTo")}</label>
+                <input
+                  type="date"
+                  name="readyTo"
+                  value={formData.readyTo || ""}
+                  onChange={onChange}
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>{t("order.rate")}</label>
+                <input
+                  type="number"
+                  name="rate"
+                  value={formData.rate || ""}
+                  onChange={onChange}
+                  placeholder="50000"
+                />
+              </div>
+              <div className={s.formGroup}>
+                <label>{t("order.vehicle")}</label>
+                <input
+                  name="vehicle"
+                  value={formData.vehicle || ""}
+                  onChange={onChange}
+                  placeholder={t("order.vehiclePlaceholder")}
                 />
               </div>
             </>

@@ -34,6 +34,8 @@ export default function CreateOrders() {
     marka: "",
     tip: "",
     kuzov: "",
+    readyFrom: "",
+    readyTo: "",
     tip_zagruzki: "",
     gruzopodyomnost: "",
     vmestimost: "",
@@ -107,20 +109,32 @@ export default function CreateOrders() {
     e.preventDefault();
     if (!userId) return;
 
+    function formatShortDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      return `${day}.${month}`;
+    }
+
     let payload = {};
     if (currentType === "CargoOrder") {
       payload = {
         userId,
         orderType: currentType,
         description: formData.description,
-        from: formData.loadingPlace,
-        to: formData.unloadingPlace,
-        cargo: formData.cargoName,
+        from: formData.from,
+        to: formData.to,
+        cargo: formData.cargo,
         volume: formData.volume ? formData.volume.toString() : "",
         weight: formData.weight ? formData.weight.toString() : "",
-        rate: "",
-        ready: "",
-        vehicle: "",
+        rate: formData.rate || "",
+        ready:
+          `${formatShortDate(formData.readyFrom)} - ${formatShortDate(
+            formData.readyTo
+          )}` || "",
+        telefon: formData.telefon || "",
+        vehicle: formData.vehicle || "",
         paymentMethod: formData.paymentMethod,
         isArchived: false,
       };
@@ -170,9 +184,9 @@ export default function CreateOrders() {
         userId,
         orderType: currentType,
         description: formData.description,
-        from: formData.loadingPlace,
-        to: formData.unloadingPlace,
-        cargo: formData.cargoName,
+        from: formData.from,
+        to: formData.to,
+        cargo: formData.cargo,
         volume: formData.volume?.toString() || "",
         weight: formData.weight?.toString() || "",
         rate: "",
@@ -248,13 +262,13 @@ export default function CreateOrders() {
     setCurrentType(order.orderType);
     setFormData({
       description: order.description || "",
-      loadingPlace: order.from || "",
-      unloadingPlace: order.to || "",
-      cargoName: order.cargo || "",
+      from: order.from || "",
+      to: order.to || "",
+      cargo: order.cargo || "",
       volume: order.volume || "",
       weight: order.weight || "",
-      licensePlate: order.licensePlate || "",
-      brandAndModel: order.brandAndModel || "",
+      marka: order.marka || "",
+      tip: order.tip || "",
       kuzov: order.kuzov || "",
       tip_zagruzki: order.tip_zagruzki || "",
       gruzopodyomnost: order.gruzopodyomnost || "",
@@ -263,10 +277,10 @@ export default function CreateOrders() {
       otkuda: order.otkuda || "",
       kuda: order.kuda || "",
       telefon: order.telefon || "",
-      contactName: order.imya || "",
-      contactFirm: order.firma || "",
-      contactCity: order.gorod || "",
-      contactEmail: order.pochta || "",
+      imya: order.imya || "",
+      firma: order.firma || "",
+      gorod: order.gorod || "",
+      pochta: order.pochta || "",
       company: order.company || "",
       paymentMethod: order.paymentMethod || "",
       isArchived: order.isArchived || false,
@@ -391,16 +405,13 @@ export default function CreateOrders() {
               {order.orderType === "CargoOrder" ? (
                 <>
                   <p>
-                    <strong>{t("orders.cargo")}:</strong>{" "}
-                    {order.cargoName || "—"}
+                    <strong>{t("orders.cargo")}:</strong> {order.cargo || "—"}
                   </p>
                   <p>
-                    <strong>{t("orders.from")}:</strong>{" "}
-                    {order.loadingPlace || "—"}
+                    <strong>{t("orders.from")}:</strong> {order.from || "—"}
                   </p>
                   <p>
-                    <strong>{t("orders.to")}:</strong>{" "}
-                    {order.unloadingPlace || "—"}
+                    <strong>{t("orders.to")}:</strong> {order.to || "—"}
                   </p>
                 </>
               ) : (
