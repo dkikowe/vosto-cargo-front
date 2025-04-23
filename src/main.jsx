@@ -4,9 +4,13 @@ import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
 import "./i18n";
 
-if (!window.location.hash || window.location.hash === "#/") {
-  window.location.replace(window.location.origin + "/#/home");
-}
+window.onload = () => {
+  setTimeout(() => {
+    if (!window.location.hash || window.location.hash === "#/") {
+      window.location.replace(window.location.origin + "/#/home");
+    }
+  }, 100);
+};
 
 ReactDOM.render(
   <ThemeProvider>
