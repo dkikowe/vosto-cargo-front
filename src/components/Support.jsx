@@ -21,6 +21,7 @@ const Support = () => {
       if (initData) {
         const params = new URLSearchParams(initData);
         const userData = params.get("user");
+        console.log(userData);
 
         if (userData) {
           const userObj = JSON.parse(decodeURIComponent(userData));
