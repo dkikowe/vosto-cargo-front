@@ -52,8 +52,16 @@
                 color: #ffffff
 
 .icon
-    width: 35px
-    height: 35px
+
+    filter: grayscale(100%) brightness(0.7)
+    opacity: 0.5
+    transition: all 0.3s ease
+
+.iconActive
+
+    filter: none
+    opacity: 1
+    transition: all 0.3s ease
 
 .logo
     object-fit: cover
@@ -64,3 +72,9 @@
 
 .containerDisabled
     display: none
+
+.line
+    border-radius: 8px
+    width: 1px
+    height: 43px
+    background: linear-gradient(180deg, rgba(234, 234, 234, 0.1) 0%, #eaeaea 50%, rgba(234, 234, 234, 0.1) 100%)

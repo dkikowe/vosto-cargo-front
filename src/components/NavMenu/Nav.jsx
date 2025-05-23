@@ -14,16 +14,21 @@ export default function Nav() {
   const navItems = [
     {
       path: "/home",
-      icon: <House className={s.icon} />,
+      img: "/images/nav-icons/home.svg",
       label: t("nav.requests"),
     },
     {
       path: "/create",
-      icon: <PackagePlus className={s.icon} />,
+      img: "/images/nav-icons/create.svg",
+
       label: t("nav.create"),
     },
-    { path: "/start", img: "/images/log.png" },
-    { path: "/menu", icon: <Menu className={s.icon} />, label: t("nav.menu") },
+    { path: "/start", img: "/images/nav-icons/logo.svg" },
+    {
+      path: "/menu",
+      img: "/images/nav-icons/menu.svg",
+      label: t("nav.menu"),
+    },
   ];
 
   return (
@@ -36,30 +41,36 @@ export default function Nav() {
     >
       <div className={s.icons}>
         {navItems.map((item, index) => (
-          <NavLink
-            key={index}
-            to={item.path}
-            className={({ isActive }) =>
-              isActive
-                ? `${s.iconDivActive} ${theme === "dark" ? s.dark : s.light}`
-                : s.iconDiv
-            }
-          >
-            {item.img ? (
-              <img
-                src={item.img}
-                width={75}
-                height={75}
-                alt="Logo"
-                className={s.logo}
-              />
-            ) : (
-              <>
-                {item.icon}
-                <p className={s.navText}>{item.label}</p>
-              </>
-            )}
-          </NavLink>
+          <>
+            <NavLink
+              key={index}
+              to={item.path}
+              className={({ isActive }) =>
+                isActive
+                  ? `${s.iconDivActive} ${theme === "dark" ? s.dark : s.light}`
+                  : s.iconDiv
+              }
+            >
+              {item.img ? (
+                <>
+                  <img
+                    src={item.img}
+                    alt="Logo"
+                    className={
+                      location.pathname === item.path ? s.iconActive : s.icon
+                    }
+                  />
+                  <p className={s.navText}>{item.label}</p>
+                </>
+              ) : (
+                <>
+                  {item.icon}
+                  <p className={s.navText}>{item.label}</p>
+                </>
+              )}
+            </NavLink>
+            {index !== navItems.length - 1 && <div className={s.line}></div>}
+          </>
         ))}
       </div>
     </div>
