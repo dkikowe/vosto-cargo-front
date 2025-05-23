@@ -56,9 +56,9 @@ export default function Nav() {
                   <img
                     src={item.img}
                     alt="Logo"
-                    className={
-                      location.pathname === item.path ? s.iconActive : s.icon
-                    }
+                    className={`${s.icon} ${
+                      location.pathname === item.path ? s.iconActive : ""
+                    } ${theme === "dark" ? s.darkIcon : ""}`}
                   />
                   <p className={s.navText}>{item.label}</p>
                 </>

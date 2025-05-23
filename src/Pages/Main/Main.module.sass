@@ -5,51 +5,156 @@
     transition: background 0.3s ease, color 0.3s ease
 
 .header
-    width: 100vw
-    background: #3a5c9f
-    padding: 100px 20px 10px 20px
-    position: fixed
-    z-index: 999
-    top: 0
+    width: 100%
+    background: #053576
+    padding: 0
+    min-height: 0
+    display: flex
+    flex-direction: column
+    align-items: flex-start
+    justify-content: flex-start
+    box-shadow: none
 
-.switch
+    z-index: auto
+    top: auto
+
+.switcher
+    display: flex
+    flex-direction: row
+    gap: 20px
+    margin-left: 20px
+
+    margin-bottom: 12px
+
+.tab, .tabActive
     display: flex
     align-items: center
+    gap: 6px
 
-    .typeSwitcher
-        position: relative
-        display: flex
-        width: 250px
-        margin: 0 auto 15px
-        background-color: #242c3e
-        border-radius: 15px
+    color: #8CA3C2
+    cursor: pointer
+    position: relative
 
-    .switchIndicator
+    font-family: "Inter", sans-serif
+    font-weight: 600
+    font-size: 16px
+    line-height: 96%
+    letter-spacing: -0.02em
+
+.tabActive
+    color: #fff
+    &::after
+        content: ''
+        display: block
         position: absolute
-        top: 0
         left: 0
-        width: 50%
-        height: 100%
-        background-color: #ffffff
-        border-radius: 15px
-        transition: left 0.3s ease
+        bottom: -6px
+        width: 100%
+        height: 3px
+        background: #fff
+        border-radius: 2px
 
-    .switcher
-        position: relative
-        z-index: 1
-        flex: 1
-        padding: 8px 16px
-        border: none
-        border-radius: 15px
-        background-color: transparent
-        cursor: pointer
-        color: #ffffff
-        font-weight: 500
-        font-size: 14px
+.iconCargo
+    width: 20px
+    height: 20px
+    background: url('/images/nav-icons/home.svg') no-repeat center/contain
 
-    .activeText
-        @extend .switcher
-        color: #000000
+.iconTruck
+    width: 20px
+    height: 20px
+    background: url('/images/nav-icons/menu.svg') no-repeat center/contain
+
+.filtersBlock
+    background: #fff
+    border-radius: 24px
+    margin: 20px auto
+    width: 100vw
+    max-width: 95%
+    padding: 18px 12px 12px 12px
+    box-sizing: border-box
+    display: flex
+    flex-direction: column
+    justify-content: center
+    gap: 0
+    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.04)
+
+.filterRow
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: space-between
+    border-bottom: 1px solid #F0F0F0
+    padding: 0 0 8px 0
+    min-height: 32px
+
+.filterRowBottom
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: space-between
+    padding-top: 8px
+    gap: 8px
+
+.filterItem, .filterItemBottom
+    display: flex
+    align-items: center
+    gap: 6px
+    font-size: 14px
+    font-weight: 700
+    color: #B0B0B0
+    font-family: 'Inter', sans-serif
+
+.filterItemBottom
+    font-size: 12px
+    font-weight: 600
+    color: #B0B0B0
+
+.filterLabel
+    color: #B0B0B0
+    font-weight: 700
+    font-size: inherit
+    font-family: inherit
+
+.required
+    color: #F44336
+    font-size: 1em
+    font-weight: 700
+
+.iconFrom
+    width: 16px
+    height: 16px
+    background: url('/images/nav-icons/from.svg') no-repeat center/contain
+
+.iconTo
+    width: 16px
+    height: 16px
+    background: url('/images/nav-icons/to.svg') no-repeat center/contain
+
+.iconDate
+    width: 16px
+    height: 16px
+    background: url('/images/nav-icons/date.svg') no-repeat center/contain
+
+.iconType
+    width: 16px
+    height: 16px
+    background: url('/images/nav-icons/type.svg') no-repeat center/contain
+
+.switchBtn
+    width: 36px
+    height: 36px
+    border-radius: 50%
+    border: 2px solid #F0F0F0
+    display: flex
+    align-items: center
+    justify-content: center
+    background: #fff
+    margin-left: 4px
+
+.iconSwitch
+    width: 18px
+    height: 18px
+    background: url('/images/nav-icons/switch.svg') no-repeat center/contain
 
 .resultContainer
     background: white
@@ -58,7 +163,7 @@
     min-height: 200px
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)
     margin-bottom: 100px
-    margin-top: 205px
+
     overflow-y: auto
     -webkit-overflow-scrolling: touch
 
@@ -228,10 +333,6 @@ p
     border: 1px solid #dcdcdc
     border-radius: 4px
     font-size: 14px
-
-.filterLabel
-    display: flex
-    flex-direction: column
 
 .buttonGroup
     display: flex

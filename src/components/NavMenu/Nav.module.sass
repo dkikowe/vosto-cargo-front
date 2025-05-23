@@ -33,6 +33,7 @@
             flex-direction: column
             width: 72px
             color: #9b9b9b
+            gap: 10px
 
             .dark &
                 color: #b3b3b3
@@ -44,6 +45,7 @@
             flex-direction: column
             width: 72px
             color: #000000
+            gap: 10px
 
             &.dark
                 color: #ffffff
@@ -52,23 +54,65 @@
                 color: #ffffff
 
 .icon
-
+    width: 35px
+    height: 35px
     filter: grayscale(100%) brightness(0.7)
     opacity: 0.5
     transition: all 0.3s ease
 
-.iconActive
+    .dark &
+        filter: brightness(0) invert(1)
+        opacity: 0.6
 
+    &[src*="log.png"]
+        width: auto
+        height: auto
+        filter: none
+        opacity: 1
+
+        .dark &
+            filter: none
+            opacity: 1
+
+.iconActive
+    width: 35px
+    height: 35px
     filter: none
     opacity: 1
     transition: all 0.3s ease
+
+    .dark &
+        filter: brightness(0) invert(1) !important
+        opacity: 1 !important
+
+    &[src*="log.png"]
+        width: auto
+        height: auto
+        filter: none
+        opacity: 1
+
+        .dark &
+            filter: none
+            opacity: 1
 
 .logo
     object-fit: cover
     margin-bottom: 10px
 
 .navText
+    font-family: "Inter", sans-serif
+    font-weight: 500
     font-size: 10px
+    line-height: 96%
+    letter-spacing: -0.02em
+    text-align: center
+    color: rgba(45, 46, 47, 0.6)
+
+    .dark &
+        color: #DEDEDE
+
+    .iconDivActive .dark &
+        color: #ffffff
 
 .containerDisabled
     display: none
@@ -78,3 +122,8 @@
     width: 1px
     height: 43px
     background: linear-gradient(180deg, rgba(234, 234, 234, 0.1) 0%, #eaeaea 50%, rgba(234, 234, 234, 0.1) 100%)
+
+.iconDivActive
+    .dark &
+        .navText
+            color: #ffffff

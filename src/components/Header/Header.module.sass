@@ -1,19 +1,155 @@
-
 .header
     display: flex
-    flex-direction: row
-    justify-content: center
-    align-items: center
-    position: absolute
-    top: 0px
-    left: 0%
-    gap: 180px
-    width: 100%
-    background: #f5f5f5
-    padding-top: 40px
 
-    .logo
-        width: 120px
-        height: 40px
-        object-fit: contain
-        margin-left: 10px
+    justify-content: center
+    align-items: flex-end
+
+    width: 100%
+    background: #053576
+    padding-top: 40px
+    height: 150px
+
+.line
+    margin: 20px 0
+    width: 100vw
+    height: 1px
+    background: rgba(255, 255, 255, 0.1)
+
+.logo
+    display: flex
+    align-items: center
+    justify-content: center
+    flex-direction: column
+
+.switcher
+    display: flex
+    flex-direction: row
+    gap: 32px
+    margin-left: 32px
+    margin-top: 32px
+    margin-bottom: 24px
+
+.tab, .tabActive
+    display: flex
+    align-items: center
+    gap: 8px
+    font-size: 28px
+    font-weight: 700
+    color: #8CA3C2
+    cursor: pointer
+    position: relative
+    font-family: 'Inter', sans-serif
+
+.tabActive
+    color: #fff
+    &::after
+        content: ''
+        display: block
+        position: absolute
+        left: 0
+        bottom: -8px
+        width: 100%
+        height: 4px
+        background: #fff
+        border-radius: 2px
+
+.iconCargo
+    width: 32px
+    height: 32px
+    background: url('/images/nav-icons/home.svg') no-repeat center/contain
+
+.iconTruck
+    width: 32px
+    height: 32px
+    background: url('/images/nav-icons/menu.svg') no-repeat center/contain
+
+.filtersBlock
+    background: #fff
+    border-radius: 32px
+    margin-left: 16px
+    width: 95vw
+    max-width: 420px
+    padding: 32px 24px 24px 24px
+    box-sizing: border-box
+    display: flex
+    flex-direction: column
+    gap: 0
+    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.04)
+
+.filterRow
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: space-between
+    border-bottom: 1px solid #F0F0F0
+    padding: 0 0 16px 0
+    min-height: 48px
+
+.filterRowBottom
+    display: flex
+    flex-direction: row
+    align-items: center
+    justify-content: space-between
+    padding-top: 16px
+    gap: 16px
+
+.filterItem, .filterItemBottom
+    display: flex
+    align-items: center
+    gap: 12px
+    font-size: 22px
+    font-weight: 700
+    color: #B0B0B0
+    font-family: 'Inter', sans-serif
+
+.filterItemBottom
+    font-size: 18px
+    font-weight: 600
+    color: #B0B0B0
+
+.filterLabel
+    color: #B0B0B0
+    font-weight: 700
+    font-size: inherit
+    font-family: inherit
+
+.required
+    color: #F44336
+    font-size: 1em
+    font-weight: 700
+
+.iconFrom
+    width: 24px
+    height: 24px
+    background: url('/images/nav-icons/from.svg') no-repeat center/contain
+
+.iconTo
+    width: 24px
+    height: 24px
+    background: url('/images/nav-icons/to.svg') no-repeat center/contain
+
+.iconDate
+    width: 24px
+    height: 24px
+    background: url('/images/nav-icons/date.svg') no-repeat center/contain
+
+.iconType
+    width: 24px
+    height: 24px
+    background: url('/images/nav-icons/type.svg') no-repeat center/contain
+
+.switchBtn
+    width: 56px
+    height: 56px
+    border-radius: 50%
+    border: 3px solid #F0F0F0
+    display: flex
+    align-items: center
+    justify-content: center
+    background: #fff
+    margin-left: 8px
+
+.iconSwitch
+    width: 28px
+    height: 28px
+    background: url('/images/nav-icons/switch.svg') no-repeat center/contain
