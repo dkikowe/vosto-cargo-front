@@ -302,7 +302,8 @@
       "exampleBodyType": "Напр.: тент, изотерм...",
       "find": "Найти",
       "reset": "Сброс",
-      "noOrdersByFilters": "Нет заявок по заданным фильтрам"
+      "noOrdersByFilters": "Нет заявок по заданным фильтрам",
+      "apply": "Поиск"
     }
     
     

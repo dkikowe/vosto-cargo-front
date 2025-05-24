@@ -1,8 +1,7 @@
-.parserContainer
-    max-width: 600px
-    height: calc(100vh - 80px)
-    background: #f5f5f5
-    transition: background 0.3s ease, color 0.3s ease
+
+.parserSwitcher
+    height: 65vh
+    overflow-y: scroll
 
 .header
     width: 100%
@@ -15,9 +14,6 @@
     justify-content: flex-start
     box-shadow: none
 
-    z-index: auto
-    top: auto
-
 .switcher
     display: flex
     flex-direction: row
@@ -25,6 +21,20 @@
     margin-left: 20px
 
     margin-bottom: 12px
+
+.applyButton
+    border-radius: 8px
+    padding: 10px
+    width: 95%
+    height: 55px
+    background: #d97536
+    font-family: "Inter", sans-serif
+    font-weight: 600
+    font-size: 16px
+    line-height: 96%
+    letter-spacing: -0.02em
+    color: #fff
+    margin: 0 auto
 
 .tab, .tabActive
     display: flex
@@ -66,48 +76,99 @@
 
 .filtersBlock
     background: #fff
-    border-radius: 24px
+    border-radius: 16px
     margin: 20px auto
     width: 100vw
     max-width: 95%
-    padding: 18px 12px 12px 12px
+    padding: 0
     box-sizing: border-box
     display: flex
     flex-direction: column
     justify-content: center
     gap: 0
     box-shadow: 0 2px 16px 0 rgba(0,0,0,0.04)
+    overflow: hidden
 
 .filterRow
     display: flex
     flex-direction: row
     align-items: center
     justify-content: space-between
-    border-bottom: 1px solid #F0F0F0
-    padding: 0 0 8px 0
-    min-height: 32px
+    border-bottom: 1px solid #EBEBEB
+    min-height: 50px
+    padding: 0 15px
+    background: transparent
+    position: relative
 
 .filterRowBottom
     display: flex
     flex-direction: row
     align-items: center
     justify-content: space-between
-    padding-top: 8px
-    gap: 8px
+    padding: 0
+    min-height: 50px
+    border-top: 1px solid rgba(45, 46, 47, 0.1)
+    background: transparent
+    position: relative
 
 .filterItem, .filterItemBottom
     display: flex
     align-items: center
-    gap: 6px
-    font-size: 14px
+    gap: 10px
+    font-size: 16px
     font-weight: 700
     color: #B0B0B0
     font-family: 'Inter', sans-serif
+    flex: 1
+    height: 50px
+    background: transparent
+    padding: 0 10px
 
 .filterItemBottom
-    font-size: 12px
-    font-weight: 600
+    font-size: 16px
+    font-weight: 700
     color: #B0B0B0
+    position: relative
+    height: 50px
+    background: transparent
+    padding: 0 24px
+
+// Вертикальная линия между нижними фильтрами
+.filterRowBottom .filterItemBottom:first-child
+    border-right: 1px solid rgba(45, 46, 47, 0.1)
+
+.filterInput
+    flex: 1
+    padding: 0
+    border: none
+    border-radius: 0
+    font-size: 16px
+    font-weight: 700
+    outline: none
+    box-shadow: none
+    background: transparent
+    color: #222
+    height: 50px
+    &::placeholder
+        font-family: "Inter", sans-serif
+        font-weight: 600
+        font-size: 14px
+        line-height: 96%
+        letter-spacing: -0.02em
+        color: rgba(45, 46, 47, 0.4)
+    &:focus
+        border: none
+        outline: none
+        box-shadow: none
+
+// Для инпутов с value делаем жирный цвет
+.filterInput:not(:placeholder-shown)
+    font-family: "Inter", sans-serif
+    font-weight: 600
+    font-size: 14px
+    line-height: 96%
+    letter-spacing: -0.02em
+    color: #000000
 
 .filterLabel
     color: #B0B0B0
@@ -144,28 +205,29 @@
     width: 36px
     height: 36px
     border-radius: 50%
-    border: 2px solid #F0F0F0
+
     display: flex
     align-items: center
     justify-content: center
     background: #fff
+
+    position: absolute
+    right: 12px
+    top: 60%
     margin-left: 4px
 
 .iconSwitch
-    width: 18px
-    height: 18px
-    background: url('/images/nav-icons/switch.svg') no-repeat center/contain
+    width: 36px
+    height: 36px
+    background: url('/images/main/switch.svg') no-repeat center/contain
 
 .resultContainer
     background: white
     border-radius: 8px
     padding: 20px
-    min-height: 200px
+
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)
     margin-bottom: 100px
-
-    overflow-y: auto
-    -webkit-overflow-scrolling: touch
 
 .loading
     display: flex
@@ -327,13 +389,6 @@ p
     padding: 10px
     justify-content: center
 
-.filterInput
-    flex: 1
-    padding: 10px
-    border: 1px solid #dcdcdc
-    border-radius: 4px
-    font-size: 14px
-
 .buttonGroup
     display: flex
     justify-content: center
@@ -486,3 +541,6 @@ p
 
         &:active
             transform: scale(0.97)
+.switchBtnActive
+    transform: rotate(360deg)
+    transition: transform 0.25s cubic-bezier(0.4,0.2,0.2,1)

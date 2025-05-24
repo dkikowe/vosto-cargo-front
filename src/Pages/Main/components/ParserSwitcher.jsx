@@ -69,9 +69,17 @@ export const Card = ({ data }) => {
   const [hasRated, setHasRated] = useState(false);
   const [userRating, setUserRating] = useState(null);
 
+  // --- добавлено для раскрытия деталей ---
+  const [showDetails, setShowDetails] = useState(false);
+
   const cardStyle = {
-    backgroundColor: isDark ? "#111" : "#fff",
-    color: isDark ? "#fff" : "#000",
+    backgroundColor: isDark ? "#fff" : "#fff",
+    color: isDark ? "#000" : "#000",
+    borderRadius: 16,
+    boxShadow: "0px 0px 55px rgba(37, 52, 73, 0.05)",
+    marginBottom: 16,
+    padding: 0,
+    border: "none",
   };
 
   useEffect(() => {
@@ -203,98 +211,301 @@ export const Card = ({ data }) => {
   if (isCargo) {
     return (
       <div className={s.card} style={cardStyle}>
-        <div className={s.cardHeader}>
+        <div
+          className={s.cardHeader}
+          style={{
+            borderRadius: 16,
+            padding: 24,
+            paddingBottom: showDetails ? 0 : 24,
+          }}
+        >
           {data.orderNumber && (
-            <h3>
-              {t("card.orderNumber")}: Nº{data.orderNumber}
-            </h3>
+            <div style={{ fontSize: 12, color: "#7A7A7A", marginBottom: 8 }}>
+              груз №{data.orderNumber}
+            </div>
           )}
-          {data.cargo && <h3>{data.cargo}</h3>}
-          {data.ready && <p>{data.ready}</p>}
-        </div>
-
-        {(data.from || data.to) && (
-          <div className={s.cardRoute}>
-            {data.from && (
-              <div>
-                <span className={s.label} style={cardStyle}>
-                  {t("card.from")}
-                </span>
-                <p>{data.from}</p>
-              </div>
-            )}
-            {data.to && (
-              <div>
-                <span className={s.label} style={cardStyle}>
-                  {t("card.to")}
-                </span>
-                <p>{data.to}</p>
-              </div>
-            )}
-            {mapLink && (
-              <a
-                className={s.routeButton}
-                href={mapLink}
-                target="_blank"
-                rel="noopener noreferrer"
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <h3 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>
+              {data.from} — {data.to}
+            </h3>
+            <div style={{ marginLeft: 8 }}>
+              {/* иконка коробки */}
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                {t("card.showRoute")}
-              </a>
+                <path
+                  d="M3.75 7.5 12 12.25l8.25-4.75M12 21.5V12.25"
+                  stroke="#053576"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M21.5 8.25v7.5a2.25 2.25 0 0 1-1.125 1.95l-6.375 3.675a2.25 2.25 0 0 1-2.25 0l-6.375-3.675A2.25 2.25 0 0 1 2.5 15.75v-7.5A2.25 2.25 0 0 1 3.625 6.3l6.375-3.675a2.25 2.25 0 0 1 2.25 0l6.375 3.675A2.25 2.25 0 0 1 21.5 8.25Z"
+                  stroke="#053576"
+                  strokeWidth="1.5"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginTop: 8,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                fontSize: 15,
+                color: "#353535",
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Z"
+                  stroke="#353535"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M8 4.5v4l2.5 2.5"
+                  stroke="#353535"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span style={{ marginLeft: 6 }}>{data.ready}</span>
+            </div>
+            {data.rate && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  fontSize: 15,
+                  color: "#353535",
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Z"
+                    stroke="#353535"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M4.5 8h7"
+                    stroke="#353535"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span style={{ marginLeft: 6 }}>{data.rate}</span>
+              </div>
             )}
           </div>
-        )}
-
-        <div className={s.cardBody}>
-          {data.weight && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                {t("card.weight")}
-              </span>
-              <span>{data.weight}</span>
+        </div>
+        {/* Кнопка подробнее/скрыть детали */}
+        <div style={{ borderTop: "1px solid #EAEAEA", margin: "0 0 0 0" }}>
+          <button
+            style={{
+              width: "100%",
+              background: "none",
+              border: "none",
+              color: "#053576",
+              fontWeight: 600,
+              fontSize: 18,
+              padding: "18px 0",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              outline: "none",
+              borderRadius: showDetails ? "0 0 16px 16px" : "0 0 16px 16px",
+              transition: "background 0.2s",
+            }}
+            onClick={() => setShowDetails((v) => !v)}
+          >
+            <span>{showDetails ? "Скрыть детали" : "Подробнее о заявке"}</span>
+            <span
+              style={{
+                marginLeft: 8,
+                transform: showDetails ? "rotate(180deg)" : "none",
+                transition: "transform 0.2s",
+              }}
+            >
+              <svg
+                width="24"
+                height="24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6 9l6 6 6-6"
+                  stroke="#053576"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+        {/* Детали заявки */}
+        {showDetails && (
+          <div
+            style={{
+              padding: 24,
+              paddingTop: 0,
+              borderRadius: "0 0 16px 16px",
+              background: "#fff",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 600,
+                fontSize: 16,
+                marginBottom: 8,
+                color: "#222",
+              }}
+            >
+              Заказчик
             </div>
-          )}
-          {data.volume && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                {t("card.volume")}
-              </span>
-              <span>{data.volume}</span>
+            <div style={{ fontWeight: 700, color: "#053576", fontSize: 16 }}>
+              {data.customerName || "—"}
             </div>
-          )}
-          {data.rate && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                {t("card.rate")}
-              </span>
-              <span>{data.rate}</span>
+            {data.telefon && (
+              <div style={{ margin: "8px 0" }}>
+                <a
+                  href={`tel:${data.telefon}`}
+                  style={{
+                    color: "#053576",
+                    textDecoration: "none",
+                    fontWeight: 500,
+                  }}
+                >
+                  {data.telefon}
+                </a>
+              </div>
+            )}
+            <div style={{ margin: "12px 0 0 0", color: "#353535" }}>
+              <div style={{ marginBottom: 4 }}>
+                <b>Маршрут:</b> {data.from} — {data.to}
+              </div>
+              {mapLink && (
+                <a
+                  href={mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "#7D97B8",
+                    fontSize: 14,
+                    textDecoration: "underline",
+                  }}
+                >
+                  Показать маршрут на карте
+                </a>
+              )}
             </div>
-          )}
-          {data.vehicle && (
-            <div className={s.cardRow}>
-              <span className={s.label} style={cardStyle}>
-                {t("card.vehicle")}
-              </span>
-              <span>{data.vehicle}</span>
-            </div>
-          )}
-          {data.telefon && (
-            <div className={s.cardContact}>
-              {!showContact ? (
-                <button className={s.contactButton} onClick={handleShowContact}>
-                  {t("card.contactCustomer")}
-                </button>
-              ) : (
-                <div>
-                  <span className={s.label} style={cardStyle}>
-                    {t("card.contact")}
-                  </span>
-                  <p>Тел: {data.telefon}</p>
-                  {renderRatingSection()}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                marginTop: 16,
+              }}
+            >
+              {data.cargo && (
+                <div
+                  style={{
+                    background: "#F5F7FA",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 14,
+                  }}
+                >
+                  {data.cargo}
+                </div>
+              )}
+              {data.weight && (
+                <div
+                  style={{
+                    background: "#F5F7FA",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 14,
+                  }}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    style={{ marginRight: 4, verticalAlign: "middle" }}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Z"
+                      stroke="#353535"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M4.5 8h7"
+                      stroke="#353535"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  {data.weight}
+                </div>
+              )}
+              {data.volume && (
+                <div
+                  style={{
+                    background: "#F5F7FA",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 14,
+                  }}
+                >
+                  {data.volume}
+                </div>
+              )}
+              {data.vehicle && (
+                <div
+                  style={{
+                    background: "#F5F7FA",
+                    borderRadius: 8,
+                    padding: "6px 12px",
+                    fontSize: 14,
+                  }}
+                >
+                  {data.vehicle}
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -420,6 +631,8 @@ export const ParserSwitcher = () => {
     bodyType: "",
   });
   const [searchResults, setSearchResults] = useState([]);
+  const [isSwitching, setIsSwitching] = useState(false);
+  const [filteredFeedData, setFilteredFeedData] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -430,6 +643,7 @@ export const ParserSwitcher = () => {
     try {
       const { data } = await axios.get("/allOrders");
       setResult(data);
+      setFilteredFeedData([]); // Сбрасываем отфильтрованные данные при обновлении
     } catch (error) {
       console.error(t("parserSwitcher.errorLoading"), error);
     } finally {
@@ -470,13 +684,13 @@ export const ParserSwitcher = () => {
       if (fromD) fromD.setHours(0, 0, 0, 0);
       let toD = cargoSearch.toDate ? new Date(cargoSearch.toDate) : null;
       if (toD) toD.setHours(23, 59, 59, 999);
-      const usedYear =
-        fromD?.getFullYear() || toD?.getFullYear() || new Date().getFullYear();
+
       filtered = filtered.filter((item) => {
-        const [startDate, endDate] = parseRange(item.ready, usedYear);
-        if (!startDate || !endDate) return false;
-        if (fromD && startDate < fromD) return false;
-        if (toD && endDate > toD) return false;
+        if (!item.createdAt) return false;
+        const itemDate = new Date(item.createdAt);
+        if (isNaN(itemDate.getTime())) return false;
+        if (fromD && itemDate < fromD) return false;
+        if (toD && itemDate > toD) return false;
         return true;
       });
     }
@@ -588,73 +802,198 @@ export const ParserSwitcher = () => {
       bodyType: "",
     });
     setSearchResults([]);
+    setFilteredFeedData([]);
   };
 
-  const feedData = result
-    ? result
-        .filter((item) => item.orderType === currentType && !item.isArchived)
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-    : [];
+  const handleApplyFilters = () => {
+    if (!result) return;
 
-  if (isLoading) {
-    return (
-      <div className={s.loading}>
-        <div
-          className={s.header}
-          style={{
-            backgroundColor: theme === "dark" ? "#121212" : "",
-          }}
-        >
-          <div className={s.switch}>
-            <div className={s.typeSwitcher}>
-              <div
-                className={s.switchIndicator}
-                style={{
-                  left: currentType === "CargoOrder" ? "0%" : "50%",
-                }}
-              />
-              <button
-                className={
-                  currentType === "CargoOrder" ? s.activeText : s.switcher
-                }
-                onClick={() => handleTypeSwitch("CargoOrder")}
-              >
-                {t("parserSwitcher.cargo")}
-              </button>
-              <button
-                className={
-                  currentType === "MachineOrder" ? s.activeText : s.switcher
-                }
-                onClick={() => handleTypeSwitch("MachineOrder")}
-              >
-                {t("parserSwitcher.machine")}
-              </button>
-            </div>
-          </div>
-          <div className={s.statusButtons}>
-            <button
-              className={currentTab === "feed" ? s.statusActive : s.statusItem}
-              onClick={() => setCurrentTab("feed")}
-            >
-              {t("parserSwitcher.feed")}
-            </button>
-            <button
-              className={
-                currentTab === "search" ? s.statusActiveArchive : s.archive
-              }
-              onClick={() => {
-                setCurrentTab("search");
-                setSearchResults([]);
-              }}
-            >
-              {t("parserSwitcher.search")}
-            </button>
-          </div>
-        </div>
-        {t("parserSwitcher.loading")}
-      </div>
+    console.log("Current filters:", {
+      type: currentType,
+      cargoSearch,
+      machineSearch,
+    });
+
+    let filtered = result.filter(
+      (item) => item.orderType === currentType && !item.isArchived
     );
-  }
+
+    console.log("Initial filtered items:", filtered.length);
+
+    if (currentType === "CargoOrder") {
+      // Применяем фильтры для грузов
+      if (cargoSearch.fromDate || cargoSearch.toDate) {
+        let fromD = cargoSearch.fromDate
+          ? new Date(cargoSearch.fromDate)
+          : null;
+        if (fromD) fromD.setHours(0, 0, 0, 0);
+        let toD = cargoSearch.toDate ? new Date(cargoSearch.toDate) : null;
+        if (toD) toD.setHours(23, 59, 59, 999);
+
+        console.log("Date filters:", { fromD, toD });
+
+        filtered = filtered.filter((item) => {
+          if (!item.createdAt) return false;
+          const itemDate = new Date(item.createdAt);
+          console.log("Item date:", itemDate, "for item:", item);
+          if (isNaN(itemDate.getTime())) return false;
+          if (fromD && itemDate < fromD) return false;
+          if (toD && itemDate > toD) return false;
+          return true;
+        });
+      }
+
+      if (cargoSearch.cargoType) {
+        console.log("Filtering by cargo type:", cargoSearch.cargoType);
+        filtered = filtered.filter((item) => {
+          if (!item.cargo) return false;
+          const matches = item.cargo
+            .toLowerCase()
+            .includes(cargoSearch.cargoType.toLowerCase());
+          console.log("Cargo match:", item.cargo, matches);
+          return matches;
+        });
+      }
+
+      if (cargoSearch.fromLocation) {
+        console.log("Filtering by from location:", cargoSearch.fromLocation);
+        filtered = filtered.filter((item) => {
+          if (!item.from) return false;
+          const matches = item.from
+            .toLowerCase()
+            .includes(cargoSearch.fromLocation.toLowerCase());
+          console.log("From location match:", item.from, matches);
+          return matches;
+        });
+      }
+
+      if (cargoSearch.toLocation) {
+        console.log("Filtering by to location:", cargoSearch.toLocation);
+        filtered = filtered.filter((item) => {
+          if (!item.to) return false;
+          const matches = item.to
+            .toLowerCase()
+            .includes(cargoSearch.toLocation.toLowerCase());
+          console.log("To location match:", item.to, matches);
+          return matches;
+        });
+      }
+    } else {
+      // Применяем фильтры для машин
+      if (machineSearch.fromDate || machineSearch.toDate) {
+        let fromD = machineSearch.fromDate
+          ? new Date(machineSearch.fromDate)
+          : null;
+        if (fromD) fromD.setHours(0, 0, 0, 0);
+        let toD = machineSearch.toDate ? new Date(machineSearch.toDate) : null;
+        if (toD) toD.setHours(23, 59, 59, 999);
+        filtered = filtered.filter((item) => {
+          if (!item.data_gotovnosti) return false;
+          let itemDate;
+          const ddmmParsed = tryParseDate(item.data_gotovnosti);
+          if (ddmmParsed) {
+            itemDate = ddmmParsed;
+          } else {
+            itemDate = new Date(item.data_gotovnosti);
+          }
+          if (isNaN(itemDate.getTime())) return false;
+          if (fromD && itemDate < fromD) return false;
+          if (toD && itemDate > toD) return false;
+          return true;
+        });
+      }
+      if (machineSearch.tonnage) {
+        filtered = filtered.filter((item) => {
+          if (!item.gruzopodyomnost) return false;
+          return item.gruzopodyomnost
+            .toLowerCase()
+            .includes(machineSearch.tonnage.toLowerCase());
+        });
+      }
+      if (machineSearch.fromLocation) {
+        filtered = filtered.filter((item) => {
+          if (!item.otkuda) return false;
+          return item.otkuda
+            .toLowerCase()
+            .includes(machineSearch.fromLocation.toLowerCase());
+        });
+      }
+      if (machineSearch.toLocation) {
+        filtered = filtered.filter((item) => {
+          if (!item.kuda) return false;
+          return item.kuda
+            .toLowerCase()
+            .includes(machineSearch.toLocation.toLowerCase());
+        });
+      }
+      if (machineSearch.bodyType) {
+        filtered = filtered.filter((item) => {
+          if (!item.kuzov) return false;
+          return item.kuzov
+            .toLowerCase()
+            .includes(machineSearch.bodyType.toLowerCase());
+        });
+      }
+    }
+
+    console.log("Final filtered items:", filtered.length);
+    setFilteredFeedData(filtered);
+  };
+
+  const handleResetFilters = () => {
+    if (currentType === "CargoOrder") {
+      setCargoSearch({
+        fromDate: "",
+        toDate: "",
+        cargoType: "",
+        fromLocation: "",
+        toLocation: "",
+      });
+    } else {
+      setMachineSearch({
+        fromDate: "",
+        toDate: "",
+        tonnage: "",
+        fromLocation: "",
+        toLocation: "",
+        bodyType: "",
+      });
+    }
+    setFilteredFeedData([]);
+  };
+
+  const feedData =
+    filteredFeedData.length > 0
+      ? filteredFeedData.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )
+      : result
+      ? result
+          .filter((item) => item.orderType === currentType && !item.isArchived)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      : [];
+
+  console.log("Current feed data:", feedData.length);
+
+  const handleSwitchLocations = () => {
+    setIsSwitching(true);
+    setTimeout(() => {
+      if (currentType === "CargoOrder") {
+        setCargoSearch((cs) => ({
+          ...cs,
+          fromLocation: cs.toLocation,
+          toLocation: cs.fromLocation,
+        }));
+      } else {
+        setMachineSearch((ms) => ({
+          ...ms,
+          fromLocation: ms.toLocation,
+          toLocation: ms.fromLocation,
+        }));
+      }
+      setIsSwitching(false);
+    }, 250);
+  };
 
   if (!result) {
     return <div className={s.placeholder}>{t("parserSwitcher.noData")}</div>;
@@ -663,20 +1002,16 @@ export const ParserSwitcher = () => {
   const containerStyle = {
     backgroundColor: theme === "dark" ? "#1A1A1A" : undefined,
     color: theme === "dark" ? "#ddd" : undefined,
-    minHeight: "100vh",
   };
 
   return (
-    <div className={s.parserContainer} style={containerStyle}>
+    <div className={s.parserSwitcher}>
       <div
         className={s.header}
         style={{ backgroundColor: theme === "dark" ? "#121212" : "#053576" }}
       >
         <div className={s.switcher}>
-          <div
-            className={currentType === "CargoOrder" ? s.tabActive : s.tab}
-            onClick={() => handleTypeSwitch("CargoOrder")}
-          >
+          <div className={s.tab} onClick={() => handleTypeSwitch("CargoOrder")}>
             <svg
               width="16"
               height="16"
@@ -689,10 +1024,14 @@ export const ParserSwitcher = () => {
                 fill="#7D97B8"
               />
             </svg>
-            <span>Поиск груза</span>
+            <span
+              className={currentType === "CargoOrder" ? s.tabActive : s.tab}
+            >
+              Поиск груза
+            </span>
           </div>
           <div
-            className={currentType === "MachineOrder" ? s.tabActive : s.tab}
+            className={s.tab}
             onClick={() => handleTypeSwitch("MachineOrder")}
           >
             <svg
@@ -707,7 +1046,11 @@ export const ParserSwitcher = () => {
                 fill="#7D97B8"
               />
             </svg>
-            <span>Поиск машины</span>
+            <span
+              className={currentType === "MachineOrder" ? s.tabActive : s.tab}
+            >
+              Поиск машины
+            </span>
           </div>
         </div>
         <div className={s.filtersBlock}>
@@ -725,14 +1068,40 @@ export const ParserSwitcher = () => {
                   fill="#356DBB"
                 />
               </svg>
-              <span className={s.filterLabel}>
-                Откуда <span className={s.required}>*</span>
-              </span>
+              <input
+                className={s.filterInput}
+                type="text"
+                placeholder="Откуда"
+                value={
+                  currentType === "CargoOrder"
+                    ? cargoSearch.fromLocation
+                    : machineSearch.fromLocation
+                }
+                onChange={(e) =>
+                  currentType === "CargoOrder"
+                    ? setCargoSearch({
+                        ...cargoSearch,
+                        fromLocation: e.target.value,
+                      })
+                    : setMachineSearch({
+                        ...machineSearch,
+                        fromLocation: e.target.value,
+                      })
+                }
+                autoComplete="off"
+              />
             </div>
-            <div className={s.switchBtn}>
+            <div
+              className={`${s.switchBtn} ${
+                isSwitching ? s.switchBtnActive : ""
+              }`}
+              onClick={handleSwitchLocations}
+              style={{ cursor: "pointer" }}
+            >
               <span className={s.iconSwitch} />
             </div>
           </div>
+
           <div className={s.filterRow}>
             <div className={s.filterItem}>
               <svg
@@ -747,11 +1116,73 @@ export const ParserSwitcher = () => {
                   fill="#356DBB"
                 />
               </svg>
-              <span className={s.filterLabel}>
-                Куда <span className={s.required}>*</span>
-              </span>
+              <input
+                className={s.filterInput}
+                type="text"
+                placeholder="Куда"
+                value={
+                  currentType === "CargoOrder"
+                    ? cargoSearch.toLocation
+                    : machineSearch.toLocation
+                }
+                onChange={(e) =>
+                  currentType === "CargoOrder"
+                    ? setCargoSearch({
+                        ...cargoSearch,
+                        toLocation: e.target.value,
+                      })
+                    : setMachineSearch({
+                        ...machineSearch,
+                        toLocation: e.target.value,
+                      })
+                }
+                autoComplete="off"
+              />
             </div>
           </div>
+
+          {currentType === "MachineOrder" && (
+            <div className={s.filterRow}>
+              <div className={s.filterItem}>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M0 1.8C0.0166667 1.28333 0.191667 0.858333 0.525 0.525C0.858333 0.191667 1.28333 0.0166667 1.8 0H8.2C8.71667 0.0166667 9.14167 0.191667 9.475 0.525C9.80833 0.858333 9.98333 1.28333 10 1.8V6.4C9.96667 6.76667 9.76667 6.96667 9.4 7C9.03333 6.96667 8.83333 6.76667 8.8 6.4V1.8C8.76667 1.43333 8.56667 1.23333 8.2 1.2H1.8C1.43333 1.23333 1.23333 1.43333 1.2 1.8V6.4C1.16667 6.76667 0.966667 6.96667 0.6 7C0.233333 6.96667 0.0333333 6.76667 0 6.4V1.8ZM15.2 9.2C15.1833 9.76667 14.9917 10.2417 14.625 10.625C14.2417 10.9917 13.7667 11.1833 13.2 11.2C12.6333 11.1833 12.1583 10.9917 11.775 10.625C11.4083 10.2417 11.2167 9.76667 11.2 9.2H10.8H7.2C7.18333 9.76667 6.99167 10.2417 6.625 10.625C6.24167 10.9917 5.76667 11.1833 5.2 11.2C4.51667 11.1833 3.98333 10.9167 3.6 10.4C3.21667 10.9167 2.68333 11.1833 2 11.2C1.43333 11.1833 0.958333 10.9917 0.575 10.625C0.208333 10.2417 0.0166667 9.76667 0 9.2C0.0166667 8.63333 0.208333 8.15833 0.575 7.775C0.958333 7.40833 1.43333 7.21667 2 7.2C2.68333 7.21667 3.21667 7.48333 3.6 8C3.98333 7.48333 4.51667 7.21667 5.2 7.2C5.88333 7.21667 6.41667 7.48333 6.8 8H10.8V5.6V3.4C10.8333 3.03333 11.0333 2.83333 11.4 2.8H13.225C13.6583 2.81667 14.0167 2.99167 14.3 3.325L15.775 5.1C15.925 5.28333 16 5.5 16 5.75V6V6.4V8.4C16 8.63333 15.925 8.825 15.775 8.975C15.625 9.125 15.4333 9.2 15.2 9.2ZM14.625 5.6L13.375 4.075C13.3417 4.025 13.2917 4 13.225 4H12V5.6H14.625ZM3.4 2.6V5.8C3.36667 6.16667 3.16667 6.36667 2.8 6.4C2.43333 6.36667 2.23333 6.16667 2.2 5.8V2.6C2.23333 2.23333 2.43333 2.03333 2.8 2C3.16667 2.03333 3.36667 2.23333 3.4 2.6ZM5.6 2.6V5.8C5.56667 6.16667 5.36667 6.36667 5 6.4C4.63333 6.36667 4.43333 6.16667 4.4 5.8V2.6C4.43333 2.23333 4.63333 2.03333 5 2C5.36667 2.03333 5.56667 2.23333 5.6 2.6ZM7.8 2.6V5.8C7.76667 6.16667 7.56667 6.36667 7.2 6.4C6.83333 6.36667 6.63333 6.16667 6.6 5.8V2.6C6.63333 2.23333 6.83333 2.03333 7.2 2C7.56667 2.03333 7.76667 2.23333 7.8 2.6ZM13.2 10C13.4333 10 13.625 9.925 13.775 9.775C13.925 9.625 14 9.43333 14 9.2C14 8.96667 13.925 8.775 13.775 8.625C13.625 8.475 13.4333 8.4 13.2 8.4C12.9667 8.4 12.775 8.475 12.625 8.625C12.475 8.775 12.4 8.96667 12.4 9.2C12.4 9.43333 12.475 9.625 12.625 9.775C12.775 9.925 12.9667 10 13.2 10ZM6 9.2C6 8.96667 5.925 8.775 5.775 8.625C5.625 8.475 5.43333 8.4 5.2 8.4C4.96667 8.4 4.775 8.475 4.625 8.625C4.475 8.775 4.4 8.96667 4.4 9.2C4.4 9.43333 4.475 9.625 4.625 9.775C4.775 9.925 4.96667 10 5.2 10C5.43333 10 5.625 9.925 5.775 9.775C5.925 9.625 6 9.43333 6 9.2ZM2 10C2.23333 10 2.425 9.925 2.575 9.775C2.725 9.625 2.8 9.43333 2.8 9.2C2.8 8.96667 2.725 8.775 2.575 8.625C2.425 8.475 2.23333 8.4 2 8.4C1.76667 8.4 1.575 8.475 1.425 8.625C1.275 8.775 1.2 8.96667 1.2 9.2C1.2 9.43333 1.275 9.625 1.425 9.775C1.575 9.925 1.76667 10 2 10Z"
+                    fill="#356DBB"
+                  />
+                </svg>
+                <select
+                  className={s.filterInput}
+                  value={machineSearch.bodyType}
+                  onChange={(e) =>
+                    setMachineSearch({
+                      ...machineSearch,
+                      bodyType: e.target.value,
+                    })
+                  }
+                  style={{
+                    appearance: "none",
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    background: "transparent",
+                    fontWeight: machineSearch.bodyType ? 700 : 700,
+                    color: machineSearch.bodyType ? "#222" : "#B0B0B0",
+                  }}
+                >
+                  <option value="" disabled hidden>
+                    Тип кузова
+                  </option>
+                  <option value="Тент">Тент</option>
+                  <option value="Рефрижератор">Рефрижератор</option>
+                </select>
+              </div>
+            </div>
+          )}
           <div className={s.filterRowBottom}>
             <div className={s.filterItemBottom}>
               <svg
@@ -766,28 +1197,90 @@ export const ParserSwitcher = () => {
                   fill="#356DBB"
                 />
               </svg>
-              <span className={s.filterLabel}>
-                Выбрать дату <span className={s.required}>*</span>
-              </span>
+              <input
+                className={s.filterInput}
+                type="date"
+                placeholder="Выбрать дату"
+                value={
+                  currentType === "CargoOrder"
+                    ? cargoSearch.fromDate
+                    : machineSearch.fromDate
+                }
+                onChange={(e) =>
+                  currentType === "CargoOrder"
+                    ? setCargoSearch({
+                        ...cargoSearch,
+                        fromDate: e.target.value,
+                      })
+                    : setMachineSearch({
+                        ...machineSearch,
+                        fromDate: e.target.value,
+                      })
+                }
+              />
             </div>
             <div className={s.filterItemBottom}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M0.155337 4.62136C0.0517773 4.863 0.0517773 5.09601 0.155337 5.32039C0.241637 5.54477 0.414237 5.70011 0.673136 5.78641L4.8932 6.97735C5.29018 7.06365 5.60949 6.94283 5.85113 6.61489L8 3.01618L1.65696 2.21359C1.4671 2.21359 1.32902 2.29126 1.24272 2.4466L0.155337 4.62136ZM8 3.01618L10.1489 6.61489C10.3905 6.94283 10.7098 7.06365 11.1068 6.97735L15.3269 5.78641C15.5858 5.70011 15.7584 5.54477 15.8447 5.32039C15.9482 5.09601 15.9482 4.863 15.8447 4.62136L14.7573 2.4466C14.671 2.29126 14.5329 2.21359 14.343 2.21359L8 3.01618ZM13.3851 7.18447V11.1715L8.62136 12.3625V6.12298C8.58684 5.74326 8.37972 5.53614 8 5.50162C7.62028 5.53614 7.41316 5.74326 7.37864 6.12298V12.3625L2.61488 11.1715V7.18447L1.37217 6.8479V11.1715C1.37217 11.4477 1.45847 11.698 1.63107 11.9223C1.80367 12.1467 2.02804 12.2934 2.3042 12.3625L7.61165 13.6828C7.87055 13.7519 8.13808 13.7519 8.41424 13.6828L13.6958 12.3625C13.9719 12.2934 14.1963 12.1467 14.3689 11.9223C14.5415 11.7152 14.6278 11.4649 14.6278 11.1715V6.8479L13.3851 7.18447Z"
-                  fill="#356DBB"
-                />
-              </svg>
-              <span className={s.filterLabel}>
-                Тип груза <span className={s.required}>*</span>
-              </span>
+              {currentType === "CargoOrder" ? (
+                <>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M0.155337 4.62136C0.0517773 4.863 0.0517773 5.09601 0.155337 5.32039C0.241637 5.54477 0.414237 5.70011 0.673136 5.78641L4.8932 6.97735C5.29018 7.06365 5.60949 6.94283 5.85113 6.61489L8 3.01618L1.65696 2.21359C1.4671 2.21359 1.32902 2.29126 1.24272 2.4466L0.155337 4.62136ZM8 3.01618L10.1489 6.61489C10.3905 6.94283 10.7098 7.06365 11.1068 6.97735L15.3269 5.78641C15.5858 5.70011 15.7584 5.54477 15.8447 5.32039C15.9482 5.09601 15.9482 4.863 15.8447 4.62136L14.7573 2.4466C14.671 2.29126 14.5329 2.21359 14.343 2.21359L8 3.01618ZM13.3851 7.18447V11.1715L8.62136 12.3625V6.12298C8.58684 5.74326 8.37972 5.53614 8 5.50162C7.62028 5.53614 7.41316 5.74326 7.37864 6.12298V12.3625L2.61488 11.1715V7.18447L1.37217 6.8479V11.1715C1.37217 11.4477 1.45847 11.698 1.63107 11.9223C1.80367 12.1467 2.02804 12.2934 2.3042 12.3625L7.61165 13.6828C7.87055 13.7519 8.13808 13.7519 8.41424 13.6828L13.6958 12.3625C13.9719 12.2934 14.1963 12.1467 14.3689 11.9223C14.5415 11.7152 14.6278 11.4649 14.6278 11.1715V6.8479L13.3851 7.18447Z"
+                      fill="#356DBB"
+                    />
+                  </svg>
+                  <input
+                    className={s.filterInput}
+                    type="text"
+                    placeholder="Тип груза"
+                    value={cargoSearch.cargoType}
+                    onChange={(e) =>
+                      setCargoSearch({
+                        ...cargoSearch,
+                        cargoType: e.target.value,
+                      })
+                    }
+                    autoComplete="off"
+                  />
+                </>
+              ) : (
+                <>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M0.155337 4.62136C0.0517773 4.863 0.0517773 5.09601 0.155337 5.32039C0.241637 5.54477 0.414237 5.70011 0.673136 5.78641L4.8932 6.97735C5.29018 7.06365 5.60949 6.94283 5.85113 6.61489L8 3.01618L1.65696 2.21359C1.4671 2.21359 1.32902 2.29126 1.24272 2.4466L0.155337 4.62136ZM8 3.01618L10.1489 6.61489C10.3905 6.94283 10.7098 7.06365 11.1068 6.97735L15.3269 5.78641C15.5858 5.70011 15.7584 5.54477 15.8447 5.32039C15.9482 5.09601 15.9482 4.863 15.8447 4.62136L14.7573 2.4466C14.671 2.29126 14.5329 2.21359 14.343 2.21359L8 3.01618ZM13.3851 7.18447V11.1715L8.62136 12.3625V6.12298C8.58684 5.74326 8.37972 5.53614 8 5.50162C7.62028 5.53614 7.41316 5.74326 7.37864 6.12298V12.3625L2.61488 11.1715V7.18447L1.37217 6.8479V11.1715C1.37217 11.4477 1.45847 11.698 1.63107 11.9223C1.80367 12.1467 2.02804 12.2934 2.3042 12.3625L7.61165 13.6828C7.87055 13.7519 8.13808 13.7519 8.41424 13.6828L13.6958 12.3625C13.9719 12.2934 14.1963 12.1467 14.3689 11.9223C14.5415 11.7152 14.6278 11.4649 14.6278 11.1715V6.8479L13.3851 7.18447Z"
+                      fill="#356DBB"
+                    />
+                  </svg>
+                  <input
+                    className={s.filterInput}
+                    type="text"
+                    placeholder="Тоннаж"
+                    value={machineSearch.tonnage}
+                    onChange={(e) =>
+                      setMachineSearch({
+                        ...machineSearch,
+                        tonnage: e.target.value,
+                      })
+                    }
+                    autoComplete="off"
+                  />
+                </>
+              )}
             </div>
           </div>
+
+          {/* Блок с кнопками применения и сброса фильтров */}
         </div>
       </div>
 
@@ -805,7 +1298,6 @@ export const ParserSwitcher = () => {
           <div
             className={s.resultContainer}
             style={{
-              overflowY: "auto",
               backgroundColor: theme === "dark" ? "#000" : "#fff",
             }}
           >
@@ -814,7 +1306,14 @@ export const ParserSwitcher = () => {
                 feedData.map((item, index) => <Card key={index} data={item} />)
               ) : (
                 <p className={s.placeholder}>
-                  {t("parserSwitcher.noOrdersByType")}
+                  {filteredFeedData.length === 0 &&
+                  (cargoSearch.fromDate ||
+                    cargoSearch.toDate ||
+                    cargoSearch.cargoType ||
+                    cargoSearch.fromLocation ||
+                    cargoSearch.toLocation)
+                    ? t("parserSwitcher.noOrdersByFilters")
+                    : t("parserSwitcher.noOrdersByType")}
                 </p>
               )}
             </div>
@@ -1016,6 +1515,23 @@ export const ParserSwitcher = () => {
           )}
         </div>
       )}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "100px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          justifyContent: "center",
+          display: "flex",
+          alignItems: "center",
+          zIndex: 1000,
+        }}
+      >
+        <button className={s.applyButton} onClick={handleApplyFilters}>
+          {t("parserSwitcher.apply")}
+        </button>
+      </div>
     </div>
   );
 };
