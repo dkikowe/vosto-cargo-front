@@ -19,6 +19,7 @@ import { ThemeContext } from "../../context/ThemeContext";
 import RoleSelect from "../../components/RoleSelect/RoleSelect";
 import { useTranslation } from "react-i18next";
 import CalculatorPopup from "../../components/Calculator/Calculator";
+import SupportPopup from "../../components/Support";
 
 // ...импорты остаются без изменений...
 
@@ -42,6 +43,7 @@ export default function Cabinet() {
   const [rating, setRating] = useState("");
 
   const [showCalculator, setShowCalculator] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { t, i18n } = useTranslation();
@@ -196,9 +198,7 @@ export default function Cabinet() {
                     <img
                       src={user?.avatar || "/images/nav-icons/user.svg"}
                       className={`${s.profileIcon} ${
-                        avatarLoaded
-                          ? "opacity-100 w-[70px] h-[70px] "
-                          : "opacity-0 w-full"
+                        avatarLoaded ? "opacity-100  " : "opacity-0"
                       }`}
                       alt=""
                       onLoad={() => setAvatarLoaded(true)}
@@ -319,7 +319,11 @@ export default function Cabinet() {
           <p>{t("cabinet.subscription")}</p>
         </div>
         <div className={s.divider}></div>
-        <div className={s.other}>
+        <div
+          className={s.other}
+          onClick={() => setShowSupport(true)}
+          style={{ cursor: "pointer" }}
+        >
           <img src="/images/design-icons-cab/support.svg" alt="" />
           <p>{t("cabinet.support")}</p>
         </div>
@@ -328,6 +332,13 @@ export default function Cabinet() {
       {showCalculator && (
         <CalculatorPopup
           onClose={() => setShowCalculator(false)}
+          theme={theme}
+          t={t}
+        />
+      )}
+      {showSupport && (
+        <SupportPopup
+          onClose={() => setShowSupport(false)}
           theme={theme}
           t={t}
         />
