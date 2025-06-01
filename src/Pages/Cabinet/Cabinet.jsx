@@ -18,13 +18,14 @@ import s from "./Cabinet.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
 import RoleSelect from "../../components/RoleSelect/RoleSelect";
 import { useTranslation } from "react-i18next";
+import CalculatorPopup from "../../components/Calculator/Calculator";
 
 // ...импорты остаются без изменений...
 
 export default function Cabinet() {
-  const initData = window.Telegram.WebApp.initData;
-  // const initData =
-  // "user=%7B%22id%22%3A5056024242%2C%22first_name%22%3A%22%3C%5C%2Fabeke%3E%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22abylaikak%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FAj3hfrbNq8PfLLKvsSp3-WizcXTc3HO8Vynsw3R1a1A5spK3fDmZERABNoOGLEQN.svg%22%7D&chat_instance=-4908992446394523843&chat_type=private&auth_date=1735556539&signature=pgNJfzcxYGAcJCJ_jnsYEsmiTJJxOP2tNKb941-fT7QcsUQ2chSkFcItG8KvjR_r3nH0vem4bxtlltuyX-IwBQ&hash=c0b510163f5b1dea53172644df35e63458216a9d5d9a10413af4f5b0204bb493";
+  // const initData = window.Telegram.WebApp.initData;
+  const initData =
+    "user=%7B%22id%22%3A5056024242%2C%22first_name%22%3A%22%3C%5C%2Fabeke%3E%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22abylaikak%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FAj3hfrbNq8PfLLKvsSp3-WizcXTc3HO8Vynsw3R1a1A5spK3fDmZERABNoOGLEQN.svg%22%7D&chat_instance=-4908992446394523843&chat_type=private&auth_date=1735556539&signature=pgNJfzcxYGAcJCJ_jnsYEsmiTJJxOP2tNKb941-fT7QcsUQ2chSkFcItG8KvjR_r3nH0vem4bxtlltuyX-IwBQ&hash=c0b510163f5b1dea53172644df35e63458216a9d5d9a10413af4f5b0204bb493";
   const navigate = useNavigate();
   const id = localStorage.getItem("id");
 
@@ -149,160 +150,6 @@ export default function Cabinet() {
       }
     });
   };
-
-  function CalculatorPopup({ onClose }) {
-    const [cityA, setCityA] = useState("");
-    const [cityB, setCityB] = useState("");
-    const [carType, setCarType] = useState("тент");
-    const [cargoType, setCargoType] = useState("full");
-    const [volume, setVolume] = useState("");
-    const [weight, setWeight] = useState("");
-    const [result, setResult] = useState(null);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    async function handleCalculate() {
-      setError(null);
-      setResult(null);
-
-      if (!cityA || !cityB || !carType) return;
-
-      if (cargoType === "groupage" && (!volume || !weight)) {
-        setError(t("calculator.error"));
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const params = { cityA, cityB, carType, cargoType };
-        if (cargoType === "groupage") {
-          params.volume = volume;
-          params.weight = weight;
-        }
-        const res = await axios.get("/getShippingCalculation", { params });
-        setResult(res.data);
-      } catch (err) {
-        console.error("Ошибка при расчете:", err);
-        setError(t("calculator.serverError"));
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    return (
-      <div className={`${s.overlay} ${theme === "dark" ? s.dark : s.light}`}>
-        <div className={s.popupCalculator}>
-          <button className={s.closeBtn} onClick={onClose}>
-            ×
-          </button>
-          <h2 className={s.title}>{t("calculator.title")}</h2>
-
-          <div className={s.field}>
-            <label>{t("calculator.cityFrom")}</label>
-            <input
-              type="text"
-              value={cityA}
-              onChange={(e) => setCityA(e.target.value)}
-              placeholder={t("calculator.placeholderFrom")}
-            />
-          </div>
-
-          <div className={s.field}>
-            <label>{t("calculator.cityTo")}</label>
-            <input
-              type="text"
-              value={cityB}
-              onChange={(e) => setCityB(e.target.value)}
-              placeholder={t("calculator.placeholderTo")}
-            />
-          </div>
-
-          <div className={s.selects}>
-            <div className={s.field}>
-              <label>{t("calculator.carType")}</label>
-              <select
-                value={carType}
-                onChange={(e) => setCarType(e.target.value)}
-                className={s.select}
-              >
-                <option value="тент">{t("calculator.tent")}</option>
-                <option value="рефрижератор">
-                  {t("calculator.refrigerator")}
-                </option>
-              </select>
-            </div>
-
-            <div className={s.field}>
-              <label>{t("calculator.cargoType")}</label>
-              <select
-                value={cargoType}
-                onChange={(e) => setCargoType(e.target.value)}
-                className={s.select}
-              >
-                <option value="full">{t("calculator.fullTruck")}</option>
-                <option value="groupage">{t("calculator.groupage")}</option>
-              </select>
-            </div>
-          </div>
-
-          {cargoType === "groupage" && (
-            <>
-              <div className={s.field}>
-                <label>{t("calculator.volume")}</label>
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={volume}
-                  onChange={(e) => setVolume(e.target.value)}
-                  placeholder={t("calculator.placeholderVolume")}
-                />
-              </div>
-              <div className={s.field}>
-                <label>{t("calculator.weight")}</label>
-                <input
-                  type="number"
-                  min="0.1"
-                  step="0.1"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder={t("calculator.placeholderWeight")}
-                />
-              </div>
-            </>
-          )}
-
-          {loading ? (
-            <button className={s.calculateBtn} disabled>
-              {t("calculator.loading")}
-            </button>
-          ) : (
-            <button className={s.calculateBtn} onClick={handleCalculate}>
-              {t("calculator.calculate")}
-            </button>
-          )}
-
-          {error && <p className={s.error}>{error}</p>}
-
-          {result && !loading && (
-            <div className={s.result}>
-              <p>
-                {t("calculator.distance")}: {result.distance} км
-              </p>
-              <p>
-                {t("calculator.tariff")}: {result.tariff} ₽/км
-              </p>
-              <p className={s.total}>
-                {t("calculator.total")}: {parseFloat(result.price).toFixed(2)} ₽
-              </p>
-            </div>
-          )}
-
-          <p className={s.warn}>{t("calculator.disclaimer")}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
@@ -454,7 +301,11 @@ export default function Cabinet() {
       </div>
 
       <div className={s.otherBlock}>
-        <div className={s.other}>
+        <div
+          className={s.other}
+          onClick={() => setShowCalculator(true)}
+          style={{ cursor: "pointer" }}
+        >
           <img src="/images/design-icons-cab/calculator.svg" alt="" />
           <p>{t("cabinet.calculator")}</p>
         </div>
@@ -475,7 +326,11 @@ export default function Cabinet() {
       </div>
 
       {showCalculator && (
-        <CalculatorPopup onClose={() => setShowCalculator(false)} />
+        <CalculatorPopup
+          onClose={() => setShowCalculator(false)}
+          theme={theme}
+          t={t}
+        />
       )}
     </div>
   );

@@ -1,109 +1,143 @@
 import React, { useState } from "react";
-import s from "./Calculator.module.sass";
-import axios from "../../axios"; // <-- Ваш конфиг axios (например, с базовым URL и пр.)
+import s from "./CalculatorPopup.module.sass";
+import axios from "../../axios";
 
-export default function CalculatorPopup({ isOpen, onClose }) {
+export default function CalculatorPopup({ onClose, theme, t }) {
   const [cityA, setCityA] = useState("");
   const [cityB, setCityB] = useState("");
-  const [rate, setRate] = useState("");
-  const [distance, setDistance] = useState(0);
-  const [price, setPrice] = useState(0);
-
-  async function getCoordinates(cityName) {
-    // Запрос к Яндекс.Геокодеру
-    // Документация: https://yandex.ru/dev/maps/geocoder
-    const geocodeUrl = `https://geocode-maps.yandex.ru/1.x/?apikey=6f430e40-1644-44a5-b758-197e7a073e5b&format=json&geocode=${encodeURIComponent(
-      cityName
-    )}`;
-
-    // Вместо fetch используем axios.get
-    const response = await axios.get(geocodeUrl);
-    const data = response.data;
-    const featureMember = data?.response?.GeoObjectCollection?.featureMember;
-    if (!featureMember || !featureMember.length) {
-      throw new Error("Не удалось получить координаты города " + cityName);
-    }
-
-    const coordsString = featureMember[0].GeoObject.Point.pos; // "долгота широта"
-    const [lon, lat] = coordsString.split(" ").map(Number);
-
-    return { lat, lon };
-  }
-
-  async function getRouteDistance(latA, lonA, latB, lonB) {
-    // Запрос к Яндекс.Routing API
-    // Документация: https://yandex.ru/dev/maps/routes
-    const routeUrl = `https://api.routing.yandex.net/v2/route?apikey=f7efe847-44ce-4616-bdac-943545246b8b&waypoints=${latA},${lonA}|${latB},${lonB}&avoid_tolls=YES&lang=ru_RU`;
-
-    // Аналогично через axios.get
-    const response = await axios.get(routeUrl);
-    const data = response.data;
-
-    const route = data?.routes?.[0];
-    if (!route || !route.legs?.[0]?.distance?.value) {
-      throw new Error("Не удалось получить данные о маршруте");
-    }
-
-    // Расстояние приходит в метрах
-    return route.legs[0].distance.value;
-  }
+  const [carType, setCarType] = useState("тент");
+  const [cargoType, setCargoType] = useState("full");
+  const [volume, setVolume] = useState("");
+  const [weight, setWeight] = useState("");
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleCalculate() {
-    if (!cityA || !cityB || !rate) return;
+    setError(null);
+    setResult(null);
+    if (!cityA || !cityB || !carType) return;
+    if (cargoType === "groupage" && (!volume || !weight)) {
+      setError(t("calculator.error"));
+      return;
+    }
     try {
-      // 1) Получаем координаты обоих городов
-      const coordsA = await getCoordinates(cityA);
-      const coordsB = await getCoordinates(cityB);
-
-      // 2) Вызываем Routing API, чтобы узнать расстояние
-      const distMeters = await getRouteDistance(
-        coordsA.lat,
-        coordsA.lon,
-        coordsB.lat,
-        coordsB.lon
-      );
-      const distKm = distMeters / 1000;
-
-      // 3) Считаем цену за км (простая формула: rate / distance)
-      setDistance(distKm);
-      setPrice(Number(rate) / distKm);
-    } catch (error) {
-      console.error(error);
+      setLoading(true);
+      const params = { cityA, cityB, carType, cargoType };
+      if (cargoType === "groupage") {
+        params.volume = volume;
+        params.weight = weight;
+      }
+      const res = await axios.get("/getShippingCalculation", { params });
+      setResult(res.data);
+    } catch (err) {
+      setError(t("calculator.serverError"));
+    } finally {
+      setLoading(false);
     }
   }
 
-  if (!isOpen) return null;
-
   return (
-    <div className={s.overlay}>
-      <div className={s.popup}>
+    <div className={`${s.overlay} ${theme === "dark" ? s.dark : s.light}`}>
+      <div className={s.bottomSheetPopup}>
         <button className={s.closeBtn} onClick={onClose}>
           ×
         </button>
-        <h2>Калькулятор цены за км (Яндекс)</h2>
-        <input
-          type="text"
-          placeholder="Город A"
-          value={cityA}
-          onChange={(e) => setCityA(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Город B"
-          value={cityB}
-          onChange={(e) => setCityB(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Ставка в рублях"
-          value={rate}
-          onChange={(e) => setRate(e.target.value)}
-        />
-        <button onClick={handleCalculate}>Рассчитать</button>
-        <div className={s.result}>
-          <p>Расстояние: {distance ? `${distance.toFixed(2)} км` : "-"}</p>
-          <p>Цена за км: {price ? `${price.toFixed(2)} руб.` : "-"}</p>
+        <h2 className={s.title}>{t("calculator.title")}</h2>
+        <div className={s.field}>
+          <label>{t("calculator.cityFrom")}</label>
+          <input
+            type="text"
+            value={cityA}
+            onChange={(e) => setCityA(e.target.value)}
+            placeholder={t("calculator.placeholderFrom")}
+          />
         </div>
+        <div className={s.field}>
+          <label>{t("calculator.cityTo")}</label>
+          <input
+            type="text"
+            value={cityB}
+            onChange={(e) => setCityB(e.target.value)}
+            placeholder={t("calculator.placeholderTo")}
+          />
+        </div>
+        <div className={s.selects}>
+          <div className={s.field}>
+            <label>{t("calculator.carType")}</label>
+            <select
+              value={carType}
+              onChange={(e) => setCarType(e.target.value)}
+              className={s.select}
+            >
+              <option value="тент">{t("calculator.tent")}</option>
+              <option value="рефрижератор">
+                {t("calculator.refrigerator")}
+              </option>
+            </select>
+          </div>
+          <div className={s.field}>
+            <label>{t("calculator.cargoType")}</label>
+            <select
+              value={cargoType}
+              onChange={(e) => setCargoType(e.target.value)}
+              className={s.select}
+            >
+              <option value="full">{t("calculator.fullTruck")}</option>
+              <option value="groupage">{t("calculator.groupage")}</option>
+            </select>
+          </div>
+        </div>
+        {cargoType === "groupage" && (
+          <>
+            <div className={s.field}>
+              <label>{t("calculator.volume")}</label>
+              <input
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={volume}
+                onChange={(e) => setVolume(e.target.value)}
+                placeholder={t("calculator.placeholderVolume")}
+              />
+            </div>
+            <div className={s.field}>
+              <label>{t("calculator.weight")}</label>
+              <input
+                type="number"
+                min="0.1"
+                step="0.1"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder={t("calculator.placeholderWeight")}
+              />
+            </div>
+          </>
+        )}
+        {loading ? (
+          <button className={s.calculateBtn} disabled>
+            {t("calculator.loading")}
+          </button>
+        ) : (
+          <button className={s.calculateBtn} onClick={handleCalculate}>
+            {t("calculator.calculate")}
+          </button>
+        )}
+        {error && <p className={s.error}>{error}</p>}
+        {result && !loading && (
+          <div className={s.result}>
+            <p>
+              {t("calculator.distance")}: {result.distance} км
+            </p>
+            <p>
+              {t("calculator.tariff")}: {result.tariff} ₽/км
+            </p>
+            <p className={s.total}>
+              {t("calculator.total")}: {parseFloat(result.price).toFixed(2)} ₽
+            </p>
+          </div>
+        )}
+        <p className={s.warn}>{t("calculator.disclaimer")}</p>
       </div>
     </div>
   );

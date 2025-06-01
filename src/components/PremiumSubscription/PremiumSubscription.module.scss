@@ -1,23 +1,32 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 24px 100px 24px;
+
   overflow: scroll;
-  height: 90vh
+  height: calc(100vh - 200px);
+  padding-bottom: 100px;
 }
 
 .header {
   text-align: center;
   margin-bottom: 3rem;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  margin-top: 80px;
   gap: 10px;
+  background: #053576;
+  padding: 20px 0px;
+
   
 
   h1 {
-    font-size: 30px;
+    font-family: "Inter", sans-serif;
+font-weight: 600;
+font-size: 24px;
+line-height: 96%;
+letter-spacing: -0.02em;
+text-align: center;
+color: #fff;
     
     
   }
@@ -29,12 +38,17 @@
 }
 
 .tariffs {
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 
   h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    font-size: 2rem;
+    font-family: "Inter", sans-serif;
+font-weight: 550;
+font-size: 22px;
+line-height: 96%;
+letter-spacing: -0.02em;
+color: #2d2e2f;
+margin-left: 20px;
+margin-bottom: 20px;
     
   }
 }
@@ -42,7 +56,7 @@
 .tariffGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+  gap: 0.5rem;
 }
 
 .tariffCard {
@@ -104,9 +118,14 @@
 
 .additionalOptions {
   h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    font-size: 2rem;
+    font-family: "Inter", sans-serif;
+font-weight: 550;
+font-size: 22px;
+line-height: 96%;
+letter-spacing: -0.02em;
+color: #2d2e2f;
+margin-left: 20px;
+margin-bottom: 20px;
     
   }
 }
@@ -114,7 +133,7 @@
 .optionsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
+
 }
 
 .optionCard {
@@ -180,4 +199,105 @@
   &:hover {
     background-color: #45a049;
   }
+}
+
+.singleTariffCard {
+  width: 100%;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 0 55px rgba(37, 52, 73, 0.05);
+  padding: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.tariffName {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d2e2f;
+}
+
+.tariffPrice {
+  font-family: "Inter", sans-serif;
+font-weight: 600;
+font-size: 24px;
+line-height: 96%;
+letter-spacing: -0.02em;
+text-align: right;
+color: #2d2e2f;
+}
+
+.durationRow {
+  display: flex;
+  align-items: center;
+  color: #8c8c8c;
+  font-size: 16px;
+  gap: 8px;
+}
+
+.calendarIcon {
+  width: 18px;
+  height: 18px;
+  background: url('data:image/svg+xml;utf8,<svg fill="%238c8c8c" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7zm12 18H5V8h14v12z"/></svg>') no-repeat center center;
+  display: inline-block;
+}
+
+.limit {
+  color: #8c8c8c;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.rightBlock {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.rubTon {
+  font-family: "Inter", sans-serif;
+font-weight: 700;
+font-size: 9px;
+letter-spacing: -0.02em;
+color: #d97536;
+}
+
+.payLink {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 96%;
+  letter-spacing: -0.02em;
+  color: #356dbb;
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.featureItem {
+  font-family: "Inter", sans-serif;
+font-weight: 500;
+font-size: 12px;
+line-height: 96%;
+letter-spacing: -0.02em;
+color: #2d2e2f;
+opacity: 0.6;
+width: 200px;
 } 
