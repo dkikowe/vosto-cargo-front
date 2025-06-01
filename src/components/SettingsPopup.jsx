@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import s from "./SettingsPopup.module.sass";
 import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const SettingsPopup = ({
   onClose,
@@ -12,6 +13,7 @@ const SettingsPopup = ({
   toggleTheme,
   currentLang,
 }) => {
+  const navigate = useNavigate();
   const startY = useRef(null);
   const sheetRef = useRef(null);
   const [translateY, setTranslateY] = useState(0);
@@ -68,14 +70,14 @@ const SettingsPopup = ({
 
         <div className={s.title}>{t("cabinet.settings") || "Настройки"}</div>
         <div className={s.settingsList}>
-          <div className={s.settingsItem} onClick={onPrivacy}>
+          <div className={s.settingsItem} onClick={() => navigate("/conf")}>
             <img src="/images/design-icons-cab/conf.svg" alt="" />
             <span className={s.settingsItemLabel}>
               {t("cabinet.privacy") || "Конфиденциальность"}
             </span>
             <ChevronRight className={s.settingsItemArrow} />
           </div>
-          <div className={s.settingsItem} onClick={onLanguage}>
+          <div className={s.settingsItem} onClick={() => navigate("/lang")}>
             <img src="/images/design-icons-cab/lang.svg" alt="" />
             <span className={s.settingsItemLabel}>
               {t("cabinet.changeLang") || "Язык"}

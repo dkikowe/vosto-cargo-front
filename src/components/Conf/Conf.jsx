@@ -13,25 +13,26 @@ export default function Conf() {
 
   const containerStyle = {
     backgroundColor: isDark ? "#121212" : "#fff",
-    color: isDark ? "#fff" : "#000",
-  };
-
-  const headerStyle = {
-    display: "flex",
-    alignItems: "center",
   };
 
   return (
     <div className={s.container} style={containerStyle}>
-      <div className={s.header} style={headerStyle}>
+      <div className={s.header}>
         <ChevronLeft
           onClick={() => navigate("/menu")}
-          style={{ cursor: "pointer", color: isDark ? "#fff" : "#000" }}
+          style={{ cursor: "pointer", color: isDark ? "#fff" : "#fff" }}
         />
         <h2 className={s.title}>{t("conf.title")}</h2>
       </div>
 
-      <p style={{ whiteSpace: "pre-line", lineHeight: "1.6" }}>
+      <p
+        style={{
+          whiteSpace: "pre-line",
+          lineHeight: "1.6",
+          color: isDark ? "#fff" : "#000",
+          padding: "0px 20px",
+        }}
+      >
         {t("conf.text")}
       </p>
     </div>

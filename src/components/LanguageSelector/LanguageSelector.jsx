@@ -3,8 +3,11 @@ import styles from "./LanguageSelector.module.scss";
 import { useTranslation } from "react-i18next";
 import axios from "../../axios";
 import { ThemeContext } from "../../context/ThemeContext";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const LanguageSelector = () => {
+  const navigate = useNavigate();
   const { i18n, t } = useTranslation();
   const userId = localStorage.getItem("id");
   const { theme } = useContext(ThemeContext);
@@ -67,9 +70,13 @@ const LanguageSelector = () => {
 
   return (
     <div className={styles.container} style={{ backgroundColor: background }}>
-      <h2 className={styles.title} style={{ color: textColor }}>
-        {t("languageSelector.chooseLanguage")}
-      </h2>
+      <div className={styles.header}>
+        <ChevronLeft
+          onClick={() => navigate("/menu")}
+          style={{ cursor: "pointer", color: isDarkMode ? "#fff" : "#fff" }}
+        />
+        <h2 className={styles.title}>{t("languageSelector.chooseLanguage")}</h2>
+      </div>
       <div
         className={styles.languagesGrid}
         style={{ backgroundColor: background }}
@@ -77,7 +84,6 @@ const LanguageSelector = () => {
         {languages.map((language) => (
           <div
             key={language.code}
-            style={{ backgroundColor: bgFor }}
             className={`${styles.languageCard} ${
               language.code === normalizeLang(currentLang)
                 ? styles.selected
@@ -95,6 +101,11 @@ const LanguageSelector = () => {
               <span className={styles.nativeName} style={{ color: textColor }}>
                 {language.nativeName}
               </span>
+            </div>
+            <div className={styles.radio}>
+              {language.code === normalizeLang(currentLang) && (
+                <div className={styles.radioInner} />
+              )}
             </div>
           </div>
         ))}
