@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import s from "./SettingsPopup.module.sass";
 import { ChevronRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 const SettingsPopup = ({
   onClose,
@@ -13,45 +12,58 @@ const SettingsPopup = ({
   toggleTheme,
   currentLang,
 }) => {
-  // Для свайпа вниз
   const startY = useRef(null);
-  const threshold = 60; // px
-  const [closing, setClosing] = useState(false);
+  const sheetRef = useRef(null);
+  const [translateY, setTranslateY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const threshold = 100;
 
   const handleTouchStart = (e) => {
     startY.current = e.touches[0].clientY;
-  };
-  const handleTouchMove = (e) => {
-    if (startY.current !== null) {
-      const deltaY = e.touches[0].clientY - startY.current;
-      if (deltaY > threshold) {
-        handleClose();
-        startY.current = null;
-      }
-    }
-  };
-  const handleTouchEnd = () => {
-    startY.current = null;
+    setIsDragging(true);
   };
 
-  // Плавное закрытие
-  const handleClose = () => {
-    setClosing(true);
-    setTimeout(() => {
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    const deltaY = e.touches[0].clientY - startY.current;
+    if (deltaY > 0) {
+      setTranslateY(deltaY);
+      sheetRef.current.style.transform = `translateY(${deltaY}px)`;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (translateY > threshold) {
+      sheetRef.current.classList.add(s.closing);
+    } else {
+      sheetRef.current.style.transition = "transform 0.3s";
+      sheetRef.current.style.transform = "translateY(0)";
+      setTimeout(() => {
+        sheetRef.current.style.transition = "";
+      }, 300);
+    }
+    setTranslateY(0);
+  };
+
+  const handleAnimationEnd = () => {
+    if (sheetRef.current.classList.contains(s.closing)) {
       onClose();
-      setClosing(false);
-    }, 300); // длительность анимации
+    }
   };
 
   return (
     <div
-      className={`${s.overlay} ${theme === "dark" ? s.dark : s.light}`}
+      className={`${s.overlay} ${theme === "dark" ? s.dark : ""}`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      style={{ pointerEvents: closing ? "none" : "auto" }}
     >
-      <div className={s.bottomSheetPopup + (closing ? " closing" : "")}>
+      <div
+        ref={sheetRef}
+        className={s.bottomSheetPopup}
+        onAnimationEnd={handleAnimationEnd}
+      >
         <div className={s.handle}></div>
 
         <div className={s.title}>{t("cabinet.settings") || "Настройки"}</div>

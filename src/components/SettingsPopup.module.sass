@@ -9,7 +9,6 @@
     align-items: flex-end
     justify-content: center
     z-index: 1000
-    transition: background 0.3s
 
 .bottomSheetPopup
     background-color: #fff
@@ -23,21 +22,13 @@
     gap: 16px
     padding: 0 20px 24px 20px
     position: relative
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)
-    will-change: transform
+    transform: translateY(0)
+    transition: transform 0.3s ease
 
-.bottomSheetPopup.closing
-    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards
-
-@keyframes slideUp
-    from
-        transform: translateY(100%)
-    to
-        transform: translateY(0)
+.closing
+    animation: slideDown 0.3s ease forwards
 
 @keyframes slideDown
-    from
-        transform: translateY(0)
     to
         transform: translateY(100%)
 
@@ -48,25 +39,12 @@
     border-radius: 3px
     margin: 12px auto 8px auto
 
-.closeBtn
-    background: none
-    border: none
-    font-size: 28px
-    position: absolute
-    top: 18px
-    right: 18px
-    cursor: pointer
-    color: #888
-    z-index: 2
-
 .title
     font-size: 22px
     font-weight: 700
-    margin-bottom: 8px
+    margin: 0 0 16px 0
     text-align: center
     color: #222
-    margin-top: 0
-    margin-bottom: 16px
 
 .settingsList
     display: flex
@@ -80,9 +58,6 @@
     padding: 12px 0
     cursor: pointer
 
-.settingsItem:last-child
-    cursor: default
-
 .settingsItemLabel
     flex: 1
 
@@ -94,19 +69,9 @@
     color: #888
     font-size: 18px
 
-// Для темной темы
-.dark
-    .bottomSheetPopup
-        background-color: #1e1e1e
-        color: #fff
-    .title
-        color: #fff
-    .settingsItemValue
-        color: #bbb
-    .settingsItemArrow
-        color: #bbb
-    .handle
-        background: #444
+.settingsItemToggle
+    display: flex
+    align-items: center
 
 .switch
     position: relative
@@ -141,3 +106,15 @@ input:checked + .slider
 
 input:checked + .slider::before
     transform: translateX(18px)
+
+.dark
+    .bottomSheetPopup
+        background-color: #1e1e1e
+        color: #fff
+    .title
+        color: #fff
+    .settingsItemValue,
+    .settingsItemArrow
+        color: #bbb
+    .handle
+        background: #444
