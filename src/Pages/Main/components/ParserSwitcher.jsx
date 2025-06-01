@@ -73,13 +73,13 @@ export const Card = ({ data }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const cardStyle = {
-    backgroundColor: isDark ? "#fff" : "#fff",
-    color: isDark ? "#000" : "#000",
-    borderRadius: 16,
-    boxShadow: "0px 0px 55px rgba(37, 52, 73, 0.05)",
-    marginBottom: 16,
-    padding: 0,
-    border: "none",
+    // backgroundColor: isDark ? "#fff" : "#fff",
+    // color: isDark ? "#000" : "#000",
+    // borderRadius: 16,
+    // boxShadow: "0px 0px 55px rgba(37, 52, 73, 0.05)",
+    // marginBottom: 16,
+    // padding: 0,
+    // border: "none"
   };
 
   useEffect(() => {
@@ -210,151 +210,39 @@ export const Card = ({ data }) => {
   // -------------------- CARGO --------------------
   if (isCargo) {
     return (
-      <div className={s.card} style={cardStyle}>
-        <div
-          className={s.cardHeader}
-          style={{
-            borderRadius: 16,
-            padding: 24,
-            paddingBottom: showDetails ? 0 : 24,
-          }}
-        >
+      <div className={`${s.card} ${s.cargoCard}`}>
+        <div className={s.cardHeaderCargo}>
           {data.orderNumber && (
-            <div style={{ fontSize: 12, color: "#7A7A7A", marginBottom: 8 }}>
-              груз №{data.orderNumber}
-            </div>
+            <div className={s.cardOrderNumber}>груз №{data.orderNumber}</div>
           )}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <h3 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>
+          <div className={s.cardTitleRow}>
+            <h1 className={s.cardTitle}>
               {data.from} — {data.to}
-            </h3>
-            <div style={{ marginLeft: 8 }}>
-              {/* иконка коробки */}
-              <svg
-                width="24"
-                height="24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3.75 7.5 12 12.25l8.25-4.75M12 21.5V12.25"
-                  stroke="#053576"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M21.5 8.25v7.5a2.25 2.25 0 0 1-1.125 1.95l-6.375 3.675a2.25 2.25 0 0 1-2.25 0l-6.375-3.675A2.25 2.25 0 0 1 2.5 15.75v-7.5A2.25 2.25 0 0 1 3.625 6.3l6.375-3.675a2.25 2.25 0 0 1 2.25 0l6.375 3.675A2.25 2.25 0 0 1 21.5 8.25Z"
-                  stroke="#053576"
-                  strokeWidth="1.5"
-                  strokeLinejoin="round"
-                />
-              </svg>
+            </h1>
+            <div className={s.cardBoxIcon}>
+              <img src="/images/design-icons-main/cargo.svg" alt="" />
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginTop: 8,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: 15,
-                color: "#353535",
-              }}
-            >
-              <svg
-                width="16"
-                height="16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Z"
-                  stroke="#353535"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M8 4.5v4l2.5 2.5"
-                  stroke="#353535"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span style={{ marginLeft: 6 }}>{data.ready}</span>
+          <div className={s.cardInfoRow}>
+            <div className={s.cardDate}>
+              <img src="/images/design-icons-main/date.svg" alt="" />
+              <span>{data.ready}</span>
             </div>
             {data.rate && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  fontSize: 15,
-                  color: "#353535",
-                }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Z"
-                    stroke="#353535"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M4.5 8h7"
-                    stroke="#353535"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <span style={{ marginLeft: 6 }}>{data.rate}</span>
+              <div className={s.cardRate}>
+                <img src="/images/design-icons-main/coins.svg" alt="" />
+                <span>{data.rate}р</span>
               </div>
             )}
           </div>
         </div>
-        {/* Кнопка подробнее/скрыть детали */}
-        <div style={{ borderTop: "1px solid #EAEAEA", margin: "0 0 0 0" }}>
+        <div className={s.cardDetailsToggle}>
           <button
-            style={{
-              width: "100%",
-              background: "none",
-              border: "none",
-              color: "#053576",
-              fontWeight: 600,
-              fontSize: 18,
-              padding: "18px 0",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              outline: "none",
-              borderRadius: showDetails ? "0 0 16px 16px" : "0 0 16px 16px",
-              transition: "background 0.2s",
-            }}
+            className={s.cardDetailsBtn}
             onClick={() => setShowDetails((v) => !v)}
           >
             <span>{showDetails ? "Скрыть детали" : "Подробнее о заявке"}</span>
-            <span
-              style={{
-                marginLeft: 8,
-                transform: showDetails ? "rotate(180deg)" : "none",
-                transition: "transform 0.2s",
-              }}
-            >
+            <span className={showDetails ? s.cardArrowOpen : s.cardArrow}>
               <svg
                 width="24"
                 height="24"
@@ -372,134 +260,61 @@ export const Card = ({ data }) => {
             </span>
           </button>
         </div>
-        {/* Детали заявки */}
         {showDetails && (
-          <div
-            style={{
-              padding: 24,
-              paddingTop: 0,
-              borderRadius: "0 0 16px 16px",
-              background: "#fff",
-            }}
-          >
-            <div
-              style={{
-                fontWeight: 600,
-                fontSize: 16,
-                marginBottom: 8,
-                color: "#222",
-              }}
-            >
-              Заказчик
-            </div>
-            <div style={{ fontWeight: 700, color: "#053576", fontSize: 16 }}>
-              {data.customerName || "—"}
-            </div>
+          <div className={s.cardDetailsContent}>
+            <div className={s.cardCustomerLabel}>Заказчик</div>
+            <div className={s.cardCustomer}>{data.customerName || "—"}</div>
             {data.telefon && (
-              <div style={{ margin: "8px 0" }}>
-                <a
-                  href={`tel:${data.telefon}`}
-                  style={{
-                    color: "#053576",
-                    textDecoration: "none",
-                    fontWeight: 500,
-                  }}
-                >
-                  {data.telefon}
-                </a>
+              <div className={s.cardPhone}>
+                <a href={`tel:${data.telefon}`}>{data.telefon}</a>
               </div>
             )}
-            <div style={{ margin: "12px 0 0 0", color: "#353535" }}>
-              <div style={{ marginBottom: 4 }}>
-                <b>Маршрут:</b> {data.from} — {data.to}
+            <div className={s.cardRouteBlock}>
+              <div className={s.cardRouteBlockTitle}>
+                <img src="/images/design-icons-main/place.svg" alt="" />
+                <span>{data.from}</span>
+              </div>
+              <img src="/images/design-icons-main/between.svg" alt="" />
+              <div className={s.cardRouteBlockTitle}>
+                <img src="/images/design-icons-main/place.svg" alt="" />
+                <span>{data.to}</span>
               </div>
               {mapLink && (
                 <a
                   href={mapLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{
-                    color: "#7D97B8",
-                    fontSize: 14,
-                    textDecoration: "underline",
-                  }}
+                  className={s.cardMapLink}
                 >
                   Показать маршрут на карте
                 </a>
               )}
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 8,
-                marginTop: 16,
-              }}
-            >
+            <div className={s.cardTagsRow}>
               {data.cargo && (
-                <div
-                  style={{
-                    background: "#F5F7FA",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    fontSize: 14,
-                  }}
-                >
+                <div className={s.cardTag}>
+                  <img
+                    src="/images/design-icons-main/cargo-detail.svg"
+                    alt=""
+                  />
                   {data.cargo}
                 </div>
               )}
               {data.weight && (
-                <div
-                  style={{
-                    background: "#F5F7FA",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    fontSize: 14,
-                  }}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    fill="none"
-                    style={{ marginRight: 4, verticalAlign: "middle" }}
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8 1.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13Z"
-                      stroke="#353535"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M4.5 8h7"
-                      stroke="#353535"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  {data.weight}
+                <div className={s.cardTag}>
+                  <img src="/images/design-icons-main/baggage.svg" alt="" />
+                  {data.weight} т
                 </div>
               )}
               {data.volume && (
-                <div
-                  style={{
-                    background: "#F5F7FA",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    fontSize: 14,
-                  }}
-                >
-                  {data.volume}
+                <div className={s.cardTag}>
+                  <img src="/images/design-icons-main/expand.svg" alt="" />
+                  {data.volume} м³
                 </div>
               )}
               {data.vehicle && (
-                <div
-                  style={{
-                    background: "#F5F7FA",
-                    borderRadius: 8,
-                    padding: "6px 12px",
-                    fontSize: 14,
-                  }}
-                >
+                <div className={s.cardTag}>
+                  <img src="/images/design-icons-main/gruzocar.svg" alt="" />
                   {data.vehicle}
                 </div>
               )}

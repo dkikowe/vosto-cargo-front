@@ -306,181 +306,171 @@ export default function Cabinet() {
 
   return (
     <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
-      <div className={s.profileContainer}>
-        <div className={s.profile}>
-          <label htmlFor="image" className="w-[97px] relative">
-            {selectedFile ? (
-              <div className={s.overlay}>
-                <div className={s.editorContainer}>
-                  <AvatarEditor
-                    ref={(ref) => setEditor(ref)}
-                    image={selectedFile}
-                    width={97}
-                    height={97}
-                    border={50}
-                    borderRadius={50}
-                    scale={scale}
-                    className={s.divAvatar}
-                  />
-                  <input
-                    type="range"
-                    min="1"
-                    max="3"
-                    step="0.01"
-                    value={scale}
-                    onChange={(e) => setScale(parseFloat(e.target.value))}
-                  />
-                  <button onClick={handleSaveAvatar} className={s.saveButton}>
-                    {t("cabinet.saveAvatar")}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <img
-                  src={user?.avatar || "/images/nav-icons/user.svg"}
-                  className={`${s.profileIcon} ${
-                    avatarLoaded ? "opacity-100" : "opacity-0"
-                  }`}
-                  alt=""
-                  onLoad={() => setAvatarLoaded(true)}
-                />
-                <img
-                  className="absolute right-[30px] bottom-0"
-                  src="/images/cabinet-icons/photo.svg"
-                  alt=""
-                />
-                <input
-                  type="file"
-                  hidden
-                  id="image"
-                  onChange={handleFileSelection}
-                  accept=".png, .jpg"
-                />
-              </>
-            )}
-          </label>
-          <div className={s.desc}>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={s.name}
-              onBlur={saveName}
-            />
-            <div className={s.rating}>
-              <Star height={12} width={12} />
-              <p className={s.ratingNum}>{rating === 5 ? "5.0" : rating}</p>
+      <div className={s.profileWrapper}>
+        <div className={s.profileRating}>
+          <img src="/images/design-icons-cab/star.svg" alt="" />
+          <p>{rating === 5 ? "5.0" : rating}</p>
+        </div>
+        <div className={s.profileContainer}>
+          <div className={s.profile}>
+            <div className={s.photo}>
+              <label htmlFor="image" className="w-[97px] relative">
+                {selectedFile ? (
+                  <div className={s.overlay}>
+                    <div className={s.editorContainer}>
+                      <AvatarEditor
+                        ref={(ref) => setEditor(ref)}
+                        image={selectedFile}
+                        width={97}
+                        height={97}
+                        border={50}
+                        borderRadius={50}
+                        scale={scale}
+                        className={s.divAvatar}
+                      />
+                      <input
+                        type="range"
+                        min="1"
+                        max="3"
+                        step="0.01"
+                        value={scale}
+                        onChange={(e) => setScale(parseFloat(e.target.value))}
+                      />
+                      <button
+                        onClick={handleSaveAvatar}
+                        className={s.saveButton}
+                      >
+                        {t("cabinet.saveAvatar")}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <img
+                      src={user?.avatar || "/images/nav-icons/user.svg"}
+                      className={`${s.profileIcon} ${
+                        avatarLoaded
+                          ? "opacity-100 w-full "
+                          : "opacity-0 w-full"
+                      }`}
+                      alt=""
+                      onLoad={() => setAvatarLoaded(true)}
+                    />
+                    <img
+                      className="absolute right-[0px] h-[20px] w-[20px] bottom-0"
+                      src="/images/design-icons-cab/photos.svg"
+                      alt=""
+                    />
+                    <input
+                      type="file"
+                      hidden
+                      id="image"
+                      onChange={handleFileSelection}
+                      accept=".png, .jpg"
+                    />
+                  </>
+                )}
+              </label>
             </div>
-            <RoleSelect userId={id} />
+            <div className={s.desc}>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={s.name}
+                onBlur={saveName}
+              />
+
+              <RoleSelect userId={id} />
+            </div>
+          </div>
+          <div className={s.profileBottom}>
             <p className={s.idTelega}>
               {t("cabinet.telegramId")}: {idTelega}
             </p>
+            <div className={s.actions}>
+              <div className={s.action}>
+                <img
+                  src="/images/design-icons-cab/bell.svg"
+                  className="w-[18px] h-[18px]"
+                  alt=""
+                />
+              </div>
+              <div className={s.action}>
+                <img
+                  src="/images/design-icons-cab/settings.svg"
+                  className="w-[18px] h-[18px]"
+                  alt=""
+                />
+              </div>
+            </div>
           </div>
         </div>
-        <hr />
-        <div className={s.company} onClick={() => handleNavigate("company")}>
-          <div className={s.icon}>
-            <Building2 />
-            <p className={s.companyText}>
-              {company && company.name ? company.name : t("cabinet.addCompany")}
+      </div>
+
+      <div className={s.company}>
+        <div className={s.companyTop}>
+          <img src="/images/design-icons-cab/company.svg" alt="" />
+          <div className={s.companyName}>
+            <p className={s.name}>Ваша компания</p>
+            <p className={s.comp}>
+              {company && company.name ? company.name : "Пока пусто"}
             </p>
           </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
+        </div>
+        <div className={s.companyBottom}>
+          <p className={s.companyBottomButton}>
+            {company && company.name
+              ? "Изменить компанию"
+              : t("cabinet.addCompany")}
+            <div className={s.plusik}>
+              <p>+</p>
+            </div>
+          </p>
         </div>
       </div>
 
-      <div className={s.paymentContainer}>
-        <div className={s.support} onClick={() => setShowCalculator(true)}>
-          <div className={s.iconText}>
-            <Calculator />
-            <p>{t("cabinet.calculator")}</p>
-          </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
+      <div className={s.geoToggle}>
+        <div className={s.geoToggleLeft}>
+          <svg
+            className={s.geoToggleIcon}
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="#2563eb"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 21s-6-5.686-6-10a6 6 0 0112 0c0 4.314-6 10-6 10z"></path>
+            <circle cx="12" cy="11" r="2"></circle>
+          </svg>
+          <span className={s.geoToggleLabel}>Геопозиция</span>
+        </div>
+        <div className={s.geoToggleSwitch}>
+          <div className={s.geoToggleThumb} />
         </div>
       </div>
 
-      <div className={s.paymentContainer}>
-        <div className={s.premium} onClick={() => handleNavigate("prem")}>
-          <div className={s.iconText}>
-            <Star />
-            <p>{t("cabinet.subscription")}</p>
-          </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
+      <div className={s.otherBlock}>
+        <div className={s.other}>
+          <img src="/images/design-icons-cab/calculator.svg" alt="" />
+          <p>{t("cabinet.calculator")}</p>
         </div>
-        <hr />
-        <div className={s.support} onClick={() => handleNavigate("support")}>
-          <div className={s.iconText}>
-            <Headset />
-            <p>{t("cabinet.support")}</p>
-          </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
+        <div className={s.divider}></div>
+        <div className={s.other}>
+          <img
+            src="/images/design-icons-cab/prem.svg"
+            onClick={() => navigate("/prem")}
+            alt=""
+          />
+          <p>{t("cabinet.subscription")}</p>
         </div>
-      </div>
-
-      <div className={s.themeChanger}>
-        <div className={s.change}>
-          <div className={s.iconText}>
-            <SunMoon />
-            <p>
-              {theme === "dark"
-                ? t("cabinet.darkTheme")
-                : t("cabinet.lightTheme")}
-            </p>
-          </div>
-          <div className={s.themeToggle}>
-            <label className={s.switch}>
-              <input
-                type="checkbox"
-                checked={theme === "dark"}
-                onChange={toggleTheme}
-              />
-              <span className={s.slider}></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div className={s.paymentContainer}>
-        <div
-          className={s.support}
-          onClick={() => handleNavigate("notification")}
-        >
-          <div className={s.iconText}>
-            <Bell />
-            <p>{t("cabinet.notifications")}</p>
-          </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
-        </div>
-        <hr />
-        <div className={s.support} onClick={() => handleNavigate("conf")}>
-          <div className={s.iconText}>
-            <LockKeyhole />
-            <p>{t("cabinet.privacy")}</p>
-          </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
-        </div>
-      </div>
-      <div className={s.paymentContainer}>
-        <div className={s.premium} onClick={() => handleNavigate("lang")}>
-          <div className={s.iconText}>
-            <Languages />
-            <p>{t("cabinet.changeLang")}</p>
-          </div>
-          <div className={s.str}>
-            <ChevronRight />
-          </div>
+        <div className={s.divider}></div>
+        <div className={s.other}>
+          <img src="/images/design-icons-cab/support.svg" alt="" />
+          <p>{t("cabinet.support")}</p>
         </div>
       </div>
 

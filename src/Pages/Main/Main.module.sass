@@ -1,4 +1,3 @@
-
 .parserSwitcher
     height: 65vh
     overflow-y: scroll
@@ -26,7 +25,7 @@
     border-radius: 8px
     padding: 10px
     width: 95%
-    height: 55px
+    height: 45px
     background: #d97536
     font-family: "Inter", sans-serif
     font-weight: 600
@@ -224,7 +223,6 @@
 .resultContainer
     background: white
     border-radius: 8px
-    padding: 20px
 
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)
     margin-bottom: 100px
@@ -263,6 +261,7 @@
     margin-bottom: 30px
 
 .cardsGrid
+    width: 100%
     display: grid
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))
     gap: 20px
@@ -275,15 +274,20 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)
     padding: 20px
     transition: transform 0.2s ease
+    width: 100%
     &:hover
         transform: translateY(-5px)
 
 .cardHeader
     margin-bottom: 15px
     h3
-        font-size: 18px
-        font-weight: 600
-        margin: 0 0 5px 0
+        font-family: "Inter", sans-serif
+        font-weight: 500
+        font-size: 16px
+        line-height: 96%
+        letter-spacing: -0.02em
+        color: #2d2e2f
+
     .date
         color: #666
         font-size: 14px
@@ -544,3 +548,183 @@ p
 .switchBtnActive
     transform: rotate(360deg)
     transition: transform 0.25s cubic-bezier(0.4,0.2,0.2,1)
+
+.cargoCard
+    background: #fff
+    color: #000
+    border-radius: 16px
+    box-shadow: 0px 0px 55px rgba(37, 52, 73, 0.05)
+    margin-bottom: 16px
+    padding: 0
+    border: none
+
+.cardHeaderCargo
+    border-radius: 16px
+    padding: 18px
+    padding-bottom: 24px
+
+.cardOrderNumber
+    font-size: 12px
+    color: #7A7A7A
+    margin-bottom: 8px
+
+.cardTitleRow
+    display: flex
+    align-items: center
+    justify-content: space-between
+
+.cardTitle
+    font-family: "Inter", sans-serif
+    font-weight: 600
+    font-size: 18px
+    line-height: 96%
+    letter-spacing: -0.02em
+    color: #2d2e2f
+
+.cardBoxIcon
+    margin-left: 8px
+
+.cardInfoRow
+    display: flex
+
+    flex-direction: column
+
+    margin-top: 8px
+
+.cardDate
+    display: flex
+    align-items: center
+    gap: 5px
+    font-size: 15px
+    color: #353535
+
+.cardRouteBlockTitle
+    display: flex
+    align-items: center
+    gap: 5px
+    font-family: "Inter", sans-serif
+    font-weight: 500
+    font-size: 14px
+    line-height: 96%
+    letter-spacing: -0.02em
+    color: #2d2e2f
+
+.cardRate
+    gap: 5px
+    display: flex
+    align-items: center
+    font-size: 15px
+    color: #353535
+
+.cardDetailsToggle
+    border-top: 1px solid #EAEAEA
+    margin: 0
+
+.cardDetailsBtn
+    width: 100%
+    background: none
+    border: none
+
+    padding: 18px
+    cursor: pointer
+    display: flex
+    align-items: center
+    justify-content: space-between
+    outline: none
+    border-radius: 0 0 16px 16px
+    transition: background 0.2s
+    font-family: "Inter", sans-serif
+    font-weight: 600
+    font-size: 16px
+    line-height: 96%
+    letter-spacing: -0.02em
+    color: #356dbb
+
+.cardArrow
+    margin-left: 8px
+    transition: transform 0.2s
+
+.cardArrowOpen
+    margin-left: 8px
+    transform: rotate(180deg)
+    transition: transform 0.2s
+
+.cardDetailsContent
+    padding: 24px
+    padding-top: 0
+    border-radius: 0 0 16px 16px
+    background: #fff
+
+.cardCustomerLabel
+    font-weight: 600
+    font-size: 16px
+    margin-bottom: 8px
+    color: #222
+
+.cardCustomer
+    font-weight: 700
+    color: #053576
+    font-size: 16px
+
+.cardPhone
+    margin: 8px 0
+    a
+        color: #053576
+        text-decoration: none
+        font-weight: 500
+
+.cardRouteBlock
+    margin: 12px 0 0 0
+    color: #353535
+    div
+        margin-bottom: 4px
+
+.cardMapLink
+    font-family: "Inter", sans-serif
+    font-weight: 500
+    font-size: 12px
+    line-height: 96%
+    letter-spacing: -0.02em
+    text-decoration: underline
+    text-decoration-skip-ink: none
+    color: #2d2e2f
+    opacity: 0.6
+    margin-left: 20px
+
+.cardTagsRow
+    display: flex
+    flex-wrap: wrap
+    gap: 8px
+    margin-top: 16px
+
+.cardTag
+
+    border-radius: 4px
+    padding: 6px 8px
+    font-family: "Inter", sans-serif
+    font-weight: 500
+    font-size: 14px
+    line-height: 96%
+    letter-spacing: -0.02em
+    color: #2d2e2f
+    background: #f4f4f4
+    display: flex
+    justify-content: center
+    align-items: center
+    gap: 4px
+    img
+        width: 14px
+        height: 14px
+
+.profileBottom
+    display: flex
+    width: 100%
+    justify-content: space-between
+    align-items: center
+    padding: 0 10px
+    .idTelega
+        font-family: "Inter", sans-serif
+        font-weight: 500
+        font-size: 12px
+        line-height: 96%
+        letter-spacing: -0.02em

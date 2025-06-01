@@ -4,8 +4,8 @@
     background: #f5f5f5 // светлая тема по умолчанию
     gap: 20px
     align-items: center
-    padding-top: 50px
-    height: calc(100vh - 90px)
+
+    height: calc(100vh - 180px)
     transition: background 0.3s ease, color 0.3s ease
     overflow-y: scroll
 
@@ -15,6 +15,54 @@
         .profileContainer
             background: #1e1e1e
             transition: background 0.3s ease
+
+.profileWrapper
+
+    width: 100%
+    display: flex
+    align-items: center
+    justify-content: center
+    background: #053576
+    padding: 20px 5px
+    position: relative
+    .profileRating
+        position: absolute
+        display: flex
+        align-items: center
+        justify-content: center
+        gap: 4px
+        top: 5%
+        right: 10%
+        background: #d97536
+        border-radius: 21px
+        padding: 4px 6px
+        width: 49px
+        height: 20px
+        p
+            margin: 0
+            font-family: "Inter", sans-serif
+            font-weight: 500
+            font-size: 14px
+            line-height: 96%
+            letter-spacing: -0.02em
+            text-align: center
+            color: #fff
+
+    .profileContainer
+        width: 90%
+        color: #ffffff
+        border-radius: 15px
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)
+        display: flex
+        flex-direction: column
+        justify-content: flex-start
+        align-items: center
+        gap: 10px
+        padding: 10px
+        transition: background 0.3s ease, color 0.3s ease
+
+        .dark &  // для темной темы, если контейнер находится внутри .dark
+            background: #1e1e1e
 
 .paymentContainer
     width: 90%
@@ -48,6 +96,47 @@
     align-items: center
     flex-direction: row
 
+.geoToggle
+    display: flex
+    justify-content: space-between
+    align-items: center
+    background: white
+    border-radius: 16px
+    padding: 30px 16px
+    width: 90%
+    margin: 0 auto
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05)
+    background: #fff
+
+    .geoToggleLeft
+        display: flex
+        align-items: center
+        gap: 10px
+
+    .geoToggleIcon
+        width: 20px
+        height: 20px
+        color: #2563eb
+
+    .geoToggleLabel
+        font-size: 16px
+        color: #1f2937
+
+    .geoToggleSwitch
+        width: 40px
+        height: 24px
+        background: #a3a3a3
+        border-radius: 9999px
+        display: flex
+        align-items: center
+        padding: 2px
+
+    .geoToggleThumb
+        width: 18px
+        height: 18px
+        background: white
+        border-radius: 50%
+
 .iconText
     display: flex
     flex-direction: row
@@ -74,22 +163,6 @@
     font-weight: 500
     margin-left: 30px
     font-size: 24px
-
-.profileContainer
-    width: 90%
-    height: 26%
-    border-radius: 15px
-    background: #ffffff
-    display: flex
-    flex-direction: column
-    justify-content: flex-start
-    align-items: center
-    gap: 10px
-    padding: 10px
-    transition: background 0.3s ease, color 0.3s ease
-
-    .dark &  // для темной темы, если контейнер находится внутри .dark
-        background: #1e1e1e
 
 .rating
     display: flex
@@ -155,16 +228,117 @@ input[type="range"]
     display: flex
     justify-content: left
     align-items: flex-start
-    width: 80vw
-    gap: 30px
+    width: 100%
+    gap: 20px
 
-.company
+.otherBlock
     display: flex
     flex-direction: row
     align-items: center
+    justify-content: center
+    width: 90%
+    margin-top: 0 auto
+    border-radius: 16px
+    border-radius: 16px
+    gap: 25px
+    padding: 24px 0px
+
+    background: #fff
+    .divider
+        border-radius: 8px
+        width: 1px
+        height: 65px
+        background: linear-gradient(180deg, rgba(234, 234, 234, 0.1) 0%, #eaeaea 50%, rgba(234, 234, 234, 0.1) 100%)
+    .other
+        display: flex
+        align-items: center
+        justify-content: center
+        gap: 10px
+        flex-direction: column
+        p
+            font-family: "Inter", sans-serif
+            font-weight: 500
+            font-size: 12px
+            line-height: 96%
+            letter-spacing: -0.02em
+            text-align: center
+            color: #2d2e2f
+
+.company
+    display: flex
+    flex-direction: column
+    align-items: center
     justify-content: space-between
     width: 90vw
+    border-radius: 16px
+
     padding: 10px
+    box-shadow: 0 0 55px -20px rgba(37, 52, 73, 0.05)
+    background: #fff
+    .companyTop
+        display: flex
+        align-items: center
+        justify-content: flex-start
+        gap: 10px
+        width: 100%
+        padding: 10px
+        .companyName
+            display: flex
+            flex-direction: column
+            align-items: flex-start
+            justify-content: center
+
+            .comp
+                font-family: "Inter", sans-serif
+                font-weight: 500
+                font-size: 14px
+                line-height: 96%
+                letter-spacing: -0.02em
+                color: #575859
+
+            .name
+                font-family: "Inter", sans-serif
+                font-weight: 600
+                font-size: 16px
+                line-height: 96%
+                letter-spacing: -0.02em
+                color: #2d2e2f
+.companyBottom
+    display: flex
+    align-items: center
+    justify-content: space-between
+    width: 100%
+    padding: 10px
+
+    .companyBottomButton
+        border-radius: 10px
+        height: 55px
+        width: 100%
+        background: #356dbb
+        font-family: "Inter", sans-serif
+        font-weight: 500
+        font-size: 16px
+        line-height: 96%
+        letter-spacing: -0.02em
+        color: #fff
+        display: flex
+        align-items: center
+        justify-content: space-between
+        padding: 20px
+        cursor: pointer
+        &:hover
+            background: #25549b
+        .plusik
+            margin-left: 20px
+            border-radius: 100px
+            width: 38px
+            height: 38px
+            background: rgba(255, 255, 255, 0.08)
+            font-weight: 500
+            font-size: 16px
+            display: flex
+            justify-content: center
+            align-items: center
 
 .icon
     display: flex
@@ -187,13 +361,18 @@ input[type="range"]
     font-size: 14px
 
 .idTelega
-    font-size: 14px
-    color: #696969
+    font-family: "Inter", sans-serif
+    font-weight: 500
+    font-size: 12px
+    line-height: 96%
+    letter-spacing: -0.02em
+    color: #fff
+    opacity: 0.6
+    text-align: left
 
 .profileIcon
     position: relative
-    width: 70px
-    height: 70px
+    width: 100%
     object-fit: cover
     border-radius: 50%
 
@@ -461,3 +640,30 @@ input
         background-color: #4f46e5
         &:hover
             background-color: #4338ca
+
+.profileBottom
+    display: flex
+    width: 100%
+    justify-content: space-between
+    align-items: center
+
+    .actions
+        display: flex
+        gap: 10px
+
+        .action
+            border-radius: 100px
+            width: 44px
+            height: 44px
+            display: flex
+            align-items: center
+            justify-content: center
+            background: rgba(255, 255, 255, 0.08)
+
+    .idTelega
+        padding-top: 20px
+        font-family: "Inter", sans-serif
+        font-weight: 500
+        font-size: 12px
+        line-height: 96%
+        letter-spacing: -0.02em
