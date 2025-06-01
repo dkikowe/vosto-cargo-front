@@ -1,0 +1,143 @@
+.overlay
+    position: fixed
+    top: 0
+    left: 0
+    width: 100vw
+    height: 100vh
+    background: rgba(0, 0, 0, 0.5)
+    display: flex
+    align-items: flex-end
+    justify-content: center
+    z-index: 1000
+    transition: background 0.3s
+
+.bottomSheetPopup
+    background-color: #fff
+    border-radius: 24px 24px 0 0
+    width: 100%
+    max-width: 480px
+    min-height: 180px
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1)
+    display: flex
+    flex-direction: column
+    gap: 16px
+    padding: 0 20px 24px 20px
+    position: relative
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+    will-change: transform
+
+.bottomSheetPopup.closing
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards
+
+@keyframes slideUp
+    from
+        transform: translateY(100%)
+    to
+        transform: translateY(0)
+
+@keyframes slideDown
+    from
+        transform: translateY(0)
+    to
+        transform: translateY(100%)
+
+.handle
+    width: 48px
+    height: 6px
+    background: #d1d5db
+    border-radius: 3px
+    margin: 12px auto 8px auto
+
+.closeBtn
+    background: none
+    border: none
+    font-size: 28px
+    position: absolute
+    top: 18px
+    right: 18px
+    cursor: pointer
+    color: #888
+    z-index: 2
+
+.title
+    font-size: 22px
+    font-weight: 700
+    margin-bottom: 8px
+    text-align: center
+    color: #222
+    margin-top: 0
+    margin-bottom: 16px
+
+.settingsList
+    display: flex
+    flex-direction: column
+    gap: 16px
+
+.settingsItem
+    display: flex
+    align-items: center
+    gap: 12px
+    padding: 12px 0
+    cursor: pointer
+
+.settingsItem:last-child
+    cursor: default
+
+.settingsItemLabel
+    flex: 1
+
+.settingsItemValue
+    color: #888
+    font-size: 16px
+
+.settingsItemArrow
+    color: #888
+    font-size: 18px
+
+// Для темной темы
+.dark
+    .bottomSheetPopup
+        background-color: #1e1e1e
+        color: #fff
+    .title
+        color: #fff
+    .settingsItemValue
+        color: #bbb
+    .settingsItemArrow
+        color: #bbb
+    .handle
+        background: #444
+
+.switch
+    position: relative
+    display: inline-block
+    width: 42px
+    height: 24px
+
+.slider
+    position: absolute
+    cursor: pointer
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: #ccc
+    transition: .4s
+    border-radius: 34px
+
+.slider::before
+    position: absolute
+    content: ""
+    height: 18px
+    width: 18px
+    left: 3px
+    bottom: 3px
+    background-color: white
+    transition: .4s
+    border-radius: 50%
+
+input:checked + .slider
+    background-color: #0080ff
+
+input:checked + .slider::before
+    transform: translateX(18px)

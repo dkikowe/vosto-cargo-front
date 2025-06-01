@@ -17,7 +17,8 @@
     "enterNewName": "Введите новое имя",
     "changeAvatar": "Изменить фото",
     "defaultName": "Ваше имя",
-    "changeLang":"Язык"
+    "changeLang":"Язык",
+    "settings":"Настройки"
   },
   "languageSelector":{
     "chooseLanguage": "Выберите язык"

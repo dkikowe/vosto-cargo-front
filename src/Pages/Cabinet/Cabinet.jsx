@@ -20,6 +20,7 @@ import RoleSelect from "../../components/RoleSelect/RoleSelect";
 import { useTranslation } from "react-i18next";
 import CalculatorPopup from "../../components/Calculator/Calculator";
 import SupportPopup from "../../components/Support";
+import SettingsPopup from "../../components/SettingsPopup";
 
 // ...импорты остаются без изменений...
 
@@ -44,6 +45,7 @@ export default function Cabinet() {
 
   const [showCalculator, setShowCalculator] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { t, i18n } = useTranslation();
@@ -242,7 +244,11 @@ export default function Cabinet() {
                   alt=""
                 />
               </div>
-              <div className={s.action}>
+              <div
+                className={s.action}
+                onClick={() => setShowSettings(true)}
+                style={{ cursor: "pointer" }}
+              >
                 <img
                   src="/images/design-icons-cab/settings.svg"
                   className="w-[18px] h-[18px]"
@@ -341,6 +347,22 @@ export default function Cabinet() {
           onClose={() => setShowSupport(false)}
           theme={theme}
           t={t}
+        />
+      )}
+      {showSettings && (
+        <SettingsPopup
+          onClose={() => setShowSettings(false)}
+          theme={theme}
+          t={t}
+          isDark={theme === "dark"}
+          toggleTheme={toggleTheme}
+          currentLang={i18n.language === "ru" ? "русский" : i18n.language}
+          onLanguage={() => {
+            /* тут можно открыть LanguageSelector */
+          }}
+          onPrivacy={() => {
+            /* тут можно открыть Privacy */
+          }}
         />
       )}
     </div>
