@@ -231,7 +231,7 @@ export const Card = ({ data }) => {
             {data.rate && (
               <div className={s.cardRate}>
                 <img src="/images/design-icons-main/coins.svg" alt="" />
-                <span>{data.rate}р</span>
+                <span>{data.rate}</span>
               </div>
             )}
           </div>
@@ -303,7 +303,7 @@ export const Card = ({ data }) => {
               {data.weight && (
                 <div className={s.cardTag}>
                   <img src="/images/design-icons-main/baggage.svg" alt="" />
-                  {data.weight} т
+                  {data.weight}
                 </div>
               )}
               {data.volume && (
@@ -327,95 +327,105 @@ export const Card = ({ data }) => {
 
   // -------------------- MACHINE --------------------
   return (
-    <div className={s.card} style={cardStyle}>
-      <div className={s.cardHeader}>
+    <div className={`${s.card} ${s.cargoCard}`}>
+      <div className={s.cardHeaderCargo}>
         {data.orderNumber && (
-          <h3>
-            {t("card.orderNumber")}: Nº{data.orderNumber}
-          </h3>
+          <div className={s.cardOrderNumber}>машина №{data.orderNumber}</div>
         )}
-        {(data.marka || data.tip) && (
-          <h3>
-            {data.marka} {data.tip}
-          </h3>
-        )}
-        {data.data_gotovnosti && (
-          <span className={s.date}>{data.data_gotovnosti}</span>
-        )}
+        <div className={s.cardTitleRow}>
+          <h1 className={s.cardTitle}>
+            {data.otkuda} — {data.kuda}
+          </h1>
+          <div className={s.cardBoxIcon}>
+            <img src="/images/design-icons-main/gruzocar.svg" alt="" />
+          </div>
+        </div>
+        <div className={s.cardInfoRow}>
+          <div className={s.cardDate}>
+            <img src="/images/design-icons-main/date.svg" alt="" />
+            <span>{data.data_gotovnosti}</span>
+          </div>
+        </div>
       </div>
-      <div className={s.cardBody}>
-        {data.kuzov && (
-          <div className={s.cardRow}>
-            <span className={s.label} style={cardStyle}>
-              {t("card.bodyType")}
-            </span>
-            <span>{data.kuzov}</span>
-          </div>
-        )}
-        {data.tip_zagruzki && (
-          <div className={s.cardRow}>
-            <span className={s.label} style={cardStyle}>
-              {t("card.loadingType")}
-            </span>
-            <span>{data.tip_zagruzki}</span>
-          </div>
-        )}
-        {data.gruzopodyomnost && (
-          <div className={s.cardRow}>
-            <span className={s.label} style={cardStyle}>
-              {t("card.tonnage")}
-            </span>
-            <span>{data.gruzopodyomnost}</span>
-          </div>
-        )}
-        {data.vmestimost && (
-          <div className={s.cardRow}>
-            <span className={s.label} style={cardStyle}>
-              {t("card.capacity")}
-            </span>
-            <span>{data.vmestimost}</span>
-          </div>
-        )}
-        {(data.otkuda || data.kuda) && (
-          <div className={s.cardRoute}>
-            {data.otkuda && (
-              <div>
-                <span className={s.label} style={cardStyle}>
-                  {t("card.from")}
-                </span>
-                <p>{data.otkuda}</p>
-              </div>
-            )}
-            {data.kuda && (
-              <div>
-                <span className={s.label} style={cardStyle}>
-                  {t("card.to")}
-                </span>
-                <p>{data.kuda}</p>
-              </div>
-            )}
-          </div>
-        )}
-        {(data.imya || data.firma || data.telefon) && (
-          <div className={s.cardContact}>
-            {!showContact ? (
-              <button className={s.contactButton} onClick={handleShowContact}>
-                {t("card.contactCarrier")}
-              </button>
-            ) : (
-              <div>
-                <span className={s.label} style={cardStyle}>
-                  {t("card.contact")}
-                </span>
-                {data.imya && <p>{data.imya}</p>}
-                {data.firma && <p>({data.firma})</p>}
-                {data.telefon && <p>Тел: {data.telefon}</p>}
-                {renderRatingSection()}
-              </div>
-            )}
-          </div>
-        )}
+      <div className={s.cardDetailsToggle}>
+        <button
+          className={s.cardDetailsBtn}
+          onClick={() => setShowDetails((v) => !v)}
+        >
+          <span>{showDetails ? "Скрыть детали" : "Подробнее о заявке"}</span>
+          <span className={showDetails ? s.cardArrowOpen : s.cardArrow}>
+            <svg
+              width="24"
+              height="24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 9l6 6 6-6"
+                stroke="#053576"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </button>
       </div>
+      {showDetails && (
+        <div className={s.cardDetailsContent}>
+          <div className={s.cardCustomerLabel}>Заказчик</div>
+          <div className={s.cardCustomer}>{data.imya || "—"}</div>
+          {data.firma && <div className={s.cardCustomer}>({data.firma})</div>}
+          {data.telefon && (
+            <div className={s.cardPhone}>
+              <a href={`tel:${data.telefon}`}>{data.telefon}</a>
+            </div>
+          )}
+          <div className={s.cardRouteBlock}>
+            <div className={s.cardRouteBlockTitle}>
+              <img src="/images/design-icons-main/place.svg" alt="" />
+              <span>{data.otkuda}</span>
+            </div>
+            <img src="/images/design-icons-main/between.svg" alt="" />
+            <div className={s.cardRouteBlockTitle}>
+              <img src="/images/design-icons-main/place.svg" alt="" />
+              <span>{data.kuda}</span>
+            </div>
+          </div>
+          <div className={s.cardTagsRow}>
+            {data.marka && data.tip && (
+              <div className={s.cardTag}>
+                <img src="/images/design-icons-main/gruzocar.svg" alt="" />
+                {data.marka} {data.tip}
+              </div>
+            )}
+            {data.kuzov && (
+              <div className={s.cardTag}>
+                <img src="/images/design-icons-main/cargo-detail.svg" alt="" />
+                {data.kuzov}
+              </div>
+            )}
+            {data.tip_zagruzki && (
+              <div className={s.cardTag}>
+                <img src="/images/design-icons-main/baggage.svg" alt="" />
+                {data.tip_zagruzki}
+              </div>
+            )}
+            {data.gruzopodyomnost && (
+              <div className={s.cardTag}>
+                <img src="/images/design-icons-main/expand.svg" alt="" />
+                {data.gruzopodyomnost} т
+              </div>
+            )}
+            {data.vmestimost && (
+              <div className={s.cardTag}>
+                <img src="/images/design-icons-main/expand.svg" alt="" />
+                {data.vmestimost} м³
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -423,6 +433,7 @@ export const Card = ({ data }) => {
 // ---------- Основной компонент ----------
 export const ParserSwitcher = () => {
   const { theme } = useContext(ThemeContext);
+  const isDark = theme === "dark";
   const { t } = useTranslation();
 
   const [currentType, setCurrentType] = useState("CargoOrder");
@@ -820,11 +831,8 @@ export const ParserSwitcher = () => {
   };
 
   return (
-    <div className={s.parserSwitcher}>
-      <div
-        className={s.header}
-        style={{ backgroundColor: theme === "dark" ? "#121212" : "#053576" }}
-      >
+    <div className={`${s.parserSwitcher} ${isDark ? s.dark : s.light}`}>
+      <div className={s.header}>
         <div className={s.switcher}>
           <div className={s.tab} onClick={() => handleTypeSwitch("CargoOrder")}>
             <svg

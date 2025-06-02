@@ -1,6 +1,6 @@
-.parserSwitcher
-    height: 65vh
-    overflow-y: scroll
+.container
+    height: calc(100vh - 220px)
+    overflow-y: hidden
 
 .header
     width: 100%
@@ -13,12 +13,14 @@
     justify-content: flex-start
     box-shadow: none
 
+    .dark &
+        background: #121212
+
 .switcher
     display: flex
     flex-direction: row
     gap: 20px
     margin-left: 20px
-
     margin-bottom: 12px
 
 .applyButton
@@ -35,15 +37,16 @@
     color: #fff
     margin: 0 auto
 
+    [data-theme="dark"] &
+    background: #d97536
+
 .tab, .tabActive
     display: flex
     align-items: center
     gap: 6px
-
     color: #8CA3C2
     cursor: pointer
     position: relative
-
     font-family: "Inter", sans-serif
     font-weight: 600
     font-size: 16px
@@ -88,6 +91,10 @@
     box-shadow: 0 2px 16px 0 rgba(0,0,0,0.04)
     overflow: hidden
 
+    .dark &
+        background: #1A1A1A
+        box-shadow: 0 2px 16px 0 rgba(0,0,0,0.2)
+
 .filterRow
     display: flex
     flex-direction: row
@@ -98,6 +105,9 @@
     padding: 0 15px
     background: transparent
     position: relative
+
+    .dark &
+        border-bottom: 1px solid #2A2A2A
 
 .filterRowBottom
     display: flex
@@ -122,6 +132,9 @@
     height: 50px
     background: transparent
     padding: 0 10px
+
+    .dark &
+        color: #999
 
 .filterItemBottom
     font-size: 16px
@@ -160,6 +173,11 @@
         outline: none
         box-shadow: none
 
+    .dark &
+        color: #fff
+        &::placeholder
+            color: rgba(255, 255, 255, 0.4)
+
 // Для инпутов с value делаем жирный цвет
 .filterInput:not(:placeholder-shown)
     font-family: "Inter", sans-serif
@@ -174,6 +192,9 @@
     font-weight: 700
     font-size: inherit
     font-family: inherit
+
+    .dark &
+        color: #999
 
 .required
     color: #F44336
@@ -221,11 +242,12 @@
     background: url('/images/main/switch.svg') no-repeat center/contain
 
 .resultContainer
-    background: white
-    border-radius: 8px
+    padding: 20px
+    min-height: calc(100vh - 220px)
+    background: #fff
 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)
-    margin-bottom: 100px
+    .dark &
+        background: #000
 
 .loading
     display: flex
@@ -237,12 +259,12 @@
     margin-top: 220px
 
 .placeholder
-    display: flex
-    justify-content: center
-    align-items: center
-    height: 100%
-    color: #999
-    font-size: 16px
+    text-align: center
+    color: #666
+    padding: 20px
+
+    .dark &
+        color: #999
 
 .result
     margin: 0
@@ -261,12 +283,10 @@
     margin-bottom: 30px
 
 .cardsGrid
-    width: 100%
     display: grid
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))
     gap: 20px
     padding: 20px
-    margin-bottom: 100px
 
 .card
     background: #fff
@@ -558,6 +578,11 @@ p
     padding: 0
     border: none
 
+    .dark &
+        background: #1A1A1A
+        color: #fff
+        box-shadow: 0px 0px 55px rgba(0, 0, 0, 0.2)
+
 .cardHeaderCargo
     border-radius: 16px
     padding: 18px
@@ -567,6 +592,9 @@ p
     font-size: 12px
     color: #7A7A7A
     margin-bottom: 8px
+
+    .dark &
+        color: #999
 
 .cardTitleRow
     display: flex
@@ -581,14 +609,15 @@ p
     letter-spacing: -0.02em
     color: #2d2e2f
 
+    .dark &
+        color: #fff
+
 .cardBoxIcon
     margin-left: 8px
 
 .cardInfoRow
     display: flex
-
     flex-direction: column
-
     margin-top: 8px
 
 .cardDate
@@ -597,6 +626,9 @@ p
     gap: 5px
     font-size: 15px
     color: #353535
+
+    .dark &
+        color: #ccc
 
 .cardRouteBlockTitle
     display: flex
@@ -609,6 +641,9 @@ p
     letter-spacing: -0.02em
     color: #2d2e2f
 
+    .dark &
+        color: #fff
+
 .cardRate
     gap: 5px
     display: flex
@@ -616,15 +651,20 @@ p
     font-size: 15px
     color: #353535
 
+    .dark &
+        color: #ccc
+
 .cardDetailsToggle
     border-top: 1px solid #EAEAEA
     margin: 0
+
+    .dark &
+        border-top: 1px solid #2A2A2A
 
 .cardDetailsBtn
     width: 100%
     background: none
     border: none
-
     padding: 18px
     cursor: pointer
     display: flex
@@ -639,6 +679,9 @@ p
     line-height: 96%
     letter-spacing: -0.02em
     color: #356dbb
+
+    .dark &
+        color: #4d8de8
 
 .cardArrow
     margin-left: 8px
@@ -655,16 +698,25 @@ p
     border-radius: 0 0 16px 16px
     background: #fff
 
+    .dark &
+        background: #1A1A1A
+
 .cardCustomerLabel
     font-weight: 600
     font-size: 16px
     margin-bottom: 8px
     color: #222
 
+    .dark &
+        color: #fff
+
 .cardCustomer
     font-weight: 700
     color: #053576
     font-size: 16px
+
+    .dark &
+        color: #4d8de8
 
 .cardPhone
     margin: 8px 0
@@ -673,11 +725,17 @@ p
         text-decoration: none
         font-weight: 500
 
+        .dark &
+            color: #4d8de8
+
 .cardRouteBlock
     margin: 12px 0 0 0
     color: #353535
     div
         margin-bottom: 4px
+
+    .dark &
+        color: #ccc
 
 .cardMapLink
     font-family: "Inter", sans-serif
@@ -698,33 +756,15 @@ p
     margin-top: 16px
 
 .cardTag
-
-    border-radius: 4px
-    padding: 6px 8px
-    font-family: "Inter", sans-serif
-    font-weight: 500
+    display: flex
+    align-items: center
+    gap: 5px
+    padding: 8px 12px
+    background: #F5F5F5
+    border-radius: 8px
     font-size: 14px
-    line-height: 96%
-    letter-spacing: -0.02em
-    color: #2d2e2f
-    background: #f4f4f4
-    display: flex
-    justify-content: center
-    align-items: center
-    gap: 4px
-    img
-        width: 14px
-        height: 14px
+    color: #353535
 
-.profileBottom
-    display: flex
-    width: 100%
-    justify-content: space-between
-    align-items: center
-    padding: 0 10px
-    .idTelega
-        font-family: "Inter", sans-serif
-        font-weight: 500
-        font-size: 12px
-        line-height: 96%
-        letter-spacing: -0.02em
+    .dark &
+        background: #2A2A2A
+        color: #fff

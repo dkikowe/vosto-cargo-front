@@ -1,13 +1,15 @@
 .header
     display: flex
-
     justify-content: center
     align-items: flex-end
-
     width: 100%
     background: #053576
     padding-top: 40px
     height: 150px
+    transition: background 0.3s ease
+
+    &.dark
+        background: #121212
 
 .line
     margin: 20px 0
@@ -15,11 +17,20 @@
     height: 1px
     background: rgba(255, 255, 255, 0.1)
 
+    .dark &
+        background: rgba(255, 255, 255, 0.05)
+
 .logo
     display: flex
     align-items: center
     justify-content: center
     flex-direction: column
+
+    img
+        transition: filter 0.3s ease
+
+        .dark &
+            filter: brightness(0) invert(1)
 
 .switcher
     display: flex

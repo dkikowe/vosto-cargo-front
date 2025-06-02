@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 import CalculatorPopup from "../../components/Calculator/Calculator";
 import SupportPopup from "../../components/Support";
 import SettingsPopup from "../../components/SettingsPopup";
+import CompanyPopup from "../Company/CompanyPopup";
 
 // ...импорты остаются без изменений...
 
@@ -46,6 +47,7 @@ export default function Cabinet() {
   const [showCalculator, setShowCalculator] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showCompanyPopup, setShowCompanyPopup] = useState(false);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { t, i18n } = useTranslation();
@@ -271,7 +273,10 @@ export default function Cabinet() {
           </div>
         </div>
         <div className={s.companyBottom}>
-          <p className={s.companyBottomButton}>
+          <p
+            className={s.companyBottomButton}
+            onClick={() => setShowCompanyPopup(true)}
+          >
             {company && company.name
               ? "Изменить компанию"
               : t("cabinet.addCompany")}
@@ -363,6 +368,13 @@ export default function Cabinet() {
           onPrivacy={() => {
             /* тут можно открыть Privacy */
           }}
+        />
+      )}
+      {showCompanyPopup && (
+        <CompanyPopup
+          onClose={() => setShowCompanyPopup(false)}
+          userId={id}
+          initialData={company}
         />
       )}
     </div>

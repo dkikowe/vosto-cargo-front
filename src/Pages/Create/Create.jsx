@@ -3,20 +3,22 @@ import axios from "../../axios.js";
 import s from "./Create.module.sass";
 import { AddOrderModal } from "./AddOrderModal.jsx";
 import { ThemeContext } from "../../context/ThemeContext";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, SlidersHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import BottomSheetModal from "./components/BottomSheetModal";
+import AddCargoStepper from "./components/AddCargoStepper";
 
 export default function CreateOrders() {
   const { t } = useTranslation();
   const { theme } = useContext(ThemeContext);
   const userId = localStorage.getItem("id");
 
-  const [currentType, setCurrentType] = useState("CargoOrder");
   const [currentTab, setCurrentTab] = useState("active");
   const [orders, setOrders] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
   const [editingOrder, setEditingOrder] = useState(null);
+  const [filterType, setFilterType] = useState("all");
+  const [showFilter, setShowFilter] = useState(false);
 
   const [formData, setFormData] = useState({
     description: "",
@@ -118,10 +120,10 @@ export default function CreateOrders() {
     }
 
     let payload = {};
-    if (currentType === "CargoOrder") {
+    if (currentTab === "CargoOrder") {
       payload = {
         userId,
-        orderType: currentType,
+        orderType: currentTab,
         description: formData.description,
         from: formData.from,
         to: formData.to,
@@ -138,10 +140,10 @@ export default function CreateOrders() {
         paymentMethod: formData.paymentMethod,
         isArchived: false,
       };
-    } else if (currentType === "MachineOrder") {
+    } else if (currentTab === "MachineOrder") {
       payload = {
         userId,
-        orderType: currentType,
+        orderType: currentTab,
         description: formData.description,
         marka: formData.marka,
         tip: formData.tip,
@@ -179,10 +181,10 @@ export default function CreateOrders() {
     if (!userId || !editingOrder) return;
 
     let payload = {};
-    if (currentType === "CargoOrder") {
+    if (currentTab === "CargoOrder") {
       payload = {
         userId,
-        orderType: currentType,
+        orderType: currentTab,
         description: formData.description,
         from: formData.from,
         to: formData.to,
@@ -195,10 +197,10 @@ export default function CreateOrders() {
         paymentMethod: formData.paymentMethod,
         isArchived: false,
       };
-    } else if (currentType === "MachineOrder") {
+    } else if (currentTab === "MachineOrder") {
       payload = {
         userId,
-        orderType: currentType,
+        orderType: currentTab,
         description: formData.description,
         marka: formData.marka,
         tip: formData.tip,
@@ -259,7 +261,7 @@ export default function CreateOrders() {
 
   const handleEditOrder = (order) => {
     setEditingOrder(order);
-    setCurrentType(order.orderType);
+    setCurrentTab(order.orderType);
     setFormData({
       description: order.description || "",
       from: order.from || "",
@@ -300,25 +302,11 @@ export default function CreateOrders() {
 
   const filteredOrders = orders.filter(
     (order) =>
-      order.orderType === currentType &&
-      (currentTab === "archive" ? order.isArchived : !order.isArchived)
+      (currentTab === "archive" ? order.isArchived : !order.isArchived) &&
+      (filterType === "all" ||
+        (filterType === "cargo" && order.orderType === "CargoOrder") ||
+        (filterType === "machine" && order.orderType === "MachineOrder"))
   );
-
-  const handleAddCargo = () => {
-    setEditingOrder(null);
-    setCurrentType("CargoOrder");
-    resetForm();
-    setShowForm(true);
-    setShowMenu(false);
-  };
-
-  const handleAddMachine = () => {
-    setEditingOrder(null);
-    setCurrentType("MachineOrder");
-    resetForm();
-    setShowForm(true);
-    setShowMenu(false);
-  };
 
   return (
     <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
@@ -326,50 +314,22 @@ export default function CreateOrders() {
         className={s.header}
         style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
       >
-        <div className={s.switch}>
-          <div className={s.typeSwitcher}>
-            <div
-              className={s.switchIndicator}
-              style={{ left: currentType === "CargoOrder" ? "0%" : "50%" }}
-            />
-            <button
-              className={
-                currentType === "CargoOrder" ? s.activeText : s.switcher
-              }
-              onClick={() => setCurrentType("CargoOrder")}
-            >
-              {t("orders.cargo")}
-            </button>
-            <button
-              className={
-                currentType === "MachineOrder" ? s.activeText : s.switcher
-              }
-              onClick={() => setCurrentType("MachineOrder")}
-            >
-              {t("orders.machine")}
-            </button>
-          </div>
-          <div className={s.plusWrapper}>
-            <p className={s.plus} onClick={() => setShowMenu((prev) => !prev)}>
-              +
-            </p>
-            {showMenu && (
-              <div className={s.plusMenu}>
-                <button className={s.plusButton} onClick={handleAddCargo}>
-                  {t("orders.addCargo")}
-                </button>
-                <button className={s.plusButton} onClick={handleAddMachine}>
-                  {t("orders.addMachine")}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        <h1>Мои заявки</h1>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
         <div className={s.statusButtons}>
           <button
             className={currentTab === "active" ? s.statusActive : s.statusItem}
             onClick={() => setCurrentTab("active")}
           >
+            <img src="/images/design-icons-create/public.svg" alt="" />
             {t("orders.published")}
           </button>
           <button
@@ -378,8 +338,87 @@ export default function CreateOrders() {
             }
             onClick={() => setCurrentTab("archive")}
           >
+            <img src="/images/design-icons-create/archive.svg" alt="" />
             {t("orders.archive")}
           </button>
+        </div>
+        <div
+          style={{
+            position: "relative",
+            marginLeft: "auto",
+            marginRight: 16,
+          }}
+        >
+          <img
+            src="/images/design-icons-create/filter.svg"
+            style={{ cursor: "pointer" }}
+            onClick={() => setShowFilter((v) => !v)}
+            alt=""
+          />
+
+          {showFilter && (
+            <div
+              style={{
+                position: "absolute",
+                top: 36,
+                right: 0,
+                background: "#fff",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
+                borderRadius: 16,
+                padding: "12px 0",
+                zIndex: 10,
+                minWidth: 180,
+              }}
+            >
+              <div
+                onClick={() => {
+                  setFilterType("all");
+                  setShowFilter(false);
+                }}
+                style={{
+                  padding: "8px 20px",
+                  cursor: "pointer",
+                  fontWeight: filterType === "all" ? "bold" : "normal",
+                  color: "#222",
+                  background: filterType === "all" ? "#f5f5f5" : "transparent",
+                }}
+              >
+                Все заявки {filterType === "all" && "✓"}
+              </div>
+              <div
+                onClick={() => {
+                  setFilterType("cargo");
+                  setShowFilter(false);
+                }}
+                style={{
+                  padding: "8px 20px",
+                  cursor: "pointer",
+                  fontWeight: filterType === "cargo" ? "bold" : "normal",
+                  color: "#222",
+                  background:
+                    filterType === "cargo" ? "#f5f5f5" : "transparent",
+                }}
+              >
+                Только грузы {filterType === "cargo" && "✓"}
+              </div>
+              <div
+                onClick={() => {
+                  setFilterType("machine");
+                  setShowFilter(false);
+                }}
+                style={{
+                  padding: "8px 20px",
+                  cursor: "pointer",
+                  fontWeight: filterType === "machine" ? "bold" : "normal",
+                  color: "#222",
+                  background:
+                    filterType === "machine" ? "#f5f5f5" : "transparent",
+                }}
+              >
+                Только автомобили {filterType === "machine" && "✓"}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className={s.ordersList}>
@@ -387,7 +426,7 @@ export default function CreateOrders() {
           <p>
             {t("orders.empty", {
               type: t(
-                currentType === "CargoOrder"
+                currentTab === "CargoOrder"
                   ? "orders.cargoPlural"
                   : "orders.machinePlural"
               ),
@@ -459,22 +498,34 @@ export default function CreateOrders() {
         <button onClick={() => setShowForm(!showForm)}>
           {showForm
             ? t("orders.closeForm")
-            : currentType === "CargoOrder"
+            : currentTab === "CargoOrder"
             ? t("orders.addCargo")
             : t("orders.addMachine")}
         </button>
       </div>
-      <AddOrderModal
+      <BottomSheetModal
         visible={showForm}
         onClose={() => {
           setShowForm(false);
           resetForm();
         }}
-        currentType={currentType}
-        formData={formData}
-        onChange={handleChange}
-        onSubmit={handleSubmitOrder}
-      />
+      >
+        {currentTab === "CargoOrder" && (
+          <AddCargoStepper
+            onSubmit={(data) => {
+              // TODO: обработка отправки (можно вызвать handleCreateOrder)
+              setShowForm(false);
+              resetForm();
+              // handleCreateOrder(data) — если нужно
+            }}
+            onClose={() => {
+              setShowForm(false);
+              resetForm();
+            }}
+          />
+        )}
+        {/* Для MachineOrder аналогично — AddMachineStepper */}
+      </BottomSheetModal>
     </div>
   );
 }
