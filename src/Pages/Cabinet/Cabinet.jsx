@@ -95,7 +95,7 @@ export default function Cabinet() {
           setName(res.data.name || t("cabinet.defaultName"));
           setRole(res.data.role);
           setIdTelega(res.data.telegramId);
-          setCompany(res.data.company);
+
           setRating(res.data.rating);
           if (res.data.theme) localStorage.setItem("theme", res.data.theme);
           if (res.data.language) i18n.changeLanguage(res.data.language);
