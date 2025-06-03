@@ -111,6 +111,7 @@ export default function Cabinet() {
         .get(`/getCompany/${id}`)
         .then((res) => {
           if (res.data && res.data.company) {
+            setCompany(res.data.company);
             console.log(res.data.company);
           }
         })
@@ -188,10 +189,20 @@ export default function Cabinet() {
                         step="0.01"
                         value={scale}
                         onChange={(e) => setScale(parseFloat(e.target.value))}
+                        style={{
+                          backgroundColor:
+                            theme === "dark" ? "#333" : undefined,
+                          color: theme === "dark" ? "#fff" : undefined,
+                        }}
                       />
                       <button
                         onClick={handleSaveAvatar}
                         className={s.saveButton}
+                        style={{
+                          backgroundColor:
+                            theme === "dark" ? "#356dbb" : undefined,
+                          color: theme === "dark" ? "#fff" : undefined,
+                        }}
                       >
                         {t("cabinet.saveAvatar")}
                       </button>
@@ -202,7 +213,7 @@ export default function Cabinet() {
                     <img
                       src={user?.avatar || "/images/nav-icons/user.svg"}
                       className={`${s.profileIcon} ${
-                        avatarLoaded ? "opacity-100  " : "opacity-0"
+                        avatarLoaded ? "opacity-100" : "opacity-0"
                       }`}
                       alt=""
                       onLoad={() => setAvatarLoaded(true)}
@@ -229,8 +240,11 @@ export default function Cabinet() {
                 onChange={(e) => setName(e.target.value)}
                 className={s.name}
                 onBlur={saveName}
+                style={{
+                  color: theme === "dark" ? "#fff" : undefined,
+                  backgroundColor: theme === "dark" ? "transparent" : undefined,
+                }}
               />
-
               <RoleSelect userId={id} />
             </div>
           </div>
@@ -264,11 +278,29 @@ export default function Cabinet() {
 
       <div className={s.company}>
         <div className={s.companyTop}>
-          <img src="/images/design-icons-cab/company.svg" alt="" />
+          {company && company.photo ? (
+            <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
+              <img src={company.photo} alt="" className="w-full h-full" />
+            </div>
+          ) : (
+            <img
+              src="/images/design-icons-cab/company.svg"
+              className="w-[50px] h-[50px]"
+              alt=""
+            />
+          )}
           <div className={s.companyName}>
-            <p className={s.name}>Ваша компания</p>
-            <p className={s.comp}>
-              {company && company.name ? company.name : "Пока пусто"}
+            <p
+              className={s.name}
+              style={{ color: theme === "dark" ? "#fff" : undefined }}
+            >
+              {t("cabinet.yourCompany")}
+            </p>
+            <p
+              className={s.comp}
+              style={{ color: theme === "dark" ? "#bbb" : undefined }}
+            >
+              {company && company.name ? company.name : t("cabinet.empty")}
             </p>
           </div>
         </div>
@@ -278,7 +310,7 @@ export default function Cabinet() {
             onClick={() => setShowCompanyPopup(true)}
           >
             {company && company.name
-              ? "Изменить компанию"
+              ? t("cabinet.changeCompany")
               : t("cabinet.addCompany")}
             <div className={s.plusik}>
               <p>+</p>
@@ -295,7 +327,7 @@ export default function Cabinet() {
             width="20"
             height="20"
             fill="none"
-            stroke="#2563eb"
+            stroke={theme === "dark" ? "#fff" : "#2563eb"}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -304,7 +336,12 @@ export default function Cabinet() {
             <path d="M12 21s-6-5.686-6-10a6 6 0 0112 0c0 4.314-6 10-6 10z"></path>
             <circle cx="12" cy="11" r="2"></circle>
           </svg>
-          <span className={s.geoToggleLabel}>Геопозиция</span>
+          <span
+            className={s.geoToggleLabel}
+            style={{ color: theme === "dark" ? "#fff" : undefined }}
+          >
+            {t("cabinet.geolocation")}
+          </span>
         </div>
         <div className={s.geoToggleSwitch}>
           <div className={s.geoToggleThumb} />

@@ -17,8 +17,12 @@
     "enterNewName": "Введите новое имя",
     "changeAvatar": "Изменить фото",
     "defaultName": "Ваше имя",
-    "changeLang":"Язык",
-    "settings":"Настройки"
+    "changeLang": "Язык",
+    "settings": "Настройки",
+    "yourCompany": "Ваша компания",
+    "empty": "Пока пусто",
+    "changeCompany": "Изменить компанию",
+    "geolocation": "Геопозиция"
   },
   "languageSelector":{
     "chooseLanguage": "Выберите язык"

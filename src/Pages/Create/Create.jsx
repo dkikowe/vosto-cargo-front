@@ -7,6 +7,8 @@ import { Edit, Trash2, SlidersHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import BottomSheetModal from "./components/BottomSheetModal";
 import AddCargoStepper from "./components/AddCargoStepper";
+import { OrderCard } from "./components/OrderCard";
+import AddMachineStepper from "./components/AddMachineStepper";
 
 export default function CreateOrders() {
   const { t } = useTranslation();
@@ -19,6 +21,8 @@ export default function CreateOrders() {
   const [editingOrder, setEditingOrder] = useState(null);
   const [filterType, setFilterType] = useState("all");
   const [showFilter, setShowFilter] = useState(false);
+  const [showTypeModal, setShowTypeModal] = useState(false);
+  const [selectedType, setSelectedType] = useState(null);
 
   const [formData, setFormData] = useState({
     description: "",
@@ -52,11 +56,14 @@ export default function CreateOrders() {
     company: "",
   });
 
+  const isDark = theme === "dark";
+
   const fetchUserOrders = async () => {
     try {
       if (!userId) return;
       const { data } = await axios.get(`/orders?userId=${userId}`);
       setOrders(data);
+      console.log(data);
     } catch (error) {
       console.error("Ошибка загрузки заказов:", error);
     }
@@ -308,6 +315,100 @@ export default function CreateOrders() {
         (filterType === "machine" && order.orderType === "MachineOrder"))
   );
 
+  const handleCreateCargoOrderFromStepper = async (data) => {
+    if (!userId) return;
+    const payload = {
+      userId,
+      orderType: "CargoOrder",
+      from: data.from,
+      to: data.to,
+      cargo: data.cargoName,
+      volume: data.volume ? data.volume.toString() : "",
+      weight: data.weight ? data.weight.toString() : "",
+      rate: data.rate || "",
+      ready: `${data.dateFrom || ""} - ${data.dateTo || ""}`,
+      telefon: data.phone || "",
+      vehicle: data.bodyType || "",
+      paymentMethod: data.payment,
+      isArchived: false,
+    };
+    await axios.post("/orders", payload);
+    fetchUserOrders();
+  };
+
+  const handleCreateMachineOrderFromStepper = async (data) => {
+    if (!userId) return;
+    const payload = {
+      userId,
+      orderType: "MachineOrder",
+      marka: data.marka,
+      tip: data.model,
+      kuzov: data.bodyType,
+      tip_zagruzki: data.loadingType,
+      gruzopodyomnost: data.capacity?.toString() || "",
+      vmestimost: data.volume?.toString() || "",
+      data_gotovnosti: data.readyDate,
+      otkuda: data.loadingCity,
+      kuda: data.unloadingCity,
+      telefon: data.phone,
+      imya: data.fio,
+      firma: data.company,
+      gorod: data.city,
+      pochta: data.email,
+      company: data.company,
+      paymentMethod: data.payment,
+      isArchived: false,
+    };
+    await axios.post("/orders", payload);
+    fetchUserOrders();
+  };
+
+  const handleUpdateOrderFromStepper = async (orderId, data) => {
+    if (!userId || !orderId) return;
+    let payload = {};
+    if (currentTab === "CargoOrder") {
+      payload = {
+        userId,
+        orderType: "CargoOrder",
+        from: data.from,
+        to: data.to,
+        cargo: data.cargoName,
+        volume: data.volume ? data.volume.toString() : "",
+        weight: data.weight ? data.weight.toString() : "",
+        rate: data.rate || "",
+        ready: `${data.dateFrom || ""} - ${data.dateTo || ""}`,
+        telefon: data.phone || "",
+        vehicle: data.bodyType || "",
+        paymentMethod: data.payment,
+        isArchived: false,
+      };
+    } else if (currentTab === "MachineOrder") {
+      payload = {
+        userId,
+        orderType: "MachineOrder",
+        marka: data.marka,
+        tip: data.model,
+        kuzov: data.bodyType,
+        tip_zagruzki: data.loadingType,
+        gruzopodyomnost: data.capacity?.toString() || "",
+        vmestimost: data.volume?.toString() || "",
+        data_gotovnosti: data.readyDate,
+        otkuda: data.loadingCity,
+        kuda: data.unloadingCity,
+        telefon: data.phone,
+        imya: data.fio,
+        firma: data.company,
+        gorod: data.city,
+        pochta: data.email,
+        company: data.company,
+        paymentMethod: data.payment,
+        isArchived: false,
+      };
+    }
+    await axios.put(`/orders/${orderId}`, payload);
+    fetchUserOrders();
+  };
+
   return (
     <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
       <div
@@ -327,6 +428,22 @@ export default function CreateOrders() {
         <div className={s.statusButtons}>
           <button
             className={currentTab === "active" ? s.statusActive : s.statusItem}
+            style={{
+              color: isDark
+                ? currentTab === "active"
+                  ? "#fff"
+                  : "#bbbbbb"
+                : currentTab === "active"
+                ? "#000"
+                : "#bbbbbb",
+              borderBottom:
+                currentTab === "active"
+                  ? isDark
+                    ? "2px solid #fff"
+                    : "2px solid #000"
+                  : "none",
+              background: "none",
+            }}
             onClick={() => setCurrentTab("active")}
           >
             <img src="/images/design-icons-create/public.svg" alt="" />
@@ -336,6 +453,22 @@ export default function CreateOrders() {
             className={
               currentTab === "archive" ? s.statusActiveArchive : s.archive
             }
+            style={{
+              color: isDark
+                ? currentTab === "archive"
+                  ? "#fff"
+                  : "#bbbbbb"
+                : currentTab === "archive"
+                ? "#000"
+                : "#bbbbbb",
+              borderBottom:
+                currentTab === "archive"
+                  ? isDark
+                    ? "2px solid #fff"
+                    : "2px solid #000"
+                  : "none",
+              background: "none",
+            }}
             onClick={() => setCurrentTab("archive")}
           >
             <img src="/images/design-icons-create/archive.svg" alt="" />
@@ -434,75 +567,56 @@ export default function CreateOrders() {
           </p>
         ) : (
           filteredOrders.map((order) => (
-            <div
+            <OrderCard
               key={order._id}
-              className={s.orderCard}
-              style={{
-                backgroundColor: theme === "dark" ? "#121212" : undefined,
-              }}
-            >
-              {order.orderType === "CargoOrder" ? (
-                <>
-                  <p>
-                    <strong>{t("orders.cargo")}:</strong> {order.cargo || "—"}
-                  </p>
-                  <p>
-                    <strong>{t("orders.from")}:</strong> {order.from || "—"}
-                  </p>
-                  <p>
-                    <strong>{t("orders.to")}:</strong> {order.to || "—"}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p>
-                    <strong>{t("orders.brandAndType")}:</strong> {order.marka}{" "}
-                    {order.tip}
-                  </p>
-                  <p>
-                    <strong>{t("orders.from")}:</strong> {order.otkuda || "—"}
-                  </p>
-                  <p>
-                    <strong>{t("orders.to")}:</strong> {order.kuda || "—"}
-                  </p>
-                </>
-              )}
-              <div className={s.actions}>
-                <button
-                  onClick={() => handleEditOrder(order)}
-                  title={t("orders.edit")}
-                >
-                  <Edit size={16} />
-                </button>
-                <button
-                  onClick={() => handleDeleteOrder(order._id)}
-                  title={t("orders.delete")}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-              <div className={s.orderActions}>
-                <button
-                  onClick={() =>
-                    handleToggleArchive(order._id, order.isArchived)
-                  }
-                >
-                  {order.isArchived ? t("orders.restore") : t("orders.archive")}
-                </button>
-              </div>
-            </div>
+              order={order}
+              theme={theme}
+              onEdit={handleEditOrder}
+              onDelete={handleDeleteOrder}
+              onToggleArchive={handleToggleArchive}
+            />
           ))
         )}
       </div>
       <div className={s.addButtonWrapper}>
-        <button onClick={() => setShowForm(!showForm)}>
-          {showForm
-            ? t("orders.closeForm")
-            : currentTab === "CargoOrder"
-            ? t("orders.addCargo")
-            : t("orders.addMachine")}
-        </button>
+        <button onClick={() => setShowTypeModal(true)}>Создать заявку</button>
       </div>
+      <BottomSheetModal
+        visible={showTypeModal}
+        onClose={() => setShowTypeModal(false)}
+      >
+        <div style={{ padding: 24, textAlign: "center" }}>
+          <div style={{ fontWeight: 600, fontSize: 20, marginBottom: 16 }}>
+            Выберите тип заявки
+          </div>
+          <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
+            <button
+              className={s.input}
+              style={{ background: "#3a5c9f", color: "#fff", minWidth: 120 }}
+              onClick={() => {
+                setSelectedType("CargoOrder");
+                setShowTypeModal(false);
+                setShowForm(true);
+                setCurrentTab("CargoOrder");
+              }}
+            >
+              Груз
+            </button>
+            <button
+              className={s.input}
+              style={{ background: "#3a5c9f", color: "#fff", minWidth: 120 }}
+              onClick={() => {
+                setSelectedType("MachineOrder");
+                setShowTypeModal(false);
+                setShowForm(true);
+                setCurrentTab("MachineOrder");
+              }}
+            >
+              Машина
+            </button>
+          </div>
+        </div>
+      </BottomSheetModal>
       <BottomSheetModal
         visible={showForm}
         onClose={() => {
@@ -512,11 +626,15 @@ export default function CreateOrders() {
       >
         {currentTab === "CargoOrder" && (
           <AddCargoStepper
-            onSubmit={(data) => {
-              // TODO: обработка отправки (можно вызвать handleCreateOrder)
+            initialValues={editingOrder}
+            onSubmit={async (data) => {
+              if (editingOrder) {
+                await handleUpdateOrderFromStepper(editingOrder._id, data);
+              } else {
+                await handleCreateCargoOrderFromStepper(data);
+              }
               setShowForm(false);
               resetForm();
-              // handleCreateOrder(data) — если нужно
             }}
             onClose={() => {
               setShowForm(false);
@@ -524,7 +642,24 @@ export default function CreateOrders() {
             }}
           />
         )}
-        {/* Для MachineOrder аналогично — AddMachineStepper */}
+        {currentTab === "MachineOrder" && (
+          <AddMachineStepper
+            initialValues={editingOrder}
+            onSubmit={async (data) => {
+              if (editingOrder) {
+                await handleUpdateOrderFromStepper(editingOrder._id, data);
+              } else {
+                await handleCreateMachineOrderFromStepper(data);
+              }
+              setShowForm(false);
+              resetForm();
+            }}
+            onClose={() => {
+              setShowForm(false);
+              resetForm();
+            }}
+          />
+        )}
       </BottomSheetModal>
     </div>
   );

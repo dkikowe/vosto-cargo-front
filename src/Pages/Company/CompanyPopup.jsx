@@ -1,8 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import s from "./CompanyPopup.module.sass";
 import { ThemeContext } from "../../context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import BottomSheetModal from "../Create/components/BottomSheetModal";
+import AvatarEditor from "react-avatar-editor";
+import axios from "../../axios";
 
 const steps = ["Основная информация", "Профиль и местоположение", "Контакты"];
 
@@ -26,6 +28,15 @@ export default function CompanyPopup({ onClose, userId, initialData }) {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [companyPhoto, setCompanyPhoto] = useState(initialData?.photo || "");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [editor, setEditor] = useState(null);
+  const [scale, setScale] = useState(1.2);
+  const [photoLoading, setPhotoLoading] = useState(false);
+
+  useEffect(() => {
+    setCompanyPhoto(initialData?.photo || "");
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +56,42 @@ export default function CompanyPopup({ onClose, userId, initialData }) {
       setTimeout(() => setMessage(""), 2000);
       onClose();
     }, 1000);
+  };
+
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setSelectedFile(file);
+  };
+
+  const handleSavePhoto = async () => {
+    if (!editor) return;
+    setPhotoLoading(true);
+    const canvas = editor.getImageScaledToCanvas();
+    canvas.toBlob(async (blob) => {
+      const formData = new FormData();
+      formData.append("photo", blob, "company.png");
+      try {
+        const response = await axios.post(
+          `/uploadCompanyPhoto/${userId}`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+        if (response.data && response.data.photo) {
+          setCompanyPhoto(response.data.photo);
+        } else {
+          // fallback: обновить по url
+          setCompanyPhoto(URL.createObjectURL(blob));
+        }
+      } catch (error) {
+        alert("Ошибка при загрузке фото компании");
+      } finally {
+        setPhotoLoading(false);
+        setSelectedFile(null);
+      }
+    });
   };
 
   return (
@@ -74,6 +121,82 @@ export default function CompanyPopup({ onClose, userId, initialData }) {
                 }}
               />
             ))}
+          </div>
+          {/* Фото компании */}
+          <div style={{ marginBottom: 16 }}>
+            <label
+              htmlFor="company-photo-upload"
+              style={{
+                cursor: "pointer",
+                display: "inline-block",
+                position: "relative",
+              }}
+            >
+              {selectedFile ? (
+                <div className={s.overlay}>
+                  <div className={s.editorContainer}>
+                    <AvatarEditor
+                      ref={setEditor}
+                      image={selectedFile}
+                      width={97}
+                      height={97}
+                      border={50}
+                      borderRadius={50}
+                      scale={scale}
+                      className={s.divAvatar}
+                    />
+                    <input
+                      type="range"
+                      min="1"
+                      max="3"
+                      step="0.01"
+                      value={scale}
+                      onChange={(e) => setScale(parseFloat(e.target.value))}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSavePhoto}
+                      className={s.saveButton}
+                      disabled={photoLoading}
+                    >
+                      {photoLoading ? "Сохраняю..." : "Сохранить фото"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <img
+                    src={companyPhoto || "/images/cabinet-icons/photo.svg"}
+                    alt="company"
+                    style={{
+                      width: 97,
+                      height: 97,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      background: "#f5f5f5",
+                    }}
+                  />
+                  <img
+                    src="/images/design-icons-cab/photos.svg"
+                    alt=""
+                    style={{
+                      position: "absolute",
+                      right: 0,
+                      bottom: 0,
+                      width: 24,
+                      height: 24,
+                    }}
+                  />
+                  <input
+                    type="file"
+                    hidden
+                    id="company-photo-upload"
+                    onChange={handlePhotoSelect}
+                    accept=".png, .jpg, .jpeg"
+                  />
+                </>
+              )}
+            </label>
           </div>
         </div>
         {step === 0 && (

@@ -1,21 +1,34 @@
 import React, { useState, useEffect } from "react";
 import s from "../Create.module.sass";
 
-const steps = ["Информация о заявке", "Информация о грузе", "Детали заявки"];
+const steps = [
+  "Информация о машине",
+  "Информация о владельце",
+  "Детали заявки",
+];
 
-export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
+export default function AddMachineStepper({
+  onSubmit,
+  onClose,
+  initialValues,
+}) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
-    from: "",
-    to: "",
-    dateFrom: "",
-    dateTo: "",
+    marka: "",
+    model: "",
     bodyType: "",
-    cargoName: "",
+    loadingType: "",
+    capacity: "",
     volume: "",
-    weight: "",
+    fio: "",
+    company: "",
+    position: "",
+    city: "",
     phone: "",
-    rate: "",
+    email: "",
+    loadingCity: "",
+    unloadingCity: "",
+    readyDate: "",
     payment: "",
   });
   const [allowSubmit, setAllowSubmit] = useState(false);
@@ -23,16 +36,23 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
   useEffect(() => {
     if (initialValues) {
       setForm({
-        from: initialValues.from || "",
-        to: initialValues.to || "",
-        dateFrom: initialValues.dateFrom || "",
-        dateTo: initialValues.dateTo || "",
-        bodyType: initialValues.bodyType || initialValues.vehicle || "",
-        cargoName: initialValues.cargoName || initialValues.cargo || "",
-        volume: initialValues.volume || "",
-        weight: initialValues.weight || "",
+        marka: initialValues.marka || "",
+        model: initialValues.model || initialValues.tip || "",
+        bodyType: initialValues.bodyType || initialValues.kuzov || "",
+        loadingType:
+          initialValues.loadingType || initialValues.tip_zagruzki || "",
+        capacity: initialValues.capacity || initialValues.gruzopodyomnost || "",
+        volume: initialValues.volume || initialValues.vmestimost || "",
+        fio: initialValues.fio || initialValues.imya || "",
+        company: initialValues.company || initialValues.firma || "",
+        position: initialValues.position || "",
+        city: initialValues.city || initialValues.gorod || "",
         phone: initialValues.phone || initialValues.telefon || "",
-        rate: initialValues.rate || "",
+        email: initialValues.email || initialValues.pochta || "",
+        loadingCity: initialValues.loadingCity || initialValues.otkuda || "",
+        unloadingCity: initialValues.unloadingCity || initialValues.kuda || "",
+        readyDate:
+          initialValues.readyDate || initialValues.data_gotovnosti || "",
         payment: initialValues.payment || initialValues.paymentMethod || "",
       });
     }
@@ -52,7 +72,7 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
       console.log("Попытка submit без allowSubmit");
       return;
     }
-    console.log("Submit формы AddCargoStepper", form);
+    console.log("Submit формы AddMachineStepper", form);
     onSubmit(form);
     setAllowSubmit(false);
   };
@@ -72,7 +92,9 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
     >
       <div style={{ textAlign: "center", marginBottom: 16 }}>
         <div style={{ fontWeight: 600, fontSize: 20 }}>
-          {initialValues ? "Редактирование груза" : "Добавление груза"}
+          {initialValues
+            ? "Редактирование автомобиля"
+            : "Добавление автомобиля"}
         </div>
         <div style={{ color: "#888", fontSize: 15, margin: "8px 0" }}>
           Шаг {step + 1} из 3: {steps[step]}
@@ -101,39 +123,21 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
       {step === 0 && (
         <>
           <input
-            name="from"
-            value={form.from}
+            name="marka"
+            value={form.marka}
             onChange={handleChange}
-            placeholder="Город погрузки"
+            placeholder="Марка"
             className={s.input}
             style={{ marginBottom: 8 }}
           />
           <input
-            name="to"
-            value={form.to}
+            name="model"
+            value={form.model}
             onChange={handleChange}
-            placeholder="Город выгрузки"
+            placeholder="Модель"
             className={s.input}
             style={{ marginBottom: 8 }}
           />
-          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-            <input
-              name="dateFrom"
-              type="date"
-              value={form.dateFrom}
-              onChange={handleChange}
-              className={s.input}
-              style={{ flex: 1 }}
-            />
-            <input
-              name="dateTo"
-              type="date"
-              value={form.dateTo}
-              onChange={handleChange}
-              className={s.input}
-              style={{ flex: 1 }}
-            />
-          </div>
           <select
             name="bodyType"
             value={form.bodyType}
@@ -146,40 +150,72 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
             <option value="Рефрижератор">Рефрижератор</option>
             <option value="Борт">Борт</option>
           </select>
-        </>
-      )}
-      {step === 1 && (
-        <>
-          <input
-            name="cargoName"
-            value={form.cargoName}
+          <select
+            name="loadingType"
+            value={form.loadingType}
             onChange={handleChange}
-            placeholder="Наименование груза"
             className={s.input}
             style={{ marginBottom: 8 }}
-          />
+          >
+            <option value="">Тип погрузки</option>
+            <option value="Задняя">Задняя</option>
+            <option value="Боковая">Боковая</option>
+            <option value="Верхняя">Верхняя</option>
+          </select>
           <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
             <input
-              name="volume"
-              value={form.volume}
+              name="capacity"
+              value={form.capacity}
               onChange={handleChange}
-              placeholder="Объем (м³)"
+              placeholder="Грузоподъемность (т)"
               className={s.input}
               style={{ flex: 1 }}
             />
             <input
-              name="weight"
-              value={form.weight}
+              name="volume"
+              value={form.volume}
               onChange={handleChange}
-              placeholder="Вес (кг)"
+              placeholder="Вместимость (м³)"
               className={s.input}
               style={{ flex: 1 }}
             />
           </div>
         </>
       )}
-      {step === 2 && (
+      {step === 1 && (
         <>
+          <input
+            name="fio"
+            value={form.fio}
+            onChange={handleChange}
+            placeholder="ФИО"
+            className={s.input}
+            style={{ marginBottom: 8 }}
+          />
+          <input
+            name="company"
+            value={form.company}
+            onChange={handleChange}
+            placeholder="Название компании"
+            className={s.input}
+            style={{ marginBottom: 8 }}
+          />
+          <input
+            name="position"
+            value={form.position}
+            onChange={handleChange}
+            placeholder="Должность"
+            className={s.input}
+            style={{ marginBottom: 8 }}
+          />
+          <input
+            name="city"
+            value={form.city}
+            onChange={handleChange}
+            placeholder="Город"
+            className={s.input}
+            style={{ marginBottom: 8 }}
+          />
           <input
             name="phone"
             value={form.phone}
@@ -189,10 +225,38 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
             style={{ marginBottom: 8 }}
           />
           <input
-            name="rate"
-            value={form.rate}
+            name="email"
+            value={form.email}
             onChange={handleChange}
-            placeholder="Ставка (₽)"
+            placeholder="Email"
+            className={s.input}
+            style={{ marginBottom: 8 }}
+          />
+        </>
+      )}
+      {step === 2 && (
+        <>
+          <input
+            name="loadingCity"
+            value={form.loadingCity}
+            onChange={handleChange}
+            placeholder="Город погрузки"
+            className={s.input}
+            style={{ marginBottom: 8 }}
+          />
+          <input
+            name="unloadingCity"
+            value={form.unloadingCity}
+            onChange={handleChange}
+            placeholder="Город выгрузки"
+            className={s.input}
+            style={{ marginBottom: 8 }}
+          />
+          <input
+            name="readyDate"
+            type="date"
+            value={form.readyDate}
+            onChange={handleChange}
             className={s.input}
             style={{ marginBottom: 8 }}
           />

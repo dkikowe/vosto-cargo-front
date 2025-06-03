@@ -5,18 +5,40 @@
     gap: 20px
     align-items: center
     overflow-y: hidden
-    height: calc(100vh - 220px)
+    height: calc(100vh - 240px)
     transition: background 0.3s ease, color 0.3s ease
 
     &.dark
         background: #121212 // темный фон
         color: #ffffff // светлый текст
-        .profileContainer
+        .profileWrapper
+            background: #1a1a1a
+            .profileContainer
+                background: #1e1e1e
+                transition: background 0.3s ease
+        .company
             background: #1e1e1e
-            transition: background 0.3s ease
+            box-shadow: 0 0 55px -20px rgba(0, 0, 0, 0.3)
+        .geoToggle
+            background: #1e1e1e
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2)
+        .otherBlock
+            background: #1e1e1e
+            .divider
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 100%)
+            .other
+                p
+                    color: #ffffff
+        .companyBottom
+            .companyBottomButton
+                background: #356dbb
+                &:hover
+                    background: #25549b
+                .plusik
+                    background: rgba(255, 255, 255, 0.15)
 
 .profileWrapper
-
+    overflow: hidden
     width: 100%
     display: flex
     align-items: center
@@ -59,6 +81,7 @@
         gap: 10px
         padding: 10px
         transition: background 0.3s ease, color 0.3s ease
+        overflow: hidden
 
         .dark &  // для темной темы, если контейнер находится внутри .dark
             background: #1e1e1e
@@ -109,7 +132,7 @@
     width: 90%
     margin: 0 auto
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05)
-    background: #fff
+    transition: background 0.3s ease, box-shadow 0.3s ease
 
     .geoToggleLeft
         display: flex
@@ -124,6 +147,7 @@
     .geoToggleLabel
         font-size: 16px
         color: #1f2937
+        transition: color 0.3s ease
 
     .geoToggleSwitch
         width: 40px
@@ -133,12 +157,14 @@
         display: flex
         align-items: center
         padding: 2px
+        transition: background 0.3s ease
 
     .geoToggleThumb
         width: 18px
         height: 18px
         background: white
         border-radius: 50%
+        transition: transform 0.3s ease
 
 .iconText
     display: flex
@@ -242,16 +268,18 @@ input[type="range"]
     width: 90%
     margin-top: 0 auto
     border-radius: 16px
-    border-radius: 16px
     gap: 25px
     padding: 24px 0px
-
     background: #fff
+    transition: background 0.3s ease
+
     .divider
         border-radius: 8px
         width: 1px
         height: 65px
         background: linear-gradient(180deg, rgba(234, 234, 234, 0.1) 0%, #eaeaea 50%, rgba(234, 234, 234, 0.1) 100%)
+        transition: background 0.3s ease
+
     .other
         display: flex
         align-items: center
@@ -266,6 +294,7 @@ input[type="range"]
             letter-spacing: -0.02em
             text-align: center
             color: #2d2e2f
+            transition: color 0.3s ease
 
 .company
     display: flex
@@ -274,10 +303,11 @@ input[type="range"]
     justify-content: space-between
     width: 90vw
     border-radius: 16px
-
     padding: 10px
     box-shadow: 0 0 55px -20px rgba(37, 52, 73, 0.05)
     background: #fff
+    transition: background 0.3s ease, box-shadow 0.3s ease
+
     .companyTop
         display: flex
         align-items: center
@@ -298,6 +328,7 @@ input[type="range"]
                 line-height: 96%
                 letter-spacing: -0.02em
                 color: #575859
+                transition: color 0.3s ease
 
             .name
                 font-family: "Inter", sans-serif
@@ -306,6 +337,8 @@ input[type="range"]
                 line-height: 96%
                 letter-spacing: -0.02em
                 color: #2d2e2f
+                transition: color 0.3s ease
+
 .companyBottom
     display: flex
     align-items: center

@@ -35,6 +35,27 @@ export default function Company() {
     >
       <div className={s.companyInnerContainer}>
         <h2 className={s.companyTitle}>{t("company.title")}</h2>
+        {companyData?.photo && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: 16,
+            }}
+          >
+            <img
+              src={companyData.photo}
+              alt="company"
+              style={{
+                width: 97,
+                height: 97,
+                borderRadius: "50%",
+                objectFit: "cover",
+                background: "#f5f5f5",
+              }}
+            />
+          </div>
+        )}
         <button
           className={s.companySaveButton}
           onClick={() => setPopupOpen(true)}
