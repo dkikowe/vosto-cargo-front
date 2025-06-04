@@ -43,6 +43,7 @@ export default function Cabinet() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [rating, setRating] = useState("");
+  const [geoEnabled, setGeoEnabled] = useState(false);
 
   const [showCalculator, setShowCalculator] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
@@ -85,6 +86,36 @@ export default function Cabinet() {
       console.error("Ошибка при разборе initData:", error);
     }
   }, [initData]);
+
+  useEffect(() => {
+    if (!geoEnabled) return;
+
+    const sendLocation = () => {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            };
+            axios.post("/save-location", {
+              userId: id,
+              location: coords,
+            });
+          },
+          (error) => {
+            console.error("Ошибка получения геопозиции:", error);
+          },
+          { enableHighAccuracy: true }
+        );
+      }
+    };
+
+    sendLocation(); // сразу
+    const interval = setInterval(sendLocation, 30000); // каждые 30 сек
+
+    return () => clearInterval(interval);
+  }, [geoEnabled, id]);
 
   useEffect(() => {
     if (id) {
@@ -344,7 +375,10 @@ export default function Cabinet() {
             {t("cabinet.geolocation")}
           </span>
         </div>
-        <div className={s.geoToggleSwitch}>
+        <div
+          className={`${s.geoToggleSwitch} ${geoEnabled ? s.enabled : ""}`}
+          onClick={() => setGeoEnabled(!geoEnabled)}
+        >
           <div className={s.geoToggleThumb} />
         </div>
       </div>

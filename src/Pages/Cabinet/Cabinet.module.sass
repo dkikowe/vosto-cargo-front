@@ -157,14 +157,39 @@
         display: flex
         align-items: center
         padding: 2px
-        transition: background 0.3s ease
+        transition: background 0.3s ease, left 0.3s ease
 
     .geoToggleThumb
         width: 18px
         height: 18px
         background: white
         border-radius: 50%
-        transition: transform 0.3s ease
+        transition: transform 0.3s ease, left 0.3s ease
+
+.geoToggleSwitch
+    width: 42px
+    height: 22px
+    background-color: #ccc
+    border-radius: 12px
+    position: relative
+    transition: background-color 0.3s
+    cursor: pointer
+
+.geoToggleSwitch.enabled
+    background-color: #2563eb
+
+.geoToggleThumb
+    width: 18px
+    height: 18px
+    background-color: white
+    border-radius: 50%
+    position: absolute
+    top: 2px
+    left: 2px
+    transition: left 0.3s ease
+
+.geoToggleSwitch.enabled .geoToggleThumb
+    left: 22px
 
 .iconText
     display: flex
