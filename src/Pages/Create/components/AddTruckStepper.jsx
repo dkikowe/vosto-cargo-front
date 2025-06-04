@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import s from "../Create.module.sass";
 import { ThemeContext } from "../../../context/ThemeContext";
 
-const steps = ["Информация о заявке", "Информация о грузе", "Детали заявки"];
+const steps = ["Информация о заявке", "Информация о машине", "Детали заявки"];
 
-export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
+export default function AddTruckStepper({ onSubmit, onClose, initialValues }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     from: "",
@@ -12,7 +12,7 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
     dateFrom: "",
     dateTo: "",
     bodyType: "",
-    cargoName: "",
+    vehicle: "",
     volume: "",
     weight: "",
     phone: "",
@@ -29,8 +29,8 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
         to: initialValues.to || "",
         dateFrom: initialValues.dateFrom || "",
         dateTo: initialValues.dateTo || "",
-        bodyType: initialValues.bodyType || initialValues.vehicle || "",
-        cargoName: initialValues.cargoName || initialValues.cargo || "",
+        bodyType: initialValues.bodyType || "",
+        vehicle: initialValues.vehicle || "",
         volume: initialValues.volume || "",
         weight: initialValues.weight || "",
         phone: initialValues.phone || initialValues.telefon || "",
@@ -54,7 +54,7 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
       console.log("Попытка submit без allowSubmit");
       return;
     }
-    console.log("Submit формы AddCargoStepper", form);
+    console.log("Submit формы AddTruckStepper", form);
     onSubmit(form);
     setAllowSubmit(false);
   };
@@ -80,7 +80,7 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
             color: theme === "dark" ? "#fff" : undefined,
           }}
         >
-          {initialValues ? "Редактирование груза" : "Добавление груза"}
+          {initialValues ? "Редактирование машины" : "Добавление машины"}
         </div>
         <div
           style={{
@@ -166,10 +166,10 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
       {step === 1 && (
         <>
           <input
-            name="cargoName"
-            value={form.cargoName}
+            name="vehicle"
+            value={form.vehicle}
             onChange={handleChange}
-            placeholder="Наименование груза"
+            placeholder="Марка и модель машины"
             className={s.input}
             style={{ marginBottom: 8 }}
           />

@@ -258,6 +258,7 @@ export default function Cabinet() {
                   src="/images/design-icons-cab/bell.svg"
                   className="w-[18px] h-[18px]"
                   alt=""
+                  onClick={() => navigate("/notification")}
                 />
               </div>
               <div

@@ -91,10 +91,14 @@ const PremiumSubscription = () => {
   };
 
   const containerStyle = {
-    backgroundColor: isDark ? "#121212" : "#f9f9f9",
+    backgroundColor: isDark ? "#121212" : "",
     color: isDark ? "#fff" : "#000",
     minHeight: "100vh",
   };
+
+  const background = isDark ? "#121212" : "";
+
+  const bgCard = isDark ? "#1e1e1e" : "";
 
   const buttonStyle = {
     backgroundColor: "#4CAF50",
@@ -108,7 +112,7 @@ const PremiumSubscription = () => {
 
   return (
     <div className={styles.container} style={containerStyle}>
-      <div className={styles.header}>
+      <div className={styles.header} style={{ background: background }}>
         <ChevronLeft
           onClick={() => navigate("/menu")}
           style={{ cursor: "pointer", color: isDark ? "#fff" : "#fff" }}
@@ -125,6 +129,10 @@ const PremiumSubscription = () => {
             <div
               key={tariff.id}
               className={styles.singleTariffCard}
+              style={{
+                backgroundColor: bgCard,
+                color: isDark ? "#fff" : "",
+              }}
               onClick={() => handleTariffSelect(tariff.id)}
             >
               <div className={styles.topRow}>
@@ -135,7 +143,12 @@ const PremiumSubscription = () => {
                     alignItems: "flex-start",
                   }}
                 >
-                  <span className={styles.tariffName}>{tariff.name}</span>
+                  <span
+                    className={styles.tariffName}
+                    style={{ color: isDark ? "#fff" : "" }}
+                  >
+                    {tariff.name}
+                  </span>
                   <div className={styles.durationRow}>
                     <svg
                       width="15"
@@ -149,17 +162,29 @@ const PremiumSubscription = () => {
                         fill="#575859"
                       />
                     </svg>
-                    <span className={styles.duration}>{tariff.duration}</span>
+                    <span
+                      className={styles.duration}
+                      style={{ color: isDark ? "#fff" : "" }}
+                    >
+                      {tariff.duration}
+                    </span>
                   </div>
                 </div>
-                <span className={styles.tariffPrice}>
+                <span
+                  className={styles.tariffPrice}
+                  style={{ color: isDark ? "#fff" : "" }}
+                >
                   {tariff.price.toLocaleString()} ₽
                 </span>
               </div>
               {tariff.features && tariff.features.length > 0 && (
                 <div className={styles.featuresList}>
                   {tariff.features.map((feature, idx) => (
-                    <div className={styles.featureItem} key={idx}>
+                    <div
+                      className={styles.featureItem}
+                      key={idx}
+                      style={{ color: isDark ? "#fff" : "" }}
+                    >
                       {feature}
                     </div>
                   ))}
@@ -174,11 +199,20 @@ const PremiumSubscription = () => {
         </div>
       </div>
 
-      <div className={styles.additionalOptions}>
-        <h2>Дополнительные опции</h2>
+      <div
+        className={styles.additionalOptions}
+        style={{ background: background }}
+      >
+        <h2 style={{ color: isDark ? "#fff" : "#000" }}>
+          Дополнительные опции
+        </h2>
         <div className={styles.optionsGrid}>
           {additionalOptions.map((option) => (
-            <div key={option.id} className={styles.singleTariffCard}>
+            <div
+              key={option.id}
+              className={styles.singleTariffCard}
+              style={{ backgroundColor: bgCard, color: isDark ? "#fff" : "" }}
+            >
               <div className={styles.topRow}>
                 <div
                   style={{
@@ -187,7 +221,12 @@ const PremiumSubscription = () => {
                     alignItems: "flex-start",
                   }}
                 >
-                  <span className={styles.tariffName}>{option.name}</span>
+                  <span
+                    className={styles.tariffName}
+                    style={{ color: isDark ? "#fff" : "" }}
+                  >
+                    {option.name}
+                  </span>
                   <div className={styles.durationRow}>
                     <svg
                       width="15"
@@ -201,15 +240,28 @@ const PremiumSubscription = () => {
                         fill="#575859"
                       />
                     </svg>
-                    <span className={styles.duration}>{option.duration}</span>
+                    <span
+                      className={styles.duration}
+                      style={{ color: isDark ? "#fff" : "" }}
+                    >
+                      {option.duration}
+                    </span>
                   </div>
                 </div>
-                <span className={styles.tariffPrice}>
+                <span
+                  className={styles.tariffPrice}
+                  style={{ color: isDark ? "#fff" : "" }}
+                >
                   {option.price.toLocaleString()} ₽
                 </span>
               </div>
               <div className={styles.featuresList}>
-                <div className={styles.featureItem}>{option.description}</div>
+                <div
+                  className={styles.featureItem}
+                  style={{ color: isDark ? "#fff" : "" }}
+                >
+                  {option.description}
+                </div>
               </div>
               <div className={styles.rightBlock}>
                 <span className={styles.rubTon}>RUB / TON</span>

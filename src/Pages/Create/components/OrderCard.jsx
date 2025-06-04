@@ -174,7 +174,7 @@ export const OrderCard = ({
             padding: "16px 16px 0 16px",
           }}
         >
-          <Box size={32} color={iconMain} />
+          <img src="/images/design-icons-main/cargo.svg" alt="" />
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span
               style={{
@@ -215,7 +215,7 @@ export const OrderCard = ({
               {order.from} — {order.to}
             </h1>
             <div>
-              <Box size={28} color={iconMain} />
+              <img src="/images/design-icons-main/cargo.svg" alt="" />
             </div>
           </div>
           <div
@@ -279,7 +279,7 @@ export const OrderCard = ({
         {showDetails && (
           <div
             className={s.cardDetailsContent}
-            style={isDark ? { color: "#fff" } : {}}
+            style={isDark ? { color: "#fff", background: "#1a1a1a" } : {}}
           >
             <div
               className={s.cardCustomerLabel}
@@ -338,7 +338,9 @@ export const OrderCard = ({
               {order.cargo && (
                 <div
                   className={s.cardTag}
-                  style={isDark ? { color: "#fff" } : {}}
+                  style={
+                    isDark ? { color: "#121212", background: "#e5e5e5" } : {}
+                  }
                 >
                   <img
                     src="/images/design-icons-main/cargo-detail.svg"
@@ -350,7 +352,9 @@ export const OrderCard = ({
               {order.weight && (
                 <div
                   className={s.cardTag}
-                  style={isDark ? { color: "#fff" } : {}}
+                  style={
+                    isDark ? { color: "#121212", background: "#e5e5e5" } : {}
+                  }
                 >
                   <img src="/images/design-icons-main/baggage.svg" alt="" />
                   {order.weight}
@@ -359,7 +363,9 @@ export const OrderCard = ({
               {order.volume && (
                 <div
                   className={s.cardTag}
-                  style={isDark ? { color: "#fff" } : {}}
+                  style={
+                    isDark ? { color: "#121212", background: "#e5e5e5" } : {}
+                  }
                 >
                   <img src="/images/design-icons-main/expand.svg" alt="" />
                   {order.volume} м³
@@ -368,7 +374,9 @@ export const OrderCard = ({
               {order.vehicle && (
                 <div
                   className={s.cardTag}
-                  style={isDark ? { color: "#fff" } : {}}
+                  style={
+                    isDark ? { color: "#121212", background: "#e5e5e5" } : {}
+                  }
                 >
                   <img src="/images/design-icons-main/gruzocar.svg" alt="" />
                   {order.vehicle}
@@ -503,13 +511,13 @@ export const OrderCard = ({
             padding: "16px 16px 0 16px",
           }}
         >
-          <Truck size={32} color={iconMain} />
+          <img src="/images/design-icons-main/gruzocar.svg" alt="" />
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span
               style={{
                 fontWeight: 600,
                 fontSize: 18,
-                color: isDark ? "#fff" : "#000",
+                color: isDark ? "#fff" : "",
               }}
             >
               Машина
@@ -544,7 +552,7 @@ export const OrderCard = ({
               {order.otkuda} — {order.kuda}
             </h1>
             <div>
-              <Truck size={28} color={iconMain} />
+              <img src="/images/design-icons-main/gruzocar.svg" alt="" />
             </div>
           </div>
           <div
@@ -595,7 +603,7 @@ export const OrderCard = ({
         {showDetails && (
           <div
             className={s.cardDetailsContent}
-            style={isDark ? { color: "#fff" } : {}}
+            style={isDark ? { color: "#fff", background: "#1a1a1a" } : {}}
           >
             <div
               className={s.cardCustomerLabel}

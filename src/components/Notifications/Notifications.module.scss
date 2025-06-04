@@ -1,5 +1,5 @@
 .notifications {
-  padding: 100px 20px 20px 20px;
+  padding: 0 0px 20px 0px;
   max-width: 600px;
   margin: 0 auto;
   transition: all 0.3s ease;
@@ -86,11 +86,21 @@
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 3rem;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  
-  gap: 120px;
+        width: 100%;
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        background: #053576;
+        padding: 20px 10px;
+        margin-bottom: 20px;
+        h1{
+            font-family: "Inter", sans-serif;
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 96%;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
 }

@@ -18,18 +18,8 @@ export function AddOrderModal({
   if (!visible) return null;
 
   return (
-    <div
-      className={`${s.modalOverlay} ${
-        theme === "dark" ? s.darkModal : s.lightModal
-      }`}
-    >
-      <div
-        className={s.modalContent}
-        style={{
-          backgroundColor: theme === "dark" ? "#121212" : undefined,
-          border: theme === "dark" ? "1px solid #fff" : undefined,
-        }}
-      >
+    <div className={`${s.modalOverlay} ${theme === "dark" ? s.dark : ""}`}>
+      <div className={s.modalContent}>
         <button className={s.closeBtn} onClick={onClose}>
           ×
         </button>
@@ -38,13 +28,7 @@ export function AddOrderModal({
             ? t("order.addCargo")
             : t("order.addMachine")}
         </h3>
-        <form
-          onSubmit={onSubmit}
-          className={s.createForm}
-          style={{
-            backgroundColor: theme === "dark" ? "#121212" : undefined,
-          }}
-        >
+        <form onSubmit={onSubmit} className={s.createForm}>
           <div className={s.formGroup}>
             <label>{t("order.description")}</label>
             <textarea

@@ -45,7 +45,7 @@ const Notifications = () => {
     fetchUserAndBuildNotifications();
   }, [t]);
 
-  const background = isDarkMode ? "#121212" : "#fff";
+  const background = isDarkMode ? "#121212" : "";
   const textColor = isDarkMode ? "#fff" : "#222";
   const messageColor = isDarkMode ? "#ccc" : "#444";
   const timeColor = isDarkMode ? "#888" : "#888";
@@ -56,13 +56,13 @@ const Notifications = () => {
       className={styles.notifications}
       style={{ backgroundColor: background, color: textColor }}
     >
-      <div className={styles.header} style={{ color: textColor }}>
+      <div
+        className={styles.header}
+        style={{ color: textColor, background: background }}
+      >
         <ChevronLeft
+          style={{ color: "#fff" }}
           onClick={() => navigate("/menu")}
-          style={{
-            cursor: "pointer",
-            color: textColor,
-          }}
         />
         <h1>{t("notifications.title")}</h1>
       </div>
