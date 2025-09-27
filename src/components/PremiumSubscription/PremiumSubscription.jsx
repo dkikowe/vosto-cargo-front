@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import axios from "../../axios";
 
 const PremiumSubscription = () => {
-  const [selectedTariff, setSelectedTariff] = useState(null);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -15,27 +14,32 @@ const PremiumSubscription = () => {
   const { t } = useTranslation();
 
   const isDark = theme === "dark";
-  const userId = localStorage.getItem("id");
+  // поддерживаем оба ключа в localStorage
+  const userId = localStorage.getItem("userId") || localStorage.getItem("id");
 
   // Загружаем данные пользователя
   useEffect(() => {
-    if (userId) {
-      axios
-        .get(`/getUserById/${userId}`)
-        .then((res) => {
-          if (res.data) {
-            setUser(res.data);
-            setIsLoading(false);
-            console.log(res.data);
-          }
-        })
-        .catch((error) => {
-          console.error("Ошибка при загрузке пользователя:", error);
+    let ignore = false;
+    async function load() {
+      try {
+        if (!userId) {
           setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
+          return;
+        }
+        const res = await axios.get(`/getUserById/${userId}`);
+        if (!ignore && res.data) {
+          setUser(res.data);
+        }
+      } catch (error) {
+        console.error("Ошибка при загрузке пользователя:", error);
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
     }
+    load();
+    return () => {
+      ignore = true;
+    };
   }, [userId]);
 
   const tariffs = [
@@ -83,15 +87,12 @@ const PremiumSubscription = () => {
         alert("Пользователь не авторизован");
         return;
       }
-
       const response = await axios.post("/api/payments/robokassa/create", {
         userId,
         amount: tariff.price,
-        plan: tariff.id, // "single" | "minimal" | "standard-3m" | "standard-12m"
+        plan: tariff.id,
       });
-
       if (response.data?.payUrl) {
-        // Сохраняем информацию о тарифе для отображения на странице success
         localStorage.setItem("selectedTariff", JSON.stringify(tariff));
         window.location.href = response.data.payUrl;
       } else {
@@ -109,18 +110,11 @@ const PremiumSubscription = () => {
         alert("Пользователь не авторизован");
         return;
       }
-
-      const response = await axios.post("/api/subscription/cancel", {
-        userId,
-      });
-
+      const response = await axios.post("/api/subscription/cancel", { userId });
       if (response.data?.success) {
         alert("Подписка успешно отменена");
-        // Обновляем данные пользователя
         const userResponse = await axios.get(`/getUserById/${userId}`);
-        if (userResponse.data) {
-          setUser(userResponse.data);
-        }
+        if (userResponse.data) setUser(userResponse.data);
       } else {
         alert("Ошибка при отмене подписки");
       }
@@ -135,20 +129,25 @@ const PremiumSubscription = () => {
     color: isDark ? "#fff" : "#000",
     minHeight: "100vh",
   };
-
   const background = isDark ? "#121212" : "";
   const bgCard = isDark ? "#1e1e1e" : "";
 
-  // Получаем информацию о текущем тарифе
+  // Текущий тариф
   const getCurrentTariff = () => {
-    if (!user?.subscription?.plan) return null;
-    return tariffs.find((tariff) => tariff.id === user.subscription.plan);
+    const plan = user?.subscription?.plan;
+    if (!plan) return null;
+    return tariffs.find((t) => t.id === plan) || null;
   };
 
   const currentTariff = getCurrentTariff();
-  const hasActiveSubscription = user?.subscription?.isActive;
 
-  // Форматируем дату окончания подписки
+  // Активность подписки по status + expiresAt
+  const hasActiveSubscription =
+    !!user?.subscription &&
+    user.subscription.status === "active" &&
+    user.subscription.expiresAt &&
+    new Date(user.subscription.expiresAt) > new Date();
+
   const formatExpirationDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -187,7 +186,6 @@ const PremiumSubscription = () => {
       </div>
 
       {hasActiveSubscription && currentTariff ? (
-        // Показываем информацию о текущей подписке
         <div className={styles.currentSubscription}>
           <h2 style={{ color: isDark ? "#fff" : "#000", marginBottom: "20px" }}>
             Ваша подписка
@@ -217,7 +215,7 @@ const PremiumSubscription = () => {
               </p>
             </div>
 
-            {currentTariff.features && currentTariff.features.length > 0 && (
+            {currentTariff.features?.length > 0 && (
               <div className={styles.featuresList}>
                 <h4
                   style={{ color: isDark ? "#fff" : "", margin: "0 0 10px 0" }}
@@ -238,7 +236,7 @@ const PremiumSubscription = () => {
 
             <div className={styles.subscriptionInfo}>
               <p style={{ color: isDark ? "#bbb" : "#666", margin: "10px 0" }}>
-                Истекает: {formatExpirationDate(user.subscription.expiresAt)}
+                Истекает: {formatExpirationDate(user?.subscription?.expiresAt)}
               </p>
             </div>
 
@@ -259,20 +257,16 @@ const PremiumSubscription = () => {
           </div>
         </div>
       ) : (
-        // Показываем список доступных тарифов
         <div className={styles.tariffs}>
           <h2 style={{ cursor: "pointer", color: isDark ? "#fff" : "#000" }}>
             Тарифы для перевозчиков
           </h2>
           <div className={styles.tariffGrid}>
-            {tariffs.map((tariff, idx) => (
+            {tariffs.map((tariff) => (
               <div
                 key={tariff.id}
                 className={styles.singleTariffCard}
-                style={{
-                  backgroundColor: bgCard,
-                  color: isDark ? "#fff" : "",
-                }}
+                style={{ backgroundColor: bgCard, color: isDark ? "#fff" : "" }}
               >
                 <div className={styles.topRow}>
                   <div
@@ -305,7 +299,7 @@ const PremiumSubscription = () => {
                   </span>
                 </div>
 
-                {tariff.features && tariff.features.length > 0 && (
+                {tariff.features?.length > 0 && (
                   <div className={styles.featuresList}>
                     {tariff.features.map((feature, idx) => (
                       <div
