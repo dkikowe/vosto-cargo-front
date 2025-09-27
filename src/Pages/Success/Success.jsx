@@ -55,26 +55,84 @@ const Success = () => {
           </h2>
 
           {selectedTariff && (
-            <div style={{ marginBottom: "16px" }}>
-              <p
+            <div style={{ marginBottom: "16px", width: "100%" }}>
+              <div
                 style={{
-                  color: isDark ? "#fff" : "#000",
-                  fontSize: "18px",
-                  fontWeight: "600",
-                  margin: "0 0 8px 0",
+                  backgroundColor: isDark ? "#2a2a2a" : "#f0f9ff",
+                  padding: "16px",
+                  borderRadius: "12px",
+                  marginBottom: "16px",
                 }}
               >
-                Тариф: {selectedTariff.name}
-              </p>
-              <p
-                style={{
-                  color: isDark ? "#bbb" : "#666",
-                  fontSize: "14px",
-                  margin: "0",
-                }}
-              >
-                Срок действия: {selectedTariff.duration}
-              </p>
+                <p
+                  style={{
+                    color: isDark ? "#fff" : "#000",
+                    fontSize: "20px",
+                    fontWeight: "700",
+                    margin: "0 0 8px 0",
+                  }}
+                >
+                  {selectedTariff.name}
+                </p>
+                <p
+                  style={{
+                    color: isDark ? "#bbb" : "#666",
+                    fontSize: "16px",
+                    margin: "0 0 8px 0",
+                  }}
+                >
+                  Срок действия: {selectedTariff.duration}
+                </p>
+                <p
+                  style={{
+                    color: "#4CAF50",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    margin: "0",
+                  }}
+                >
+                  {selectedTariff.price.toLocaleString()} ₽
+                </p>
+              </div>
+
+              {selectedTariff.features &&
+                selectedTariff.features.length > 0 && (
+                  <div style={{ marginBottom: "16px" }}>
+                    <p
+                      style={{
+                        color: isDark ? "#fff" : "#000",
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        margin: "0 0 12px 0",
+                      }}
+                    >
+                      Включено в подписку:
+                    </p>
+                    {selectedTariff.features.map((feature, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <span style={{ color: "#4CAF50", fontWeight: "bold" }}>
+                          ✓
+                        </span>
+                        <span
+                          style={{
+                            color: isDark ? "#fff" : "#000",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
           )}
 
@@ -89,26 +147,28 @@ const Success = () => {
             функциям платформы.
           </p>
 
-          <div className={styles.features}>
-            <div className={styles.feature}>
-              <span style={{ color: isDark ? "#fff" : "#000" }}>✓</span>
-              <span style={{ color: isDark ? "#fff" : "#000" }}>
-                Неограниченное количество заявок
-              </span>
+          {!selectedTariff && (
+            <div className={styles.features}>
+              <div className={styles.feature}>
+                <span style={{ color: isDark ? "#fff" : "#000" }}>✓</span>
+                <span style={{ color: isDark ? "#fff" : "#000" }}>
+                  Неограниченное количество заявок
+                </span>
+              </div>
+              <div className={styles.feature}>
+                <span style={{ color: isDark ? "#fff" : "#000" }}>✓</span>
+                <span style={{ color: isDark ? "#fff" : "#000" }}>
+                  Полный доступ к платформе
+                </span>
+              </div>
+              <div className={styles.feature}>
+                <span style={{ color: isDark ? "#fff" : "#000" }}>✓</span>
+                <span style={{ color: isDark ? "#fff" : "#000" }}>
+                  Приоритетная поддержка
+                </span>
+              </div>
             </div>
-            <div className={styles.feature}>
-              <span style={{ color: isDark ? "#fff" : "#000" }}>✓</span>
-              <span style={{ color: isDark ? "#fff" : "#000" }}>
-                Полный доступ к платформе
-              </span>
-            </div>
-            <div className={styles.feature}>
-              <span style={{ color: isDark ? "#fff" : "#000" }}>✓</span>
-              <span style={{ color: isDark ? "#fff" : "#000" }}>
-                Приоритетная поддержка
-              </span>
-            </div>
-          </div>
+          )}
 
           <button
             className={styles.backButton}

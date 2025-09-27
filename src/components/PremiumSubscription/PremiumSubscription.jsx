@@ -160,18 +160,13 @@ const PremiumSubscription = () => {
 
               <div className={styles.rightBlock}>
                 <span className={styles.rubTon}>RUB / TON</span>
-                {/* 👇 кнопка работает только для первой карточки */}
-                {idx === 0 ? (
-                  <span
-                    className={styles.payLink}
-                    style={{ cursor: "pointer", color: "#4CAF50" }}
-                    onClick={() => handlePurchase(tariff)}
-                  >
-                    Оплатить
-                  </span>
-                ) : (
-                  <span className={styles.payLink}>Оплатить</span>
-                )}
+                <span
+                  className={styles.payLink}
+                  style={{ cursor: "pointer", color: "#4CAF50" }}
+                  onClick={() => handlePurchase(tariff)}
+                >
+                  Оплатить
+                </span>
               </div>
             </div>
           ))}
