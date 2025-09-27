@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import styles from "./PremiumSubscription.module.scss";
@@ -8,11 +8,34 @@ import axios from "../../axios";
 
 const PremiumSubscription = () => {
   const [selectedTariff, setSelectedTariff] = useState(null);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
   const { t } = useTranslation();
 
   const isDark = theme === "dark";
+  const userId = localStorage.getItem("id");
+
+  // Загружаем данные пользователя
+  useEffect(() => {
+    if (userId) {
+      axios
+        .get(`/getUserById/${userId}`)
+        .then((res) => {
+          if (res.data) {
+            setUser(res.data);
+            setIsLoading(false);
+          }
+        })
+        .catch((error) => {
+          console.error("Ошибка при загрузке пользователя:", error);
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
+    }
+  }, [userId]);
 
   const tariffs = [
     {
@@ -55,8 +78,6 @@ const PremiumSubscription = () => {
 
   const handlePurchase = async (tariff) => {
     try {
-      const userId = localStorage.getItem("id");
-
       if (!userId) {
         alert("Пользователь не авторизован");
         return;
@@ -65,6 +86,7 @@ const PremiumSubscription = () => {
       const response = await axios.post("/api/payments/robokassa/create", {
         userId,
         amount: tariff.price,
+        plan: tariff.id, // "single" | "minimal" | "standard-3m" | "standard-12m"
       });
 
       if (response.data?.payUrl) {
@@ -80,6 +102,33 @@ const PremiumSubscription = () => {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    try {
+      if (!userId) {
+        alert("Пользователь не авторизован");
+        return;
+      }
+
+      const response = await axios.post("/api/subscription/cancel", {
+        userId,
+      });
+
+      if (response.data?.success) {
+        alert("Подписка успешно отменена");
+        // Обновляем данные пользователя
+        const userResponse = await axios.get(`/getUserById/${userId}`);
+        if (userResponse.data) {
+          setUser(userResponse.data);
+        }
+      } else {
+        alert("Ошибка при отмене подписки");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Не удалось отменить подписку");
+    }
+  };
+
   const containerStyle = {
     backgroundColor: isDark ? "#121212" : "",
     color: isDark ? "#fff" : "#000",
@@ -88,6 +137,43 @@ const PremiumSubscription = () => {
 
   const background = isDark ? "#121212" : "";
   const bgCard = isDark ? "#1e1e1e" : "";
+
+  // Получаем информацию о текущем тарифе
+  const getCurrentTariff = () => {
+    if (!user?.subscription?.plan) return null;
+    return tariffs.find((tariff) => tariff.id === user.subscription.plan);
+  };
+
+  const currentTariff = getCurrentTariff();
+  const hasActiveSubscription = user?.subscription?.isActive;
+
+  // Форматируем дату окончания подписки
+  const formatExpirationDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("ru-RU");
+  };
+
+  if (isLoading) {
+    return (
+      <div
+        className={styles.container}
+        style={{ backgroundColor: background, minHeight: "100vh" }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            color: isDark ? "#fff" : "#000",
+          }}
+        >
+          Загрузка...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container} style={containerStyle}>
@@ -99,79 +185,154 @@ const PremiumSubscription = () => {
         <h1>Премиум подписка</h1>
       </div>
 
-      <div className={styles.tariffs}>
-        <h2 style={{ cursor: "pointer", color: isDark ? "#fff" : "#000" }}>
-          Тарифы для перевозчиков
-        </h2>
-        <div className={styles.tariffGrid}>
-          {tariffs.map((tariff, idx) => (
-            <div
-              key={tariff.id}
-              className={styles.singleTariffCard}
+      {hasActiveSubscription && currentTariff ? (
+        // Показываем информацию о текущей подписке
+        <div className={styles.currentSubscription}>
+          <h2 style={{ color: isDark ? "#fff" : "#000", marginBottom: "20px" }}>
+            Ваша подписка
+          </h2>
+
+          <div
+            className={styles.subscriptionCard}
+            style={{
+              backgroundColor: bgCard,
+              color: isDark ? "#fff" : "",
+              padding: "20px",
+              borderRadius: "12px",
+              marginBottom: "20px",
+            }}
+          >
+            <div className={styles.subscriptionHeader}>
+              <h3 style={{ color: isDark ? "#fff" : "", margin: "0 0 10px 0" }}>
+                {currentTariff.name}
+              </h3>
+              <p
+                style={{
+                  color: isDark ? "#bbb" : "#666",
+                  margin: "0 0 15px 0",
+                }}
+              >
+                {currentTariff.duration}
+              </p>
+            </div>
+
+            {currentTariff.features && currentTariff.features.length > 0 && (
+              <div className={styles.featuresList}>
+                <h4
+                  style={{ color: isDark ? "#fff" : "", margin: "0 0 10px 0" }}
+                >
+                  Включено в подписку:
+                </h4>
+                {currentTariff.features.map((feature, idx) => (
+                  <div
+                    className={styles.featureItem}
+                    key={idx}
+                    style={{ color: isDark ? "#fff" : "", marginBottom: "5px" }}
+                  >
+                    • {feature}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className={styles.subscriptionInfo}>
+              <p style={{ color: isDark ? "#bbb" : "#666", margin: "10px 0" }}>
+                Истекает: {formatExpirationDate(user.subscription.expiresAt)}
+              </p>
+            </div>
+
+            <button
+              onClick={handleCancelSubscription}
               style={{
-                backgroundColor: bgCard,
-                color: isDark ? "#fff" : "",
+                backgroundColor: "#ff4444",
+                color: "#fff",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                marginTop: "15px",
               }}
             >
-              <div className={styles.topRow}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                  }}
-                >
+              Отменить подписку
+            </button>
+          </div>
+        </div>
+      ) : (
+        // Показываем список доступных тарифов
+        <div className={styles.tariffs}>
+          <h2 style={{ cursor: "pointer", color: isDark ? "#fff" : "#000" }}>
+            Тарифы для перевозчиков
+          </h2>
+          <div className={styles.tariffGrid}>
+            {tariffs.map((tariff, idx) => (
+              <div
+                key={tariff.id}
+                className={styles.singleTariffCard}
+                style={{
+                  backgroundColor: bgCard,
+                  color: isDark ? "#fff" : "",
+                }}
+              >
+                <div className={styles.topRow}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <span
+                      className={styles.tariffName}
+                      style={{ color: isDark ? "#fff" : "" }}
+                    >
+                      {tariff.name}
+                    </span>
+                    <div className={styles.durationRow}>
+                      <span
+                        className={styles.duration}
+                        style={{ color: isDark ? "#fff" : "" }}
+                      >
+                        {tariff.duration}
+                      </span>
+                    </div>
+                  </div>
                   <span
-                    className={styles.tariffName}
+                    className={styles.tariffPrice}
                     style={{ color: isDark ? "#fff" : "" }}
                   >
-                    {tariff.name}
+                    {tariff.price.toLocaleString()} ₽
                   </span>
-                  <div className={styles.durationRow}>
-                    <span
-                      className={styles.duration}
-                      style={{ color: isDark ? "#fff" : "" }}
-                    >
-                      {tariff.duration}
-                    </span>
+                </div>
+
+                {tariff.features && tariff.features.length > 0 && (
+                  <div className={styles.featuresList}>
+                    {tariff.features.map((feature, idx) => (
+                      <div
+                        className={styles.featureItem}
+                        key={idx}
+                        style={{ color: isDark ? "#fff" : "" }}
+                      >
+                        {feature}
+                      </div>
+                    ))}
                   </div>
-                </div>
-                <span
-                  className={styles.tariffPrice}
-                  style={{ color: isDark ? "#fff" : "" }}
-                >
-                  {tariff.price.toLocaleString()} ₽
-                </span>
-              </div>
+                )}
 
-              {tariff.features && tariff.features.length > 0 && (
-                <div className={styles.featuresList}>
-                  {tariff.features.map((feature, idx) => (
-                    <div
-                      className={styles.featureItem}
-                      key={idx}
-                      style={{ color: isDark ? "#fff" : "" }}
-                    >
-                      {feature}
-                    </div>
-                  ))}
+                <div className={styles.rightBlock}>
+                  <span className={styles.rubTon}>RUB / TON</span>
+                  <span
+                    className={styles.payLink}
+                    style={{ cursor: "pointer", color: "#4CAF50" }}
+                    onClick={() => handlePurchase(tariff)}
+                  >
+                    Оплатить
+                  </span>
                 </div>
-              )}
-
-              <div className={styles.rightBlock}>
-                <span className={styles.rubTon}>RUB / TON</span>
-                <span
-                  className={styles.payLink}
-                  style={{ cursor: "pointer", color: "#4CAF50" }}
-                  onClick={() => handlePurchase(tariff)}
-                >
-                  Оплатить
-                </span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
