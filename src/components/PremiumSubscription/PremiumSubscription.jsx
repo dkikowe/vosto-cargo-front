@@ -26,6 +26,7 @@ const PremiumSubscription = () => {
           if (res.data) {
             setUser(res.data);
             setIsLoading(false);
+            console.log(res.data);
           }
         })
         .catch((error) => {
