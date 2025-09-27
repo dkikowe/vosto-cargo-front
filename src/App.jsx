@@ -19,11 +19,12 @@ import Conf from "./components/Conf/Conf";
 import PremiumSubscription from "./components/PremiumSubscription/PremiumSubscription";
 import Notifications from "./components/Notifications/Notifications";
 import LanguageSelector from "./components/LanguageSelector/LanguageSelector";
+import Success from "./Pages/Success/Success";
 
 function App() {
   useEffect(() => {
     const tg = window.Telegram.WebApp;
-    tg.requestFullscreen();
+    // tg.requestFullscreen();
     tg.disableVerticalSwipes();
     tg.ready();
 
@@ -45,6 +46,7 @@ function App() {
         <Route path="/support" element={<Support />} />
         <Route path="/conf" element={<Conf />} />
         <Route path="/prem" element={<PremiumSubscription />} />
+        <Route path="/success" element={<Success />} />
         <Route path="/notification" element={<Notifications />} />
         <Route path="/lang" element={<LanguageSelector />} />
       </Routes>

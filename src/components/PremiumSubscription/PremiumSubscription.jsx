@@ -68,6 +68,8 @@ const PremiumSubscription = () => {
       });
 
       if (response.data?.payUrl) {
+        // Сохраняем информацию о тарифе для отображения на странице success
+        localStorage.setItem("selectedTariff", JSON.stringify(tariff));
         window.location.href = response.data.payUrl;
       } else {
         alert("Ошибка при создании ссылки оплаты");
