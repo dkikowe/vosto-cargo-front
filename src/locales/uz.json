@@ -267,7 +267,8 @@
     "capacity": "Sig'im",
     "errorFetchingRoute": "Yo'lni olishda xatolik",
     "ratingSuccess": "Reyting muvaffaqiyatli yuborildi!",
-    "ratingError": "Reyting yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."
+    "ratingError": "Reyting yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
+    "subscriptionRequiredToSeePhone": "Telefon raqamini ko'rish uchun obuna kerak"
   },
   "parserSwitcher": {
     "loading": "Yuklanmoqda...",

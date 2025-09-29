@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+/* Предотвращаем авто-зум на iOS при фокусе на полях ввода */
+input, textarea, select {
+  font-size: 16px;
+}
+
+/* Дополнительно: не даём Safari самовольно менять размер текста */
+html {
+  -webkit-text-size-adjust: 100%;
+}

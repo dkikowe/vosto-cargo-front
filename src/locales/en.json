@@ -286,7 +286,8 @@
                 "capacity": "Capacity",
                 "errorFetchingRoute": "Error fetching route",
                 "ratingSuccess": "Rating submitted successfully!",
-                "ratingError": "Failed to submit rating. Please try again."
+                "ratingError": "Failed to submit rating. Please try again.",
+                "subscriptionRequiredToSeePhone": "Subscription required to see the phone number"
               },
               "parserSwitcher":{
                 "loading": "Loading...",

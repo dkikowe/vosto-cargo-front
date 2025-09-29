@@ -579,7 +579,13 @@ export default function CreateOrders() {
         )}
       </div>
       <div className={s.addButtonWrapper}>
-        <button onClick={() => setShowTypeModal(true)}>Создать заявку</button>
+        <button
+          className={s.createButton}
+          onClick={() => setShowTypeModal(true)}
+        >
+          <span className={s.createButtonText}>Создать заявку</span>
+          <span className={s.plusCircle}>+</span>
+        </button>
       </div>
       <BottomSheetModal
         visible={showTypeModal}

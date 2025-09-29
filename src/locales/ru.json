@@ -277,7 +277,8 @@
       "capacity": "Вместимость",
       "errorFetchingRoute": "Ошибка при получении маршрута",
       "ratingSuccess": "Рейтинг успешно установлен!",
-      "ratingError": "Не удалось отправить рейтинг. Попробуйте снова."
+      "ratingError": "Не удалось отправить рейтинг. Попробуйте снова.",
+      "subscriptionRequiredToSeePhone": "Чтобы увидеть номер, нужна подписка"
     },
     "parserSwitcher":{
       "loading": "Загрузка...",

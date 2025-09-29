@@ -53,7 +53,7 @@ function parseRange(readyStr, yearArg) {
 
 // ---------- Компонент карточки (с добавлением рейтинга) ----------
 
-export const Card = ({ data }) => {
+export const Card = ({ data, canSeePhone }) => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
   const { t } = useTranslation();
@@ -266,7 +266,13 @@ export const Card = ({ data }) => {
             <div className={s.cardCustomer}>{data.customerName || "—"}</div>
             {data.telefon && (
               <div className={s.cardPhone}>
-                <a href={`tel:${data.telefon}`}>{data.telefon}</a>
+                {canSeePhone ? (
+                  <a href={`tel:${data.telefon}`}>{data.telefon}</a>
+                ) : (
+                  <span style={{ color: "#7D97B8", fontWeight: 600 }}>
+                    {t("card.subscriptionRequiredToSeePhone")}
+                  </span>
+                )}
               </div>
             )}
             <div className={s.cardRouteBlock}>
@@ -378,7 +384,13 @@ export const Card = ({ data }) => {
           {data.firma && <div className={s.cardCustomer}>({data.firma})</div>}
           {data.telefon && (
             <div className={s.cardPhone}>
-              <a href={`tel:${data.telefon}`}>{data.telefon}</a>
+              {canSeePhone ? (
+                <a href={`tel:${data.telefon}`}>{data.telefon}</a>
+              ) : (
+                <span style={{ color: "#7D97B8", fontWeight: 600 }}>
+                  {t("card.subscriptionRequiredToSeePhone")}
+                </span>
+              )}
             </div>
           )}
           <div className={s.cardRouteBlock}>
@@ -441,6 +453,10 @@ export const ParserSwitcher = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
 
+  // Текущий пользователь и статус подписки
+  const [currentUser, setCurrentUser] = useState(null);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+
   const [cargoSearch, setCargoSearch] = useState({
     fromDate: "",
     toDate: "",
@@ -462,6 +478,34 @@ export const ParserSwitcher = () => {
 
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Загружаем пользователя аналогично Cabinet
+  useEffect(() => {
+    const localId =
+      localStorage.getItem("userId") || localStorage.getItem("id");
+    if (!localId) return;
+    let ignore = false;
+    (async () => {
+      try {
+        const res = await axios.get(`/getUserById/${localId}`);
+        if (!ignore && res.data) {
+          setCurrentUser(res.data);
+          const sub = res.data.subscription;
+          const active =
+            !!sub &&
+            sub.status === "active" &&
+            sub.expiresAt &&
+            new Date(sub.expiresAt) > new Date();
+          setHasActiveSubscription(active);
+        }
+      } catch (e) {
+        console.error("Ошибка загрузки пользователя на главной:", e);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const fetchData = async () => {
@@ -1126,7 +1170,13 @@ export const ParserSwitcher = () => {
           >
             <div className={s.cardsGrid}>
               {feedData.length > 0 ? (
-                feedData.map((item, index) => <Card key={index} data={item} />)
+                feedData.map((item, index) => (
+                  <Card
+                    key={index}
+                    data={item}
+                    canSeePhone={hasActiveSubscription}
+                  />
+                ))
               ) : (
                 <p className={s.placeholder}>
                   {filteredFeedData.length === 0 &&
@@ -1326,7 +1376,11 @@ export const ParserSwitcher = () => {
           {searchResults.length > 0 ? (
             <div className={s.cardsGrid}>
               {searchResults.map((item, index) => (
-                <Card key={index} data={item} />
+                <Card
+                  key={index}
+                  data={item}
+                  canSeePhone={hasActiveSubscription}
+                />
               ))}
             </div>
           ) : (

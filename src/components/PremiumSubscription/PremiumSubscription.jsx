@@ -187,70 +187,50 @@ const PremiumSubscription = () => {
 
       {hasActiveSubscription && currentTariff ? (
         <div className={styles.currentSubscription}>
-          <h2 style={{ color: isDark ? "#fff" : "#000", marginBottom: "20px" }}>
-            Ваша подписка
-          </h2>
-
           <div
-            className={styles.subscriptionCard}
             style={{
-              backgroundColor: bgCard,
-              color: isDark ? "#fff" : "",
-              padding: "20px",
-              borderRadius: "12px",
-              marginBottom: "20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "24px",
+              padding: "0 20px",
             }}
           >
+            <h2 style={{ color: isDark ? "#fff" : "#000", margin: 0 }}>
+              Ваша подписка
+            </h2>
+            <div className={styles.subscriptionStatus}>
+              <div className={styles.statusDot}></div>
+              Активна
+            </div>
+          </div>
+
+          <div className={`${styles.subscriptionCard} ${isDark ? "dark" : ""}`}>
             <div className={styles.subscriptionHeader}>
-              <h3 style={{ color: isDark ? "#fff" : "", margin: "0 0 10px 0" }}>
-                {currentTariff.name}
-              </h3>
-              <p
-                style={{
-                  color: isDark ? "#bbb" : "#666",
-                  margin: "0 0 15px 0",
-                }}
-              >
-                {currentTariff.duration}
-              </p>
+              <h3>{currentTariff.name}</h3>
+              <p>{currentTariff.duration}</p>
             </div>
 
             {currentTariff.features?.length > 0 && (
-              <div className={styles.featuresList}>
-                <h4
-                  style={{ color: isDark ? "#fff" : "", margin: "0 0 10px 0" }}
-                >
-                  Включено в подписку:
-                </h4>
+              <div className={styles.subscriptionFeatures}>
+                <h4>Включено в подписку:</h4>
                 {currentTariff.features.map((feature, idx) => (
-                  <div
-                    className={styles.featureItem}
-                    key={idx}
-                    style={{ color: isDark ? "#fff" : "", marginBottom: "5px" }}
-                  >
-                    • {feature}
+                  <div className={styles.subscriptionFeatureItem} key={idx}>
+                    {feature}
                   </div>
                 ))}
               </div>
             )}
 
             <div className={styles.subscriptionInfo}>
-              <p style={{ color: isDark ? "#bbb" : "#666", margin: "10px 0" }}>
+              <p>
                 Истекает: {formatExpirationDate(user?.subscription?.expiresAt)}
               </p>
             </div>
 
             <button
               onClick={handleCancelSubscription}
-              style={{
-                backgroundColor: "#ff4444",
-                color: "#fff",
-                border: "none",
-                padding: "10px 20px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                marginTop: "15px",
-              }}
+              className={styles.cancelButton}
             >
               Отменить подписку
             </button>

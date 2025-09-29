@@ -62,6 +62,7 @@ margin-bottom: 20px;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 0.5rem;
   overflow-y: scroll;
+  padding-bottom: 100px;
 
 }
 
@@ -308,4 +309,221 @@ letter-spacing: -0.02em;
 color: #2d2e2f;
 opacity: 0.6;
 width: 200px;
+}
+
+// Стили для активной подписки
+.currentSubscription {
+  padding: 0;
+}
+
+.subscriptionStatus {
+  background: #4CAF50;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  .statusDot {
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.subscriptionCard {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  border: 1px solid #e5e7eb;
+  
+  &::after {
+    content: '✓';
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    background: #4CAF50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+}
+
+.subscriptionHeader {
+  margin-bottom: 24px;
+  
+  h3 {
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.2;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+  }
+  
+  p {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+.subscriptionFeatures {
+  margin-bottom: 24px;
+  
+  h4 {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: #1f2937;
+    margin: 0 0 16px 0;
+  }
+}
+
+.subscriptionFeatureItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+  
+  &::before {
+    content: '✓';
+    width: 20px;
+    height: 20px;
+    background: #4CAF50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+  }
+}
+
+.subscriptionInfo {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid #e5e7eb;
+  
+  p {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    
+    &::before {
+      content: '📅';
+      margin-right: 8px;
+      font-size: 16px;
+    }
+  }
+}
+
+.cancelButton {
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(220, 38, 38, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Темная тема для карточки подписки
+.dark .subscriptionCard {
+  background: #1f2937;
+  border-color: #374151;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.dark .subscriptionHeader h3 {
+  color: #f9fafb;
+}
+
+.dark .subscriptionHeader p {
+  color: #9ca3af;
+}
+
+.dark .subscriptionFeatures h4 {
+  color: #f9fafb;
+}
+
+.dark .subscriptionFeatureItem {
+  color: #d1d5db;
+}
+
+.dark .subscriptionInfo {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark .subscriptionInfo p {
+  color: #9ca3af;
+}
+
+.dark .cancelButton {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  color: #fca5a5;
+  
+  &:hover {
+    background: #991b1b;
+    border-color: #b91c1c;
+    box-shadow: 0 8px 16px rgba(127, 29, 29, 0.3);
+  }
 } 
