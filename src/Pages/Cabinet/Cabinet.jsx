@@ -271,7 +271,10 @@ export default function Cabinet() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={s.name}
-                onBlur={saveName}
+                onBlur={() => {
+                  saveName();
+                  window.scrollTo(0, 0);
+                }}
                 onFocus={() => {
                   requestAnimationFrame(() => {
                     nameInputRef.current?.scrollIntoView({

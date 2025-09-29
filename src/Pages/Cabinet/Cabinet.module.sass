@@ -5,7 +5,8 @@
     gap: 20px
     align-items: center
     overflow-y: auto
-    height: calc(100dvh - 240px)
+    height: calc(var(--app-height, 100dvh) - 240px)
+    padding-bottom: calc(env(safe-area-inset-bottom) + 90px)
     transition: background 0.3s ease, color 0.3s ease
 
     &.dark
