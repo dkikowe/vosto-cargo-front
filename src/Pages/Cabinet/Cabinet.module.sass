@@ -4,9 +4,15 @@
     background: #f5f5f5 // светлая тема по умолчанию
     gap: 20px
     align-items: center
-    overflow-y: hidden
-    height: calc(100vh - 240px)
-    transition: background 0.3s ease, color 0.3s ease
+    overflow-y: auto
+    -webkit-overflow-scrolling: touch
+    overscroll-behavior-y: contain
+    // используем динамические вьюпорт-единицы, чтобы не скакало при клавиатуре iOS
+    min-height: calc(100dvh - 240px)
+    // fallback для старых браузеров
+    @supports not (height: 100dvh)
+        min-height: calc(100vh - 240px)
+        transition: background 0.3s ease, color 0.3s ease
 
     &.dark
         background: #121212 // темный фон
@@ -239,7 +245,7 @@ hr
     top: 0
     left: 0
     width: 100vw
-    height: 100vh
+    height: 100dvh
     background: rgba(0, 0, 0, 0.6) // Затемнение фона
     display: flex
     justify-content: center
