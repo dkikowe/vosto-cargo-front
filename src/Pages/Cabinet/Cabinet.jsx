@@ -1,4 +1,4 @@
-import React, { use, useContext, useEffect, useRef, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useNavigate } from "react-router-dom";
 import axios from "../../axios"; // <-- Подключаем ваш настроенный axios (с baseURL = "http://localhost:3001" или другой)
@@ -44,7 +44,6 @@ export default function Cabinet() {
   const [role, setRole] = useState("");
   const [rating, setRating] = useState("");
   const [geoEnabled, setGeoEnabled] = useState(false);
-  const nameInputRef = useRef(null);
 
   const [showCalculator, setShowCalculator] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
@@ -271,23 +270,11 @@ export default function Cabinet() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={s.name}
-                onBlur={() => {
-                  saveName();
-                  window.scrollTo(0, 0);
-                }}
-                onFocus={() => {
-                  requestAnimationFrame(() => {
-                    nameInputRef.current?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center",
-                    });
-                  });
-                }}
+                onBlur={saveName}
                 style={{
                   color: theme === "dark" ? "#fff" : undefined,
                   backgroundColor: theme === "dark" ? "transparent" : undefined,
                 }}
-                ref={nameInputRef}
               />
               <RoleSelect userId={id} />
             </div>

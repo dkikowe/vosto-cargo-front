@@ -9,19 +9,3 @@ input, textarea, select {
 html {
   -webkit-text-size-adjust: 100%;
 }
-
-/* Блок устойчивости высоты/скролла для мобильных */
-html, body, #root {
-  height: 100%;
-}
-
-@supports (height: 100dvh) {
-  body {
-    min-height: 100dvh;
-  }
-}
-
-html, body {
-  overscroll-behavior-y: contain;
-  scroll-behavior: auto;
-}

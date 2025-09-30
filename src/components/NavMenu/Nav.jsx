@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import { Menu, PackagePlus, House } from "lucide-react";
 import s from "./Nav.module.sass";
@@ -10,19 +10,6 @@ export default function Nav() {
   const isStartPage = location.pathname === "/start";
   const { theme } = useContext(ThemeContext);
   const { t } = useTranslation();
-  const [keyboardOpen, setKeyboardOpen] = useState(false);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const onResize = () => {
-      const heightDiff = window.innerHeight - vv.height;
-      setKeyboardOpen(heightDiff > 150); // эвристика: клавиатура открыта
-    };
-    vv.addEventListener("resize", onResize);
-    onResize();
-    return () => vv.removeEventListener("resize", onResize);
-  }, []);
 
   const navItems = [
     {
@@ -51,7 +38,6 @@ export default function Nav() {
           ? s.containerDisabled
           : `${s.container} ${theme === "dark" ? s.dark : s.light}`
       }
-      style={{ transform: keyboardOpen ? "translateY(100%)" : undefined }}
     >
       <div className={s.icons}>
         {navItems.map((item, index) => (

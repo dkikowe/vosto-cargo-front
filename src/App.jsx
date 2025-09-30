@@ -28,25 +28,8 @@ function App() {
     tg.disableVerticalSwipes();
     tg.ready();
 
-    const setAppHeight = () => {
-      const vv = window.visualViewport;
-      const height = vv ? vv.height : window.innerHeight;
-      document.documentElement.style.setProperty("--app-height", `${height}px`);
-    };
-    setAppHeight();
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", setAppHeight);
-    } else {
-      window.addEventListener("resize", setAppHeight);
-    }
-
     return () => {
       tg.close(); // Закрытие веб-приложения (при необходимости)
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener("resize", setAppHeight);
-      } else {
-        window.removeEventListener("resize", setAppHeight);
-      }
     };
   }, []);
   return (
