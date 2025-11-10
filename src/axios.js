@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "https://vosto-cargo-back-production.up.railway.app/",
+  // baseURL: "https://vosto-cargo-back-production.up.railway.app",
+  baseURL: "https://vosto-cargo-back.vercel.app",
   // baseURL: "http://localhost:5051",
 });
 
