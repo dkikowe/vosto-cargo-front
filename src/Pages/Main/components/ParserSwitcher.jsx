@@ -53,7 +53,7 @@ function parseRange(readyStr, yearArg) {
 
 // ---------- Компонент карточки (с добавлением рейтинга) ----------
 
-export const Card = ({ data, canSeePhone }) => {
+export const Card = ({ data, canSeePhone, currentUser }) => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
   const { t } = useTranslation();
@@ -71,6 +71,18 @@ export const Card = ({ data, canSeePhone }) => {
 
   // --- добавлено для раскрытия деталей ---
   const [showDetails, setShowDetails] = useState(false);
+
+  const handleTakeOrder = async () => {
+    if (!currentUser) return;
+    try {
+      // Mock API call to take order
+      // await axios.post(`/orders/${data._id}/take`, { driverId: currentUser._id });
+      alert("Вы взяли заказ! Перейдите в кабинет для начала поездки.");
+    } catch (error) {
+      console.error("Error taking order:", error);
+      alert("Ошибка при взятии заказа");
+    }
+  };
 
   const cardStyle = {
     // backgroundColor: isDark ? "#fff" : "#fff",
@@ -1175,6 +1187,7 @@ export const ParserSwitcher = () => {
                     key={index}
                     data={item}
                     canSeePhone={hasActiveSubscription}
+                    currentUser={currentUser}
                   />
                 ))
               ) : (
@@ -1380,6 +1393,7 @@ export const ParserSwitcher = () => {
                   key={index}
                   data={item}
                   canSeePhone={hasActiveSubscription}
+                  currentUser={currentUser}
                 />
               ))}
             </div>

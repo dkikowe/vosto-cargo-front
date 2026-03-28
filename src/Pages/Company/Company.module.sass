@@ -1,21 +1,21 @@
 .companyContainer
     max-height: calc(100vh - 80px)
-    background: #f5f5f5
+    background: var(--bg-secondary)
     padding-top: 80px
     transition: background 0.3s ease, color 0.3s ease
 
     &.companyDark
-        background: #121212
-        color: #ffffff
+        background: var(--bg-secondary)
+        color: var(--text-primary)
 
     &.companyLight
-        background: #f5f5f5
-        color: #000000
+        background: var(--bg-secondary)
+        color: var(--text-primary)
 
     .companyContainer.companyDark &
-        background: #0056b3
+        background: var(--accent-color)
         &:hover
-            background: #0074d9
+            opacity: 0.9
 
     .companyInnerContainer
         overflow: scroll
@@ -27,6 +27,7 @@
     .companyTitle
         margin-bottom: 20px
         text-align: center
+        color: var(--text-primary)
 
     .companyForm
         display: flex
@@ -35,17 +36,20 @@
     .companyLabel
         margin-bottom: 4px
         font-weight: 600
+        color: var(--text-secondary)
 
     .companyInput
         padding: 8px
-        border: 1px solid #adadad
+        border: 1px solid var(--border-color)
         border-radius: 4px
         margin-bottom: 20px
+        background: var(--bg-primary)
+        color: var(--text-primary)
 
     .companySaveButton
         margin-top: 15px
-        background: #003b79
-        color: white
+        background: var(--accent-color)
+        color: var(--accent-foreground)
         border: none
         padding: 10px 15px
         border-radius: 6px
@@ -54,9 +58,9 @@
         margin-bottom: 20px
 
         &:hover
-            background: #0056b3
+            opacity: 0.9
 
     .companyMessage
         margin-top: 20px
         font-weight: bold
-        color: #006400
+        color: var(--text-primary)

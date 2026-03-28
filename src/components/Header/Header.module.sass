@@ -3,164 +3,185 @@
     justify-content: center
     align-items: flex-end
     width: 100%
-    background: #053576
+    background: var(--bg-card)
     padding-top: 40px
-    height: 150px
+    height: 120px /* Чуть компактнее */
     transition: background 0.3s ease
+    border-bottom: 1px solid var(--border-color)
+    box-shadow: var(--shadow-sm)
+    z-index: 50
+    position: relative
 
     &.dark
-        background: #121212
+        background: var(--bg-card)
 
 .line
-    margin: 20px 0
-    width: 100vw
-    height: 1px
-    background: rgba(255, 255, 255, 0.1)
-
-    .dark &
-        background: rgba(255, 255, 255, 0.05)
+    display: none /* Убираем лишнюю линию, используем border-bottom у хедера */
 
 .logo
     display: flex
     align-items: center
     justify-content: center
     flex-direction: column
+    margin-bottom: 16px
 
     img
         transition: filter 0.3s ease
-
+        /* Логотип теперь не инвертируется полностью, а адаптируется */
+        /* Если лого цветное - оставляем, если чб - можно инвертировать */
         .dark &
             filter: brightness(0) invert(1)
 
 .switcher
     display: flex
     flex-direction: row
-    gap: 32px
-    margin-left: 32px
-    margin-top: 32px
-    margin-bottom: 24px
+    gap: 8px /* Меньше отступ, кнопки ближе */
+    background: var(--bg-app) /* Фон переключателя */
+    padding: 4px
+    border-radius: var(--radius-md)
+    margin-left: 20px
+    margin-top: 20px
+    margin-bottom: 16px
 
 .tab, .tabActive
     display: flex
     align-items: center
+    justify-content: center
     gap: 8px
-    font-size: 28px
-    font-weight: 700
-    color: #8CA3C2
+    font-size: 14px
+    font-weight: 600
+    color: var(--text-secondary)
     cursor: pointer
     position: relative
     font-family: 'Inter', sans-serif
+    padding: 8px 16px
+    border-radius: var(--radius-sm)
+    transition: all 0.2s ease
 
 .tabActive
-    color: #fff
+    color: var(--primary)
+    background: var(--bg-card)
+    box-shadow: var(--shadow-sm)
+    
     &::after
-        content: ''
-        display: block
-        position: absolute
-        left: 0
-        bottom: -8px
-        width: 100%
-        height: 4px
-        background: #fff
-        border-radius: 2px
+        display: none /* Убираем подчеркивание, используем фон */
 
 .iconCargo
-    width: 32px
-    height: 32px
+    width: 20px
+    height: 20px
     background: url('/images/nav-icons/home.svg') no-repeat center/contain
+    /* Используем mask для покраски иконок в CSS переменные */
+    background-color: currentColor 
+    -webkit-mask: url('/images/nav-icons/home.svg') no-repeat center/contain
+    mask: url('/images/nav-icons/home.svg') no-repeat center/contain
+    background-image: none !important
 
 .iconTruck
-    width: 32px
-    height: 32px
-    background: url('/images/nav-icons/menu.svg') no-repeat center/contain
+    width: 20px
+    height: 20px
+    background-color: currentColor
+    -webkit-mask: url('/images/nav-icons/menu.svg') no-repeat center/contain
+    mask: url('/images/nav-icons/menu.svg') no-repeat center/contain
+    background-image: none !important
 
+/* Фильтры */
 .filtersBlock
-    background: #fff
-    border-radius: 32px
+    background: var(--bg-card)
+    border: 1px solid var(--border-color)
+    border-radius: var(--radius-lg)
     margin-left: 16px
     width: 95vw
     max-width: 420px
-    padding: 32px 24px 24px 24px
+    padding: 20px
     box-sizing: border-box
     display: flex
     flex-direction: column
-    gap: 0
-    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.04)
+    gap: 12px
+    box-shadow: var(--shadow-md)
 
 .filterRow
     display: flex
     flex-direction: row
     align-items: center
     justify-content: space-between
-    border-bottom: 1px solid #F0F0F0
-    padding: 0 0 16px 0
+    border-bottom: 1px solid var(--border-color)
+    padding: 0 0 12px 0
     min-height: 48px
+
+    &:last-child
+        border-bottom: none
+        padding-bottom: 0
 
 .filterRowBottom
     display: flex
     flex-direction: row
     align-items: center
     justify-content: space-between
-    padding-top: 16px
-    gap: 16px
+    padding-top: 12px
+    gap: 12px
 
 .filterItem, .filterItemBottom
     display: flex
     align-items: center
-    gap: 12px
-    font-size: 22px
-    font-weight: 700
-    color: #B0B0B0
+    gap: 10px
+    font-size: 16px
+    font-weight: 500
+    color: var(--text-main)
     font-family: 'Inter', sans-serif
+    flex: 1
 
 .filterItemBottom
-    font-size: 18px
-    font-weight: 600
-    color: #B0B0B0
+    font-size: 14px
+    color: var(--text-secondary)
 
 .filterLabel
-    color: #B0B0B0
-    font-weight: 700
-    font-size: inherit
-    font-family: inherit
+    color: var(--text-secondary)
+    font-weight: 500
+    font-size: 12px
+    text-transform: uppercase
+    letter-spacing: 0.05em
+    margin-bottom: 4px
+    display: block
 
 .required
-    color: #F44336
+    color: var(--secondary) /* Amber */
     font-size: 1em
     font-weight: 700
+    margin-left: 4px
 
+/* Иконки фильтров */
+.iconFrom, .iconTo, .iconDate, .iconType, .iconSwitch
+    width: 20px
+    height: 20px
+    background-color: var(--primary)
+    background-image: none !important
+    
 .iconFrom
-    width: 24px
-    height: 24px
-    background: url('/images/nav-icons/from.svg') no-repeat center/contain
-
+    -webkit-mask: url('/images/nav-icons/from.svg') no-repeat center/contain
 .iconTo
-    width: 24px
-    height: 24px
-    background: url('/images/nav-icons/to.svg') no-repeat center/contain
-
+    -webkit-mask: url('/images/nav-icons/to.svg') no-repeat center/contain
 .iconDate
-    width: 24px
-    height: 24px
-    background: url('/images/nav-icons/date.svg') no-repeat center/contain
-
+    -webkit-mask: url('/images/nav-icons/date.svg') no-repeat center/contain
 .iconType
-    width: 24px
-    height: 24px
-    background: url('/images/nav-icons/type.svg') no-repeat center/contain
+    -webkit-mask: url('/images/nav-icons/type.svg') no-repeat center/contain
+.iconSwitch
+    -webkit-mask: url('/images/nav-icons/switch.svg') no-repeat center/contain
+    background-color: var(--text-secondary)
 
 .switchBtn
-    width: 56px
-    height: 56px
+    width: 40px
+    height: 40px
     border-radius: 50%
-    border: 3px solid #F0F0F0
+    border: 1px solid var(--border-color)
     display: flex
     align-items: center
     justify-content: center
-    background: #fff
+    background: var(--bg-app)
     margin-left: 8px
+    transition: all 0.2s ease
+    cursor: pointer
 
-.iconSwitch
-    width: 28px
-    height: 28px
-    background: url('/images/nav-icons/switch.svg') no-repeat center/contain
+    &:hover
+        background: var(--bg-card)
+        box-shadow: var(--shadow-sm)
+        transform: rotate(180deg)

@@ -11,12 +11,12 @@
     z-index: 1000
 
 .bottomSheetPopup
-    background-color: #fff
+    background-color: var(--bg-card, #fff)
     border-radius: 24px 24px 0 0
     width: 100%
     max-width: 480px
     min-height: 180px
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1)
+    box-shadow: var(--shadow-md)
     display: flex
     flex-direction: column
     gap: 16px
@@ -24,6 +24,7 @@
     position: relative
     transform: translateY(0)
     transition: transform 0.3s ease
+    border-top: 1px solid var(--border-color)
 
 .closing
     animation: slideDown 0.3s ease forwards
@@ -35,7 +36,7 @@
 .handle
     width: 48px
     height: 6px
-    background: #d1d5db
+    background: var(--border-color)
     border-radius: 3px
     margin: 12px auto 8px auto
 
@@ -44,7 +45,7 @@
     font-weight: 700
     margin: 0 0 16px 0
     text-align: center
-    color: #222
+    color: var(--text-primary)
 
 .settingsList
     display: flex
@@ -60,13 +61,14 @@
 
 .settingsItemLabel
     flex: 1
+    color: var(--text-primary)
 
 .settingsItemValue
-    color: #888
+    color: var(--text-secondary)
     font-size: 16px
 
 .settingsItemArrow
-    color: #888
+    color: var(--text-secondary)
     font-size: 18px
 
 .settingsItemToggle
@@ -86,7 +88,7 @@
     left: 0
     right: 0
     bottom: 0
-    background-color: #ccc
+    background-color: var(--border-color)
     transition: .4s
     border-radius: 34px
 
@@ -102,19 +104,19 @@
     border-radius: 50%
 
 input:checked + .slider
-    background-color: #0080ff
+    background-color: var(--accent-color)
 
 input:checked + .slider::before
     transform: translateX(18px)
 
 .dark
     .bottomSheetPopup
-        background-color: #1e1e1e
-        color: #fff
+        background-color: var(--bg-card, #1c1c1e)
+        color: var(--text-primary)
     .title
-        color: #fff
+        color: var(--text-primary)
     .settingsItemValue,
     .settingsItemArrow
-        color: #bbb
+        color: var(--text-secondary)
     .handle
-        background: #444
+        background: var(--border-color)

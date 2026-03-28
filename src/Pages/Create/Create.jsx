@@ -1,672 +1,508 @@
-import React, { useState, useEffect, useContext } from "react";
-import axios from "../../axios.js";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "../../axios";
+import { toast } from "sonner";
+import {
+  Sparkles,
+  ArrowRight,
+  Package,
+  MapPin,
+  DollarSign,
+  Truck,
+  Calendar,
+} from "lucide-react";
 import s from "./Create.module.sass";
-import { AddOrderModal } from "./AddOrderModal.jsx";
-import { ThemeContext } from "../../context/ThemeContext";
-import { Edit, Trash2, SlidersHorizontal } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import BottomSheetModal from "./components/BottomSheetModal";
-import AddCargoStepper from "./components/AddCargoStepper";
-import { OrderCard } from "./components/OrderCard";
-import AddMachineStepper from "./components/AddMachineStepper";
 
-export default function CreateOrders() {
-  const { t } = useTranslation();
-  const { theme } = useContext(ThemeContext);
+const Create = () => {
+  const navigate = useNavigate();
   const userId = localStorage.getItem("id");
 
-  const [currentTab, setCurrentTab] = useState("active");
-  const [orders, setOrders] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingOrder, setEditingOrder] = useState(null);
-  const [filterType, setFilterType] = useState("all");
-  const [showFilter, setShowFilter] = useState(false);
-  const [showTypeModal, setShowTypeModal] = useState(false);
-  const [selectedType, setSelectedType] = useState(null);
+  const [activeTab, setActiveTab] = useState("manual"); // 'manual' | 'ai'
+  const [aiText, setAiText] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    description: "",
-    paymentMethod: "",
-    isArchived: false,
-    from: "",
-    to: "",
-    cargo: "",
+    cargoDescription: "",
     weight: "",
     volume: "",
-    rate: "",
-    ready: "",
-    vehicle: "",
-    url: "",
-    marka: "",
-    tip: "",
-    kuzov: "",
-    readyFrom: "",
-    readyTo: "",
-    tip_zagruzki: "",
-    gruzopodyomnost: "",
-    vmestimost: "",
-    data_gotovnosti: "",
-    otkuda: "",
-    kuda: "",
-    telefon: "",
-    imya: "",
-    firma: "",
-    gorod: "",
-    pochta: "",
-    company: "",
+    fromAddress: "",
+    toAddress: "",
+    price: "",
+    readyDate: "",
+    vehicleType: "TRUCK_20T",
   });
 
-  const isDark = theme === "dark";
-
-  const fetchUserOrders = async () => {
-    try {
-      if (!userId) return;
-      const { data } = await axios.get(`/orders?userId=${userId}`);
-      setOrders(data);
-      console.log(data);
-    } catch (error) {
-      console.error("Ошибка загрузки заказов:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserOrders();
-  }, [userId]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const resetForm = () => {
-    setFormData({
-      description: "",
-      paymentMethod: "",
-      isArchived: false,
-      from: "",
-      to: "",
-      cargo: "",
-      weight: "",
-      volume: "",
-      rate: "",
-      ready: "",
-      vehicle: "",
-      url: "",
-      marka: "",
-      tip: "",
-      kuzov: "",
-      tip_zagruzki: "",
-      gruzopodyomnost: "",
-      vmestimost: "",
-      data_gotovnosti: "",
-      otkuda: "",
-      kuda: "",
-      telefon: "",
-      imya: "",
-      firma: "",
-      gorod: "",
-      pochta: "",
-      company: "",
-    });
-    setEditingOrder(null);
-  };
-
-  const handleCreateOrder = async (e) => {
-    e.preventDefault();
-    if (!userId) return;
-
-    function formatShortDate(dateStr) {
-      if (!dateStr) return "";
-      const date = new Date(dateStr);
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      return `${day}.${month}`;
-    }
-
-    let payload = {};
-    if (currentTab === "CargoOrder") {
-      payload = {
-        userId,
-        orderType: currentTab,
-        description: formData.description,
-        from: formData.from,
-        to: formData.to,
-        cargo: formData.cargo,
-        volume: formData.volume ? formData.volume.toString() : "",
-        weight: formData.weight ? formData.weight.toString() : "",
-        rate: formData.rate || "",
-        ready:
-          `${formatShortDate(formData.readyFrom)} - ${formatShortDate(
-            formData.readyTo
-          )}` || "",
-        telefon: formData.telefon || "",
-        vehicle: formData.vehicle || "",
-        paymentMethod: formData.paymentMethod,
-        isArchived: false,
-      };
-    } else if (currentTab === "MachineOrder") {
-      payload = {
-        userId,
-        orderType: currentTab,
-        description: formData.description,
-        marka: formData.marka,
-        tip: formData.tip,
-        kuzov: formData.kuzov,
-        tip_zagruzki: formData.tip_zagruzki,
-        gruzopodyomnost: formData.gruzopodyomnost?.toString() || "",
-        vmestimost: formData.vmestimost?.toString() || "",
-        data_gotovnosti: formData.data_gotovnosti,
-        otkuda: formData.otkuda,
-        kuda: formData.kuda,
-        telefon: formData.telefon,
-        imya: formData.contactName,
-        firma: formData.contactFirm,
-        gorod: formData.contactCity,
-        pochta: formData.contactEmail,
-        company: formData.company,
-        paymentMethod: formData.paymentMethod,
-        isArchived: false,
-      };
-    }
+  const handleAiGenerate = async () => {
+    if (!aiText.trim()) return;
+    setIsAiLoading(true);
 
     try {
-      const { data: savedOrder } = await axios.post("/orders", payload);
-      console.log("Заявка успешно создана:", savedOrder);
-      setShowForm(false);
-      resetForm();
-      fetchUserOrders();
-    } catch (error) {
-      console.error("Ошибка создания заявки:", error);
-    }
-  };
+      const { data } = await axios.post("/api/v1/ai/parse", { text: aiText });
 
-  const handleUpdateOrder = async (e) => {
-    e.preventDefault();
-    if (!userId || !editingOrder) return;
-
-    let payload = {};
-    if (currentTab === "CargoOrder") {
-      payload = {
-        userId,
-        orderType: currentTab,
-        description: formData.description,
-        from: formData.from,
-        to: formData.to,
-        cargo: formData.cargo,
-        volume: formData.volume?.toString() || "",
-        weight: formData.weight?.toString() || "",
-        rate: "",
-        ready: "",
-        vehicle: "",
-        paymentMethod: formData.paymentMethod,
-        isArchived: false,
-      };
-    } else if (currentTab === "MachineOrder") {
-      payload = {
-        userId,
-        orderType: currentTab,
-        description: formData.description,
-        marka: formData.marka,
-        tip: formData.tip,
-        kuzov: formData.kuzov,
-        tip_zagruzki: formData.tip_zagruzki,
-        gruzopodyomnost: formData.gruzopodyomnost?.toString() || "",
-        vmestimost: formData.vmestimost?.toString() || "",
-        data_gotovnosti: formData.data_gotovnosti,
-        otkuda: formData.otkuda,
-        kuda: formData.kuda,
-        telefon: formData.telefon,
-        imya: formData.contactName,
-        firma: formData.contactFirm,
-        gorod: formData.contactCity,
-        pochta: formData.contactEmail,
-        company: formData.company,
-        paymentMethod: formData.paymentMethod,
-        isArchived: false,
-      };
-    }
-
-    try {
-      const { data: updatedOrder } = await axios.put(
-        `/orders/${editingOrder._id}`,
-        payload
-      );
-      console.log("Заявка успешно обновлена:", updatedOrder);
-      setShowForm(false);
-      resetForm();
-      fetchUserOrders();
-    } catch (error) {
-      console.error("Ошибка обновления заявки:", error);
-    }
-  };
-
-  const handleSubmitOrder = (e) => {
-    editingOrder ? handleUpdateOrder(e) : handleCreateOrder(e);
-  };
-
-  const handleToggleArchive = async (orderId, currentIsArchived) => {
-    try {
-      const endpoint = currentIsArchived
-        ? "/orders/restore"
-        : "/orders/archive";
-      const { data: updatedOrder } = await axios.post(endpoint, {
-        orderId,
-        userId,
+      // Map AI response to form data
+      setFormData({
+        cargoDescription: data.cargo?.description || "",
+        weight: data.cargo?.weight || "",
+        volume: data.cargo?.volume || "",
+        fromAddress: data.route?.from || "",
+        toAddress: data.route?.to || "",
+        price: data.estimatedPrice?.min || "",
+        readyDate: new Date().toISOString().split("T")[0],
+        vehicleType: data.recommendedVehicleType || "TRUCK_20T",
       });
-      console.log(
-        currentIsArchived ? "Заявка восстановлена" : "Заявка архивирована",
-        updatedOrder
-      );
-      fetchUserOrders();
+
+      setActiveTab("manual"); // Switch to manual tab to review/edit
+      toast.success("Данные успешно заполнены!");
     } catch (error) {
-      console.error("Ошибка обновления заявки:", error);
+      console.error("AI Error:", error);
+      toast.error("Не удалось распознать текст");
+    } finally {
+      setIsAiLoading(false);
     }
   };
 
-  const handleEditOrder = (order) => {
-    setEditingOrder(order);
-    setCurrentTab(order.orderType);
-    setFormData({
-      description: order.description || "",
-      from: order.from || "",
-      to: order.to || "",
-      cargo: order.cargo || "",
-      volume: order.volume || "",
-      weight: order.weight || "",
-      marka: order.marka || "",
-      tip: order.tip || "",
-      kuzov: order.kuzov || "",
-      tip_zagruzki: order.tip_zagruzki || "",
-      gruzopodyomnost: order.gruzopodyomnost || "",
-      vmestimost: order.vmestimost || "",
-      data_gotovnosti: order.data_gotovnosti || "",
-      otkuda: order.otkuda || "",
-      kuda: order.kuda || "",
-      telefon: order.telefon || "",
-      imya: order.imya || "",
-      firma: order.firma || "",
-      gorod: order.gorod || "",
-      pochta: order.pochta || "",
-      company: order.company || "",
-      paymentMethod: order.paymentMethod || "",
-      isArchived: order.isArchived || false,
-    });
-    setShowForm(true);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleDeleteOrder = async (orderId) => {
     try {
-      await axios.delete("/orders", { data: { userId, orderId } });
-      console.log("Заявка удалена");
-      fetchUserOrders();
+      const newOrder = {
+        customerId: userId,
+        cargo: {
+          description: formData.cargoDescription,
+          weight: Number(formData.weight),
+          volume: Number(formData.volume),
+          isFragile: false, // Default
+          requiresTempControl: false, // Default
+        },
+        route: {
+          from: {
+            address: formData.fromAddress,
+            city: formData.fromAddress.split(",")[0] || formData.fromAddress,
+            coordinates: { lat: 0, lng: 0 },
+          },
+          to: {
+            address: formData.toAddress,
+            city: formData.toAddress.split(",")[0] || formData.toAddress,
+            coordinates: { lat: 0, lng: 0 },
+          },
+        },
+        pricing: {
+          customerOffer: Number(formData.price),
+        },
+      };
+
+      await axios.post("/orders", newOrder);
+      toast.success("Заказ успешно создан!");
+      navigate("/home");
     } catch (error) {
-      console.error("Ошибка удаления заявки:", error);
+      console.error("Create Error:", error);
+      toast.error("Ошибка при создании заказа");
     }
-  };
-
-  const filteredOrders = orders.filter(
-    (order) =>
-      (currentTab === "archive" ? order.isArchived : !order.isArchived) &&
-      (filterType === "all" ||
-        (filterType === "cargo" && order.orderType === "CargoOrder") ||
-        (filterType === "machine" && order.orderType === "MachineOrder"))
-  );
-
-  const handleCreateCargoOrderFromStepper = async (data) => {
-    if (!userId) return;
-    const payload = {
-      userId,
-      orderType: "CargoOrder",
-      from: data.from,
-      to: data.to,
-      cargo: data.cargoName,
-      volume: data.volume ? data.volume.toString() : "",
-      weight: data.weight ? data.weight.toString() : "",
-      rate: data.rate || "",
-      ready: `${data.dateFrom || ""} - ${data.dateTo || ""}`,
-      telefon: data.phone || "",
-      vehicle: data.bodyType || "",
-      paymentMethod: data.payment,
-      isArchived: false,
-    };
-    await axios.post("/orders", payload);
-    fetchUserOrders();
-  };
-
-  const handleCreateMachineOrderFromStepper = async (data) => {
-    if (!userId) return;
-    const payload = {
-      userId,
-      orderType: "MachineOrder",
-      marka: data.marka,
-      tip: data.model,
-      kuzov: data.bodyType,
-      tip_zagruzki: data.loadingType,
-      gruzopodyomnost: data.capacity?.toString() || "",
-      vmestimost: data.volume?.toString() || "",
-      data_gotovnosti: data.readyDate,
-      otkuda: data.loadingCity,
-      kuda: data.unloadingCity,
-      telefon: data.phone,
-      imya: data.fio,
-      firma: data.company,
-      gorod: data.city,
-      pochta: data.email,
-      company: data.company,
-      paymentMethod: data.payment,
-      isArchived: false,
-    };
-    await axios.post("/orders", payload);
-    fetchUserOrders();
-  };
-
-  const handleUpdateOrderFromStepper = async (orderId, data) => {
-    if (!userId || !orderId) return;
-    let payload = {};
-    if (currentTab === "CargoOrder") {
-      payload = {
-        userId,
-        orderType: "CargoOrder",
-        from: data.from,
-        to: data.to,
-        cargo: data.cargoName,
-        volume: data.volume ? data.volume.toString() : "",
-        weight: data.weight ? data.weight.toString() : "",
-        rate: data.rate || "",
-        ready: `${data.dateFrom || ""} - ${data.dateTo || ""}`,
-        telefon: data.phone || "",
-        vehicle: data.bodyType || "",
-        paymentMethod: data.payment,
-        isArchived: false,
-      };
-    } else if (currentTab === "MachineOrder") {
-      payload = {
-        userId,
-        orderType: "MachineOrder",
-        marka: data.marka,
-        tip: data.model,
-        kuzov: data.bodyType,
-        tip_zagruzki: data.loadingType,
-        gruzopodyomnost: data.capacity?.toString() || "",
-        vmestimost: data.volume?.toString() || "",
-        data_gotovnosti: data.readyDate,
-        otkuda: data.loadingCity,
-        kuda: data.unloadingCity,
-        telefon: data.phone,
-        imya: data.fio,
-        firma: data.company,
-        gorod: data.city,
-        pochta: data.email,
-        company: data.company,
-        paymentMethod: data.payment,
-        isArchived: false,
-      };
-    }
-    await axios.put(`/orders/${orderId}`, payload);
-    fetchUserOrders();
   };
 
   return (
-    <div className={`${s.container} ${theme === "dark" ? s.dark : s.light}`}>
-      <div
-        className={s.header}
-        style={{ backgroundColor: theme === "dark" ? "#121212" : undefined }}
+    <div className={s.container}>
+      <h1
+        style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
       >
-        <h1>Мои заявки</h1>
-      </div>
+        Новый заказ
+      </h1>
+
+      {/* Tabs */}
       <div
         style={{
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
+          backgroundColor: "var(--tg-theme-secondary-bg-color, #f5f5f5)",
+          borderRadius: "12px",
+          padding: "4px",
+          marginBottom: "24px",
         }}
       >
-        <div className={s.statusButtons}>
-          <button
-            className={currentTab === "active" ? s.statusActive : s.statusItem}
-            style={{
-              color: isDark
-                ? currentTab === "active"
-                  ? "#fff"
-                  : "#bbbbbb"
-                : currentTab === "active"
-                ? "#000"
-                : "#bbbbbb",
-              borderBottom:
-                currentTab === "active"
-                  ? isDark
-                    ? "2px solid #fff"
-                    : "2px solid #000"
-                  : "none",
-              background: "none",
-            }}
-            onClick={() => setCurrentTab("active")}
-          >
-            <img src="/images/design-icons-create/public.svg" alt="" />
-            {t("orders.published")}
-          </button>
-          <button
-            className={
-              currentTab === "archive" ? s.statusActiveArchive : s.archive
-            }
-            style={{
-              color: isDark
-                ? currentTab === "archive"
-                  ? "#fff"
-                  : "#bbbbbb"
-                : currentTab === "archive"
-                ? "#000"
-                : "#bbbbbb",
-              borderBottom:
-                currentTab === "archive"
-                  ? isDark
-                    ? "2px solid #fff"
-                    : "2px solid #000"
-                  : "none",
-              background: "none",
-            }}
-            onClick={() => setCurrentTab("archive")}
-          >
-            <img src="/images/design-icons-create/archive.svg" alt="" />
-            {t("orders.archive")}
-          </button>
-        </div>
-        <div
+        <button
+          onClick={() => setActiveTab("manual")}
           style={{
-            position: "relative",
-            marginLeft: "auto",
-            marginRight: 16,
+            flex: 1,
+            padding: "10px",
+            borderRadius: "10px",
+            border: "none",
+            backgroundColor:
+              activeTab === "manual"
+                ? "var(--tg-theme-bg-color, #fff)"
+                : "transparent",
+            color:
+              activeTab === "manual"
+                ? "var(--tg-theme-text-color)"
+                : "var(--tg-theme-hint-color)",
+            fontWeight: "600",
+            boxShadow:
+              activeTab === "manual" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+            transition: "all 0.2s",
+            cursor: "pointer",
           }}
         >
-          <img
-            src="/images/design-icons-create/filter.svg"
-            style={{ cursor: "pointer" }}
-            onClick={() => setShowFilter((v) => !v)}
-            alt=""
-          />
-
-          {showFilter && (
-            <div
-              style={{
-                position: "absolute",
-                top: 36,
-                right: 0,
-                background: "#fff",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
-                borderRadius: 16,
-                padding: "12px 0",
-                zIndex: 10,
-                minWidth: 180,
-              }}
-            >
-              <div
-                onClick={() => {
-                  setFilterType("all");
-                  setShowFilter(false);
-                }}
-                style={{
-                  padding: "8px 20px",
-                  cursor: "pointer",
-                  fontWeight: filterType === "all" ? "bold" : "normal",
-                  color: "#222",
-                  background: filterType === "all" ? "#f5f5f5" : "transparent",
-                }}
-              >
-                Все заявки {filterType === "all" && "✓"}
-              </div>
-              <div
-                onClick={() => {
-                  setFilterType("cargo");
-                  setShowFilter(false);
-                }}
-                style={{
-                  padding: "8px 20px",
-                  cursor: "pointer",
-                  fontWeight: filterType === "cargo" ? "bold" : "normal",
-                  color: "#222",
-                  background:
-                    filterType === "cargo" ? "#f5f5f5" : "transparent",
-                }}
-              >
-                Только грузы {filterType === "cargo" && "✓"}
-              </div>
-              <div
-                onClick={() => {
-                  setFilterType("machine");
-                  setShowFilter(false);
-                }}
-                style={{
-                  padding: "8px 20px",
-                  cursor: "pointer",
-                  fontWeight: filterType === "machine" ? "bold" : "normal",
-                  color: "#222",
-                  background:
-                    filterType === "machine" ? "#f5f5f5" : "transparent",
-                }}
-              >
-                Только автомобили {filterType === "machine" && "✓"}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <div className={s.ordersList}>
-        {filteredOrders.length === 0 ? (
-          <p>
-            {t("orders.empty", {
-              type: t(
-                currentTab === "CargoOrder"
-                  ? "orders.cargoPlural"
-                  : "orders.machinePlural"
-              ),
-            })}
-          </p>
-        ) : (
-          filteredOrders.map((order) => (
-            <OrderCard
-              key={order._id}
-              order={order}
-              theme={theme}
-              onEdit={handleEditOrder}
-              onDelete={handleDeleteOrder}
-              onToggleArchive={handleToggleArchive}
-            />
-          ))
-        )}
-      </div>
-      <div className={s.addButtonWrapper}>
+          Вручную
+        </button>
         <button
-          className={s.createButton}
-          onClick={() => setShowTypeModal(true)}
+          onClick={() => setActiveTab("ai")}
+          style={{
+            flex: 1,
+            padding: "10px",
+            borderRadius: "10px",
+            border: "none",
+            backgroundColor:
+              activeTab === "ai"
+                ? "var(--tg-theme-bg-color, #fff)"
+                : "transparent",
+            color:
+              activeTab === "ai"
+                ? "var(--tg-theme-button-color, #3390ec)"
+                : "var(--tg-theme-hint-color)",
+            fontWeight: "600",
+            boxShadow:
+              activeTab === "ai" ? "0 2px 8px rgba(0,0,0,0.05)" : "none",
+            transition: "all 0.2s",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "6px",
+          }}
         >
-          <span className={s.createButtonText}>Создать заявку</span>
-          <span className={s.plusCircle}>+</span>
+          <Sparkles size={16} />
+          AI Помощник
         </button>
       </div>
-      <BottomSheetModal
-        visible={showTypeModal}
-        onClose={() => setShowTypeModal(false)}
-      >
-        <div style={{ padding: 24, textAlign: "center" }}>
-          <div style={{ fontWeight: 600, fontSize: 20, marginBottom: 16 }}>
-            Выберите тип заявки
-          </div>
-          <div style={{ display: "flex", gap: 16, justifyContent: "center" }}>
-            <button
-              className={s.input}
-              style={{ background: "#3a5c9f", color: "#fff", minWidth: 120 }}
-              onClick={() => {
-                setSelectedType("CargoOrder");
-                setShowTypeModal(false);
-                setShowForm(true);
-                setCurrentTab("CargoOrder");
+
+      {/* AI Tab Content */}
+      {activeTab === "ai" && (
+        <div className="animate-fade-in">
+          <div
+            style={{
+              backgroundColor: "var(--tg-theme-secondary-bg-color, #f9fafb)",
+              padding: "20px",
+              borderRadius: "16px",
+              marginBottom: "20px",
+              border: "1px solid var(--tg-theme-button-color, #3390ec)",
+            }}
+          >
+            <h3
+              style={{
+                marginTop: 0,
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "var(--tg-theme-button-color)",
               }}
             >
-              Груз
-            </button>
+              <Sparkles size={20} />
+              Умное заполнение
+            </h3>
+            <p style={{ fontSize: "14px", opacity: 0.7, marginBottom: "16px" }}>
+              Просто опишите, что и куда нужно отвезти. ИИ сам заполнит форму.
+            </p>
+            <textarea
+              value={aiText}
+              onChange={(e) => setAiText(e.target.value)}
+              placeholder="Например: Нужно перевезти 5 тонн кирпича из Москвы в Тулу завтра. Бюджет 20000р."
+              style={{
+                width: "100%",
+                minHeight: "120px",
+                padding: "16px",
+                borderRadius: "12px",
+                border: "1px solid var(--tg-theme-hint-color, #ccc)",
+                backgroundColor: "var(--tg-theme-bg-color, #fff)",
+                color: "var(--tg-theme-text-color)",
+                fontSize: "16px",
+                resize: "none",
+                marginBottom: "16px",
+                boxSizing: "border-box",
+              }}
+            />
             <button
-              className={s.input}
-              style={{ background: "#3a5c9f", color: "#fff", minWidth: 120 }}
-              onClick={() => {
-                setSelectedType("MachineOrder");
-                setShowTypeModal(false);
-                setShowForm(true);
-                setCurrentTab("MachineOrder");
+              onClick={handleAiGenerate}
+              disabled={isAiLoading || !aiText.trim()}
+              style={{
+                width: "100%",
+                padding: "14px",
+                borderRadius: "12px",
+                border: "none",
+                backgroundColor: "var(--tg-theme-button-color, #3390ec)",
+                color: "var(--tg-theme-button-text-color, #fff)",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: isAiLoading ? "wait" : "pointer",
+                opacity: isAiLoading ? 0.7 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
               }}
             >
-              Машина
+              {isAiLoading ? "Анализирую..." : "Заполнить форму"}
+              {!isAiLoading && <ArrowRight size={18} />}
             </button>
           </div>
         </div>
-      </BottomSheetModal>
-      <BottomSheetModal
-        visible={showForm}
-        onClose={() => {
-          setShowForm(false);
-          resetForm();
-        }}
-      >
-        {currentTab === "CargoOrder" && (
-          <AddCargoStepper
-            initialValues={editingOrder}
-            onSubmit={async (data) => {
-              if (editingOrder) {
-                await handleUpdateOrderFromStepper(editingOrder._id, data);
-              } else {
-                await handleCreateCargoOrderFromStepper(data);
-              }
-              setShowForm(false);
-              resetForm();
+      )}
+
+      {/* Manual Form (Always rendered but hidden if AI tab is active to preserve state, or just switch) */}
+      {/* Actually, let's switch view to keep DOM clean, state is preserved in React state */}
+      {activeTab === "manual" && (
+        <form onSubmit={handleSubmit} className="animate-fade-in">
+          {/* Route Section */}
+          <section style={{ marginBottom: "24px" }}>
+            <h3
+              style={{
+                fontSize: "18px",
+                marginBottom: "12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <MapPin size={20} color="var(--tg-theme-hint-color)" />
+              Маршрут
+            </h3>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            >
+              <div className={s.inputGroup}>
+                <label
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.7,
+                    marginBottom: "4px",
+                    display: "block",
+                  }}
+                >
+                  Откуда
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.fromAddress}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fromAddress: e.target.value })
+                  }
+                  placeholder="Город, улица, дом"
+                  style={inputStyle}
+                />
+              </div>
+              <div className={s.inputGroup}>
+                <label
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.7,
+                    marginBottom: "4px",
+                    display: "block",
+                  }}
+                >
+                  Куда
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.toAddress}
+                  onChange={(e) =>
+                    setFormData({ ...formData, toAddress: e.target.value })
+                  }
+                  placeholder="Город, улица, дом"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Cargo Section */}
+          <section style={{ marginBottom: "24px" }}>
+            <h3
+              style={{
+                fontSize: "18px",
+                marginBottom: "12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <Package size={20} color="var(--tg-theme-hint-color)" />
+              Груз
+            </h3>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            >
+              <div className={s.inputGroup}>
+                <label
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.7,
+                    marginBottom: "4px",
+                    display: "block",
+                  }}
+                >
+                  Описание груза
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.cargoDescription}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      cargoDescription: e.target.value,
+                    })
+                  }
+                  placeholder="Например: Строительные материалы"
+                  style={inputStyle}
+                />
+              </div>
+              <div style={{ display: "flex", gap: "12px" }}>
+                <div style={{ flex: 1 }}>
+                  <label
+                    style={{
+                      fontSize: "12px",
+                      opacity: 0.7,
+                      marginBottom: "4px",
+                      display: "block",
+                    }}
+                  >
+                    Вес (кг)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={formData.weight}
+                    onChange={(e) =>
+                      setFormData({ ...formData, weight: e.target.value })
+                    }
+                    placeholder="0"
+                    style={inputStyle}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label
+                    style={{
+                      fontSize: "12px",
+                      opacity: 0.7,
+                      marginBottom: "4px",
+                      display: "block",
+                    }}
+                  >
+                    Объем (м³)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={formData.volume}
+                    onChange={(e) =>
+                      setFormData({ ...formData, volume: e.target.value })
+                    }
+                    placeholder="0"
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Details Section */}
+          <section style={{ marginBottom: "32px" }}>
+            <h3
+              style={{
+                fontSize: "18px",
+                marginBottom: "12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <DollarSign size={20} color="var(--tg-theme-hint-color)" />
+              Детали
+            </h3>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            >
+              <div className={s.inputGroup}>
+                <label
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.7,
+                    marginBottom: "4px",
+                    display: "block",
+                  }}
+                >
+                  Предлагаемая цена (₽)
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={formData.price}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
+                  placeholder="0"
+                  style={{
+                    ...inputStyle,
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                  }}
+                />
+              </div>
+              <div className={s.inputGroup}>
+                <label
+                  style={{
+                    fontSize: "12px",
+                    opacity: 0.7,
+                    marginBottom: "4px",
+                    display: "block",
+                  }}
+                >
+                  Дата готовности
+                </label>
+                <input
+                  type="date"
+                  value={formData.readyDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, readyDate: e.target.value })
+                  }
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+          </section>
+
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "16px",
+              borderRadius: "16px",
+              border: "none",
+              backgroundColor: "var(--tg-theme-button-color, #3390ec)",
+              color: "var(--tg-theme-button-text-color, #fff)",
+              fontSize: "18px",
+              fontWeight: "600",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(51, 144, 236, 0.3)",
             }}
-            onClose={() => {
-              setShowForm(false);
-              resetForm();
-            }}
-          />
-        )}
-        {currentTab === "MachineOrder" && (
-          <AddMachineStepper
-            initialValues={editingOrder}
-            onSubmit={async (data) => {
-              if (editingOrder) {
-                await handleUpdateOrderFromStepper(editingOrder._id, data);
-              } else {
-                await handleCreateMachineOrderFromStepper(data);
-              }
-              setShowForm(false);
-              resetForm();
-            }}
-            onClose={() => {
-              setShowForm(false);
-              resetForm();
-            }}
-          />
-        )}
-      </BottomSheetModal>
+          >
+            Создать заказ
+          </button>
+        </form>
+      )}
     </div>
   );
-}
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "14px",
+  borderRadius: "12px",
+  border: "1px solid var(--tg-theme-hint-color, #ccc)",
+  backgroundColor: "var(--tg-theme-bg-color, #fff)",
+  color: "var(--tg-theme-text-color)",
+  fontSize: "16px",
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+export default Create;

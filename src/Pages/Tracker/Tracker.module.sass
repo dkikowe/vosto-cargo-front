@@ -1,0 +1,78 @@
+.container
+    height: calc(100vh - 80px) /* Full height minus nav */
+    width: 100%
+    position: relative
+    background: var(--bg-app)
+
+.mapContainer
+    height: 100%
+    width: 100%
+    z-index: 1
+
+.overlay
+    position: absolute
+    top: 20px
+    left: 50%
+    transform: translateX(-50%)
+    background: var(--bg-card)
+    padding: 12px 24px
+    border-radius: var(--radius-full)
+    box-shadow: var(--shadow-md)
+    z-index: 1000
+    display: flex
+    align-items: center
+    gap: 8px
+    border: 1px solid var(--border-color)
+
+.statusText
+    font-size: 14px
+    font-weight: 600
+    color: var(--text-main)
+
+.statusDot
+    width: 8px
+    height: 8px
+    background: var(--secondary)
+    border-radius: 50%
+    animation: pulse 2s infinite
+
+.statusDotActive
+    background: #10B981 /* Green */
+
+@keyframes pulse
+    0%
+        transform: scale(0.95)
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7)
+    70%
+        transform: scale(1)
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 0)
+    100%
+        transform: scale(0.95)
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0)
+
+.locateMeWrap
+    position: absolute
+    bottom: 140px
+    right: 16px
+    z-index: 1000
+    pointer-events: auto
+
+.locateMeBtn
+    width: 48px
+    height: 48px
+    border-radius: 14px
+    border: 1px solid var(--border-color)
+    background: var(--bg-card)
+    color: var(--text-main)
+    box-shadow: var(--shadow-md)
+    display: flex
+    align-items: center
+    justify-content: center
+    cursor: pointer
+    transition: transform 0.15s ease, background 0.15s ease
+
+    &:active
+        transform: scale(0.96)
+
+    svg
+        flex-shrink: 0

@@ -7,8 +7,11 @@ import {
   Truck,
   Box,
   ArchiveRestore,
+  MapPin,
 } from "lucide-react";
 import { ThemeContext } from "../../../context/ThemeContext";
+import BottomSheetModal from "./BottomSheetModal";
+import OrderMap from "../../../components/Map/OrderMap";
 
 export const OrderCard = ({
   order,
@@ -16,10 +19,12 @@ export const OrderCard = ({
   onEdit,
   onDelete,
   onToggleArchive,
+  currentUser,
 }) => {
   const isCargo = order.orderType === "CargoOrder";
   const [showDetails, setShowDetails] = useState(false);
   const [mapLink, setMapLink] = useState(null);
+  const [showMap, setShowMap] = useState(false);
   const { from, to, otkuda, kuda } = order;
   const [showMenu, setShowMenu] = useState(false);
 
@@ -397,9 +402,44 @@ export const OrderCard = ({
               >
                 {order.isArchived ? "Восстановить" : "В архив"}
               </button>
+              {(currentUser?.role === "logistician" ||
+                currentUser?.role === "customer") && (
+                <button
+                  onClick={() => setShowMap(true)}
+                  style={{
+                    background: "#356dbb",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    color: "#fff",
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <MapPin size={18} />
+                  Отследить
+                </button>
+              )}
             </div>
           </div>
         )}
+        <BottomSheetModal visible={showMap} onClose={() => setShowMap(false)}>
+          <div style={{ padding: 20 }}>
+            <h3
+              style={{
+                marginBottom: 16,
+                textAlign: "center",
+                color: isDark ? "#fff" : "#000",
+              }}
+            >
+              Отслеживание груза
+            </h3>
+            <OrderMap orderId={order._id} />
+          </div>
+        </BottomSheetModal>
       </div>
     );
   }
@@ -714,9 +754,44 @@ export const OrderCard = ({
               >
                 {order.isArchived ? "Восстановить" : "В архив"}
               </button>
+              {(currentUser?.role === "logistician" ||
+                currentUser?.role === "customer") && (
+                <button
+                  onClick={() => setShowMap(true)}
+                  style={{
+                    background: "#356dbb",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    color: "#fff",
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <MapPin size={18} />
+                  Отследить
+                </button>
+              )}
             </div>
           </div>
         )}
+        <BottomSheetModal visible={showMap} onClose={() => setShowMap(false)}>
+          <div style={{ padding: 20 }}>
+            <h3
+              style={{
+                marginBottom: 16,
+                textAlign: "center",
+                color: isDark ? "#fff" : "#000",
+              }}
+            >
+              Отслеживание груза
+            </h3>
+            <OrderMap orderId={order._id} />
+          </div>
+        </BottomSheetModal>
       </div>
     );
   }

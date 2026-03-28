@@ -1,0 +1,137 @@
+.container
+  min-height: 100vh
+  padding: 20px
+  font-family: 'Inter', sans-serif
+  transition: background 0.3s ease, color 0.3s ease
+
+  &.light
+    background: #f5f5f5
+    color: #000
+
+  &.dark
+    background: #121212
+    color: #fff
+
+.header
+  display: flex
+  align-items: center
+  gap: 16px
+  margin-bottom: 24px
+
+  h1
+    font-size: 24px
+    font-weight: 700
+    margin: 0
+
+.backBtn
+  background: none
+  border: none
+  cursor: pointer
+  padding: 4px
+  display: flex
+  align-items: center
+  justify-content: center
+
+.content
+  display: flex
+  flex-direction: column
+  gap: 16px
+
+.dashboardData
+  display: grid
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))
+  gap: 16px
+
+.card
+  padding: 20px
+  border-radius: 16px
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05)
+  
+  .light &
+    background: #fff
+    border: 1px solid #eee
+  
+  .dark &
+    background: #1e1e1e
+    border: 1px solid #333
+
+  h3
+    font-size: 14px
+    color: #888
+    margin-bottom: 8px
+    font-weight: 500
+
+  .stat
+    font-size: 32px
+    font-weight: 700
+    margin: 0
+
+.infoBlock
+  grid-column: 1 / -1
+  padding: 20px
+  border-radius: 16px
+  overflow-x: auto
+  
+  .light &
+    background: #fff
+    border: 1px solid #eee
+  
+  .dark &
+    background: #1e1e1e
+    border: 1px solid #333
+  
+  pre
+    font-size: 12px
+
+.input
+  width: 100%
+  padding: 12px
+  border-radius: 8px
+  border: 1px solid #ddd
+  font-size: 14px
+  outline: none
+  transition: border-color 0.2s
+  
+  .dark &
+    background: #2a2a2a
+    border-color: #444
+    color: #fff
+    
+    &:focus
+      border-color: #4f46e5
+  
+  .light &
+    background: #fff
+    border-color: #ddd
+    color: #000
+    
+    &:focus
+      border-color: #3a5c9f
+
+.createButton
+  display: flex
+  align-items: center
+  gap: 8px
+  padding: 10px 20px
+  background: #3a5c9f
+  color: #fff
+  border: none
+  border-radius: 8px
+  font-weight: 600
+  cursor: pointer
+  transition: opacity 0.2s
+  
+  &:hover
+    opacity: 0.9
+  
+  &:disabled
+    opacity: 0.5
+    cursor: not-allowed
+
+  .dark &
+    background: #4f46e5
+
+.ordersList
+  display: flex
+  flex-direction: column
+  gap: 16px

@@ -25,6 +25,11 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [userId]);
 
+  // Эффект для применения темы к HTML тегу
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
   const toggleTheme = async () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);

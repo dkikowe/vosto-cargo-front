@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import s from "../Create.module.sass";
 import { ThemeContext } from "../../../context/ThemeContext";
+import axios from "../../../axios";
+import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 const steps = ["Информация о заявке", "Информация о грузе", "Детали заявки"];
 
@@ -20,6 +23,8 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
     payment: "",
   });
   const [allowSubmit, setAllowSubmit] = useState(false);
+  const [magicText, setMagicText] = useState("");
+  const [isMagicLoading, setIsMagicLoading] = useState(false);
   const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
@@ -43,6 +48,30 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleMagicParse = async () => {
+    if (!magicText.trim()) return;
+    setIsMagicLoading(true);
+    try {
+      const { data } = await axios.post("/ai/parse-order", { text: magicText });
+      
+      setForm((prev) => ({
+        ...prev,
+        cargoName: data.cargoType || prev.cargoName,
+        weight: data.weight ? data.weight.toString() : prev.weight,
+        volume: data.volume ? data.volume.toString() : prev.volume,
+        from: data.from || prev.from,
+        to: data.to || prev.to,
+      }));
+      
+      toast.success("Данные успешно заполнены!");
+    } catch (error) {
+      console.error("AI Parse Error:", error);
+      toast.error("Не удалось распознать, заполните вручную");
+    } finally {
+      setIsMagicLoading(false);
+    }
   };
 
   const next = () => setStep((s) => Math.min(s + 1, 2));
@@ -82,6 +111,45 @@ export default function AddCargoStepper({ onSubmit, onClose, initialValues }) {
         >
           {initialValues ? "Редактирование груза" : "Добавление груза"}
         </div>
+        
+        {!initialValues && step === 0 && (
+          <div style={{ margin: "16px 0", padding: "12px", background: theme === "dark" ? "#2a2a2a" : "#f0f9ff", borderRadius: "8px", border: "1px dashed #3a5c9f" }}>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+              <textarea
+                value={magicText}
+                onChange={(e) => setMagicText(e.target.value)}
+                placeholder="Напишите, что нужно перевезти (например: 3 паллеты кирпичей из Москвы в Тулу, хрупкое)"
+                className={s.input}
+                style={{ width: "100%", minHeight: "60px", resize: "vertical", fontSize: "13px" }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleMagicParse}
+              disabled={isMagicLoading || !magicText.trim()}
+              style={{
+                background: "linear-gradient(90deg, #6366f1 0%, #a855f7 100%)",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                padding: "8px 12px",
+                fontSize: "13px",
+                fontWeight: "500",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                width: "100%",
+                opacity: isMagicLoading ? 0.7 : 1
+              }}
+            >
+              <Sparkles size={16} />
+              {isMagicLoading ? "Анализируем..." : "Заполнить автоматически"}
+            </button>
+          </div>
+        )}
+
         <div
           style={{
             color: theme === "dark" ? "#ccc" : "#888",
